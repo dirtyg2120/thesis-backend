@@ -1,0 +1,7 @@
+project_name: Bot Detector
+version: '0.1.0'
+
+scraper_info:
+  consumer_key: 'aAXaay9KMIAd1Y39SGV7pB8jn'
+  consumer_secret: 'pQtpwq2juRKojvq7ngJAwV6scx6BNf7Z7SCJnVguTHp5Wh6VHP'
+  callback_uri: 'oob'
