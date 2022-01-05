@@ -9,7 +9,7 @@ router = APIRouter()
 @router.get("/check", response_model=UserInfoResponse, name="user:get-data")
 async def user_info_check(url_input: str):
     if not url_input:
-        raise HTTPException(status_code=404, detail=f"'url_input' argument invalid!")
+        raise HTTPException(status_code=404, detail="'url_input' argument invalid!")
     try:
         user = UserInfoScraper(url_input)
         user_info = user.get_profile_info()
