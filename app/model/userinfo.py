@@ -9,9 +9,9 @@ class UserInfoResponse(BaseModel):
     name: str
     screen_name: str
     created_at: datetime
-    is_real: bool
+    is_real: bool  # hardcode for now
     followers_count: int
     followings_count: int
-    banner: str
-    avatar: str
-    tweets: List[str]
+    banner: Optional[str]
+    avatar: Optional[str]
+    tweets: Optional[List[str]]

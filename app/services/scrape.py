@@ -47,7 +47,7 @@ class UserInfoScraper:
 
         profile_info = []
         for attribute in columns:
-            profile_info.append(getattr(user_api, attribute, None))
+            profile_info.append(getattr(user_api, attribute))
 
         profile_info_df = pd.DataFrame(
             np.array(profile_info).reshape(1, len(columns)), columns=columns
