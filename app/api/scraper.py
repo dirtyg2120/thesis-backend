@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from app.model.userinfo import UserInfoResponse
+from app.models.userinfo import UserInfoResponse
 from app.services.scrape import UserInfoScraper
 
 router = APIRouter()
