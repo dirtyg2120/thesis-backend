@@ -1,5 +1,5 @@
 import tweepy
-import time
+from tweepy import TweepyException
 import pandas as pd
 import numpy as np
 from core.config import CONSUMER_KEY, CONSUMER_SECRET, CALLBACK_URI
@@ -33,7 +33,11 @@ class UserInfoScraper:
         return followings
 
     def get_profile_info(self):
-        user_api = self.api.get_user(screen_name=self.user_name)
+        try:
+            user_api = self.api.get_user(screen_name=self.user_name)
+        except:
+            raise TweepyException(f"{self.user_name} - User not found!")
+
         columns = [
             "id",
             "name",

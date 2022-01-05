@@ -9,8 +9,8 @@ router = APIRouter()
 
 @router.get("/check", response_model=UserInfoResponse, name="user:get-data")
 async def user_info_check(url_input: str):
-    if not url_input:
-        raise HTTPException(status_code=404, detail=f"'url_input' argument invalid!")
+    if not url_input or url_input[:20] != "https://twitter.com/":
+        raise HTTPException(status_code=404, detail=f"'url_input' argument is invalid!")
     try:
         user = UserInfoScraper(url_input)
         user_info = user.get_profile_info()
