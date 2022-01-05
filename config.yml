@@ -1,7 +1,0 @@
-project_name: Bot Detector
-version: '0.1.0'
-
-scraper_info:
-  consumer_key: ''
-  consumer_secret: ''
-  callback_uri: 'oob'
