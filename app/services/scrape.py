@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 import tweepy
-from core.config import settings
+
+from app.core.config import settings
 
 
 class UserInfoScraper:

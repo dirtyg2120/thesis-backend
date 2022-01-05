@@ -9,7 +9,7 @@ pip install -r requirements.txt
 ```
 * Run FastAPI on localhost and check the result on [localhost:8080](localhost:8080)
 ```shell
-python app/main.py
+python -m app.main
 ```
 
 ### Method 2 (with Docker): 

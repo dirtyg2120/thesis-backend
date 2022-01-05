@@ -1,10 +1,8 @@
-from logging import debug
-from typing import Optional
-
 import uvicorn
-from api.router import router as api_router
-from core.config import settings
-from fastapi import FastAPI, applications
+from fastapi import FastAPI
+
+from .api import api_router
+from .core.config import settings
 
 
 def get_application() -> FastAPI:
@@ -18,4 +16,4 @@ def get_application() -> FastAPI:
 app = get_application()
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True, debug=False)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8080, reload=True, debug=False)
