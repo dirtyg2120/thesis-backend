@@ -6,9 +6,7 @@ COPY requirements.txt  ./
 
 RUN pip install --disable-pip-version-check --no-cache-dir -r requirements.txt
 
-COPY app app
-
-COPY .env ./
+COPY . .
 
 EXPOSE 8000
 
