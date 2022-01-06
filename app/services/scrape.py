@@ -8,8 +8,8 @@ from app.core.config import settings
 
 class UserInfoScraper:
     def __init__(self, url_input) -> None:
-        self.auth = tweepy.OAuthHandler(
-            settings.CONSUMER_KEY, settings.CONSUMER_SECRET, settings.CALLBACK_URI
+        self.auth = tweepy.AppAuthHandler(
+            settings.CONSUMER_KEY, settings.CONSUMER_SECRET
         )
         self.api = tweepy.API(self.auth, wait_on_rate_limit=True)
         self.user_url = url_input
