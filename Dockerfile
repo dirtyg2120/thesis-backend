@@ -1,16 +1,15 @@
 FROM python:3.8-slim-buster
 
-EXPOSE 8080
-
-RUN apt-get update
-
-# Install pip requirements
 WORKDIR /app
+
 COPY requirements.txt  ./
-RUN python -m pip install --upgrade pip 
-RUN python -m pip install -r requirements.txt
 
-COPY . ./
+RUN pip install --disable-pip-version-check --no-cache-dir -r requirements.txt
 
-ENTRYPOINT ["python", "app/main.py"]
+COPY app app
 
+COPY .env ./
+
+EXPOSE 8000
+
+ENTRYPOINT ["uvicorn", "--host=0.0.0.0", "app.main:app"]
