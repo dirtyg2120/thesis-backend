@@ -12,7 +12,7 @@
 pip install -r requirements.txt
 ```
 
-- Run FastAPI on localhost and check the result on [localhost:8080](localhost:8080)
+- Run FastAPI on localhost and check the result on [localhost:8000](localhost:8000)
 
 ```shell
 python -m app.main
@@ -26,16 +26,16 @@ python -m app.main
 sudo docker build -t thesis-backend .
 ```
 
-- Run docker container and check the result on [localhost:8080](localhost:8080)
+- Run docker container and check the result on [localhost:8000](localhost:8000)
 
 ```shell
-sudo docker run -p 8080:8080 thesis-backend
+sudo docker run -p 8000:8000 thesis-backend
 ```
 
 ## Usage
 
 Example user: https://twitter.com/TheRock
 
-- API call: http://localhost:8080/api/check?url_input=https://twitter.com/TheRock
+- API call: http://localhost:8000/api/check?url_input=https://twitter.com/TheRock
 
 - Execute on FastAPI docs
