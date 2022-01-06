@@ -17,9 +17,9 @@ class UserInfoScraper:
 
     def get_followers(self, followers_numbs):
         followers = []
-        for follower in tweepy.Cursor(self.api.followers_ids, id=self.user_name).items(
-            followers_numbs
-        ):
+        for follower in tweepy.Cursor(
+            self.api.get_follower_ids, screen_name=self.user_name
+        ).items(followers_numbs):
             followers.append(follower)
 
         # followers_df = pd.DataFrame(followers)
@@ -27,9 +27,9 @@ class UserInfoScraper:
 
     def get_followings(self, followings_numbs):
         followings = []
-        for following in tweepy.Cursor(self.api.friends_ids, id=self.user_name).items(
-            followings_numbs
-        ):
+        for following in tweepy.Cursor(
+            self.api.get_friend_ids, screen_name=self.user_name
+        ).items(followings_numbs):
             followings.append(following)
 
         # followings_df = pd.DataFrame(followings)
@@ -64,7 +64,7 @@ class UserInfoScraper:
     def get_tweets(self, tweets_numbs):
         tweets = []
         for status in tweepy.Cursor(
-            self.api.user_timeline, id=self.user_name, exclude_replies=True
+            self.api.user_timeline, screen_name=self.user_name, exclude_replies=True
         ).items(tweets_numbs):
             tweets.append(status.text)
         return tweets
