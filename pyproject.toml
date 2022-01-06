@@ -1,0 +1,9 @@
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+plugins = ["numpy.typing.mypy_plugin", "pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = "pandas"
+ignore_missing_imports = true

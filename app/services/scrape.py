@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import tweepy
+import tweepy  # type: ignore
 
 from app.core.config import settings
 

@@ -1,4 +1,4 @@
-import uvicorn
+import uvicorn  # type: ignore
 from fastapi import FastAPI
 
 from .api import api_router
