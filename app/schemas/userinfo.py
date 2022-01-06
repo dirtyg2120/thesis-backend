@@ -1,7 +1,7 @@
 from datetime import datetime
+from typing import List, Optional
+
 from pydantic import BaseModel
-from typing import Optional, List
-from datetime import datetime
 
 
 class UserInfoResponse(BaseModel):
@@ -9,9 +9,9 @@ class UserInfoResponse(BaseModel):
     name: str
     screen_name: str
     created_at: datetime
-    is_real: bool  # hardcode for now
+    is_real: bool
     followers_count: int
     followings_count: int
-    banner: Optional[str]
-    avatar: Optional[str]
-    tweets: Optional[List[str]]
+    banner: str
+    avatar: str
+    tweets: List[str]

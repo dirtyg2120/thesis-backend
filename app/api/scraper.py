@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
-from model.userinfo import UserInfoResponse
-from services.scrape import UserInfoScraper
-from core.config import TWEETS_NUMBER
+from app.core.config import settings
+from app.schemas.userinfo import UserInfoResponse
+from app.services.scrape import UserInfoScraper
 
 router = APIRouter()
 
@@ -10,11 +10,11 @@ router = APIRouter()
 @router.get("/check", response_model=UserInfoResponse, name="user:get-data")
 async def user_info_check(url_input: str):
     if not url_input or url_input[:20] != "https://twitter.com/":
-        raise HTTPException(status_code=404, detail=f"'url_input' argument is invalid!")
+        raise HTTPException(status_code=404, detail="'url_input' argument is invalid!")
     try:
         user = UserInfoScraper(url_input)
         user_info = user.get_profile_info()
-        tweets_list = user.get_tweets(TWEETS_NUMBER)
+        tweets_list = user.get_tweets(settings.TWEETS_NUMBER)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Exception: {e}")
 

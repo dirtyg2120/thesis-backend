@@ -1,8 +1,0 @@
-project_name: Bot Detector
-version: "0.1.0"
-
-scraper_info:
-  consumer_key: "Pjt62AKIYRuBTUl9LmTdV66c5"
-  consumer_secret: "2LoOLFRDNRoKdqN1CBcRKiljlyKztXO3NN9tEDqMczwKWslXa4"
-  callback_uri: "oob"
-  number_of_tweets: 10 # how much u want to extract

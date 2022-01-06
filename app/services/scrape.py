@@ -1,22 +1,25 @@
-import tweepy
-from tweepy import TweepyException
-import pandas as pd
 import numpy as np
-from core.config import CONSUMER_KEY, CONSUMER_SECRET, CALLBACK_URI
+import pandas as pd
+import tweepy  # type: ignore
+from tweepy import TweepyException
+
+from app.core.config import settings
 
 
 class UserInfoScraper:
     def __init__(self, url_input) -> None:
-        self.auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET, CALLBACK_URI)
+        self.auth = tweepy.OAuthHandler(
+            settings.CONSUMER_KEY, settings.CONSUMER_SECRET, settings.CALLBACK_URI
+        )
         self.api = tweepy.API(self.auth, wait_on_rate_limit=True)
         self.user_url = url_input
         self.user_name = self.user_url.split("/")[3]
 
     def get_followers(self, followers_numbs):
         followers = []
-        for follower in tweepy.Cursor(self.api.followers_ids, id=self.user_name).items(
-            followers_numbs
-        ):
+        for follower in tweepy.Cursor(
+            self.api.get_follower_ids, screen_name=self.user_name
+        ).items(followers_numbs):
             followers.append(follower)
 
         # followers_df = pd.DataFrame(followers)
@@ -24,9 +27,9 @@ class UserInfoScraper:
 
     def get_followings(self, followings_numbs):
         followings = []
-        for following in tweepy.Cursor(self.api.friends_ids, id=self.user_name).items(
-            followings_numbs
-        ):
+        for following in tweepy.Cursor(
+            self.api.get_friend_ids, screen_name=self.user_name
+        ).items(followings_numbs):
             followings.append(following)
 
         # followings_df = pd.DataFrame(followings)
@@ -61,7 +64,7 @@ class UserInfoScraper:
     def get_tweets(self, tweets_numbs):
         tweets = []
         for status in tweepy.Cursor(
-            self.api.user_timeline, id=self.user_name, exclude_replies=True
+            self.api.user_timeline, screen_name=self.user_name, exclude_replies=True
         ).items(tweets_numbs):
             tweets.append(status.text)
         return tweets
