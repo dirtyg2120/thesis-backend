@@ -7,11 +7,11 @@ from pydantic import BaseModel
 class UserInfoResponse(BaseModel):
     id: int
     name: str
-    screen_name: str
+    username: str
     created_at: datetime
     is_real: bool
     followers_count: int
     followings_count: int
-    banner: str
     avatar: str
+    banner: Optional[str]
     tweets: List[str]
