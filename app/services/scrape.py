@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import tweepy  # type: ignore
+from tweepy import TweepyException
 
 from app.core.config import settings
 
@@ -35,7 +36,11 @@ class UserInfoScraper:
         return followings
 
     def get_profile_info(self):
-        user_api = self.api.get_user(screen_name=self.user_name)
+        try:
+            user_api = self.api.get_user(screen_name=self.user_name)
+        except:
+            raise TweepyException(f"{self.user_name} - User not found!")
+
         columns = [
             "id",
             "name",
@@ -59,7 +64,7 @@ class UserInfoScraper:
     def get_tweets(self, tweets_numbs):
         tweets = []
         for status in tweepy.Cursor(
-            self.api.user_timeline, id=self.user_name, exclude_replies=False
+            self.api.user_timeline, id=self.user_name, exclude_replies=True
         ).items(tweets_numbs):
             tweets.append(status.text)
         return tweets
