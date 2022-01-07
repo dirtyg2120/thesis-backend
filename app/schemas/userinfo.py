@@ -3,6 +3,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from .tweetinfo import TweetInfoResponse
+
 
 class UserInfoResponse(BaseModel):
     id: int
@@ -13,5 +15,4 @@ class UserInfoResponse(BaseModel):
     followers_count: int
     followings_count: int
     avatar: str
-    banner: Optional[str]
-    tweets: List[str]
+    tweets: List[TweetInfoResponse]

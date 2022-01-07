@@ -14,7 +14,7 @@ async def user_info_check(url: str):
     try:
         user = UserInfoScraper(url)
         user_info = user.get_profile_info()
-        tweets_list = user.get_tweets(settings.TWEETS_NUMBER)
+        tweets_list = user.get_tweet_info(settings.TWEETS_NUMBER)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Exception: {e}")
 
@@ -26,7 +26,6 @@ async def user_info_check(url: str):
         is_real=False,
         followers_count=user_info["followers_count"].iloc[0],
         followings_count=user_info["friends_count"].iloc[0],
-        banner=user_info["profile_background_image_url"].iloc[0],
         avatar=user_info["profile_image_url"].iloc[0],
         tweets=tweets_list,
     )
