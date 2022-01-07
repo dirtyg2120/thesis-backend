@@ -4,6 +4,14 @@
 
 ## Installation
 
+Create [.env](./.env) file in the root folder. That contain multiple env variables need to be configured:
+
+```
+CONSUMER_KEY=<Twitter API key>
+CONSUMER_SECRET=<Twitter API secret key>
+TWEETS_NUMBER=10
+```
+
 ### Method 1:
 
 - Install all required packages
