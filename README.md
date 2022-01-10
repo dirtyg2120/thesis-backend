@@ -40,6 +40,14 @@ sudo docker build -t thesis-backend .
 sudo docker run -p 8000:8000 thesis-backend
 ```
 
+## Testing
+
+Run the tests with:
+
+```shell
+pytest
+```
+
 ## Usage
 
 Example user: https://twitter.com/TheRock
