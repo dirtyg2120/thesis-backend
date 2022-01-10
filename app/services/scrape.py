@@ -6,7 +6,7 @@ from tweepy import TweepyException
 from functools import lru_cache
 
 from app.core.config import settings
-from app.schemas.tweetinfo import TweetInfoResponse
+from app.schemas.tweet_info import TweetInfoResponse
 
 
 @lru_cache(maxsize=128)
@@ -51,11 +51,12 @@ class UserInfoScraper:
             "followers_count",
             "friends_count",
             "profile_image_url",
+            "profile_banner_url",
         ]
 
         profile_info = []
         for attribute in profile_attribute:
-            profile_info.append(getattr(self.user_api, attribute))
+            profile_info.append(getattr(self.user_api, attribute, None))
 
         profile_info_df = pd.DataFrame(
             np.array(profile_info).reshape(1, len(profile_attribute)),
