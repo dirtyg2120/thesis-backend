@@ -3,11 +3,13 @@ import numpy as np
 import pandas as pd
 import tweepy  # type: ignore
 from tweepy import TweepyException
+from functools import lru_cache
 
 from app.core.config import settings
 from app.schemas.tweetinfo import TweetInfoResponse
 
 
+@lru_cache(maxsize=128)
 class UserInfoScraper:
     def __init__(self, url_input) -> None:
         self.auth = tweepy.AppAuthHandler(
@@ -41,7 +43,6 @@ class UserInfoScraper:
         return followings
 
     def get_profile_info(self):
-
         profile_attribute = [
             "id",
             "name",
