@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app.core.config import settings
-from app.schemas.userinfo import UserInfoResponse
+from app.schemas.user_info import UserInfoResponse
 from app.services.scrape import UserInfoScraper
 
 router = APIRouter()
@@ -28,6 +28,7 @@ async def user_info_check(url: str):
         followers_count=user_info["followers_count"].iloc[0],
         followings_count=user_info["friends_count"].iloc[0],
         avatar=user_info["profile_image_url"].iloc[0],
+        banner=user_info["profile_banner_url"].iloc[0],
         tweets=tweets_list,
     )
     return response
