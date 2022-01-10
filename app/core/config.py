@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     CONSUMER_KEY: str
     CONSUMER_SECRET: str
     CALLBACK_URI: str = "oob"
+    FRONTEND_URL: str
 
     class Config:
         env_file = ".env"
