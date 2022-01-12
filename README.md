@@ -10,6 +10,7 @@ Create [.env](./.env) file in the root folder. That contain multiple env variabl
 CONSUMER_KEY=<Twitter API key>
 CONSUMER_SECRET=<Twitter API secret key>
 TWEETS_NUMBER=10
+FRONTEND_URL=http://localhost:3000
 ```
 
 ### Method 1:

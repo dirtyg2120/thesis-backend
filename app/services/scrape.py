@@ -67,10 +67,13 @@ class UserInfoScraper:
     def get_tweet_info(self, tweets_numbs):
         tweets = []
         for status in tweepy.Cursor(
-            self.api.user_timeline, screen_name=self.user_name, exclude_replies=True
+            self.api.user_timeline,
+            screen_name=self.user_name,
+            exclude_replies=True,
+            tweet_mode="extended",
         ).items(tweets_numbs):
             tweet_object = TweetInfoResponse(
-                id=status.id, text=status.text, created_at=status.created_at
+                id=status.id, text=status.full_text, created_at=status.created_at
             )
             tweets.append(tweet_object)
         return tweets
