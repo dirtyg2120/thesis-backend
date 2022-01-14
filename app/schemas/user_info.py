@@ -7,7 +7,7 @@ from .tweet_info import TweetInfoResponse
 
 
 class UserInfoResponse(BaseModel):
-    id: int
+    id: str
     name: str
     username: str
     created_at: datetime

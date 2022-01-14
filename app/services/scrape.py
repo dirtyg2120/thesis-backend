@@ -44,7 +44,7 @@ class UserInfoScraper:
 
     def get_profile_info(self):
         profile_attribute = [
-            "id",
+            "id_str",
             "name",
             "screen_name",
             "created_at",
@@ -73,7 +73,8 @@ class UserInfoScraper:
             tweet_mode="extended",
         ).items(tweets_numbs):
             tweet_object = TweetInfoResponse(
-                id=status.id, text=status.full_text, created_at=status.created_at
+                id=status.id_str, text=status.full_text, created_at=status.created_at
             )
+            print(status.id_str)
             tweets.append(tweet_object)
         return tweets

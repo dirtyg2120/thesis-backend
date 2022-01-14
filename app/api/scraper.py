@@ -20,7 +20,7 @@ async def user_info_check(url: str):
         raise HTTPException(status_code=500, detail=f"Exception: {e}")
 
     response = UserInfoResponse(
-        id=user_info["id"].iloc[0],
+        id=user_info["id_str"].iloc[0],
         name=user_info["name"].iloc[0],
         username=user_info["screen_name"].iloc[0],
         created_at=user_info["created_at"].iloc[0],

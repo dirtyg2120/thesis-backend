@@ -4,6 +4,6 @@ from pydantic import BaseModel
 
 
 class TweetInfoResponse(BaseModel):
-    id: int
+    id: str
     text: str
     created_at: datetime
