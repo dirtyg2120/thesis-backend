@@ -15,7 +15,6 @@ async def user_info_check(url: str):
         user = UserInfoScraper(url)
         user_info = user.get_profile_info()
         tweets_list = user.get_tweet_info(settings.TWEETS_NUMBER)
-        print(UserInfoScraper.cache_info())
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Exception: {e}")
 

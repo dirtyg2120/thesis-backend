@@ -75,6 +75,5 @@ class UserInfoScraper:
             tweet_object = TweetInfoResponse(
                 id=status.id_str, text=status.full_text, created_at=status.created_at
             )
-            print(status.id_str)
             tweets.append(tweet_object)
         return tweets
