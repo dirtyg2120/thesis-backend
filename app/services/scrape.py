@@ -77,3 +77,18 @@ class UserInfoScraper:
             )
             tweets.append(tweet_object)
         return tweets
+
+    def get_frequency(self):
+        tweets = []
+        day_of_week = [0] * 7
+        hour_of_day = [0] * 24
+        for status in tweepy.Cursor(
+            self.api.user_timeline, screen_name=self.user_name, exclude_replies=True
+        ).items(100):
+            tweets.append(status.created_at)
+
+        for tweet in tweets:
+            day_of_week[tweet.weekday()] += 1
+            hour_of_day[tweet.hour] += 1
+
+        return day_of_week, hour_of_day

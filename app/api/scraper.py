@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app.core.config import settings
+from app.schemas.user_detail import UserDetailResponse
 from app.schemas.user_info import UserInfoResponse
 from app.services.scrape import UserInfoScraper
 
@@ -31,3 +32,16 @@ async def user_info_check(url: str):
         tweets=tweets_list,
     )
     return response
+
+
+@router.get("/detail", response_model=UserDetailResponse, name="user:get-detail")
+async def user_detail_check(url: str):
+    if not url or url[:20] != "https://twitter.com/":
+        raise HTTPException(status_code=404, detail="'url_input' argument is invalid!")
+    try:
+        user = UserInfoScraper(url)
+        day_of_week, hour_of_day = user.get_frequency()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Exception: {e}")
+
+    return UserDetailResponse(day_of_week=day_of_week, hour_of_day=hour_of_day)
