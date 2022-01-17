@@ -4,13 +4,9 @@ import pandas as pd
 import tweepy  # type: ignore
 from tweepy import TweepyException
 from functools import lru_cache
-import pytz
 
 from app.core.config import settings
 from app.schemas.tweet_info import TweetInfoResponse
-
-UTC = pytz.utc
-HCM = pytz.timezone("Asia/Ho_Chi_Minh")
 
 
 @lru_cache(maxsize=128)
@@ -77,9 +73,7 @@ class UserInfoScraper:
             tweet_mode="extended",
         ).items(tweets_numbs):
             tweet_object = TweetInfoResponse(
-                id=status.id_str,
-                text=status.full_text,
-                created_at=status.created_at.replace(tzinfo=UTC).astimezone(tz=HCM),
+                id=status.id_str, text=status.full_text, created_at=status.created_at
             )
             tweets.append(tweet_object)
         return tweets

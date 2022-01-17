@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException
-import pytz
 
 from app.core.config import settings
 from app.schemas.user_detail import UserDetailResponse
@@ -7,8 +6,6 @@ from app.schemas.user_info import UserInfoResponse
 from app.services.scrape import UserInfoScraper
 
 router = APIRouter()
-UTC = pytz.utc
-HCM = pytz.timezone("Asia/Ho_Chi_Minh")
 
 
 @router.get("/check", response_model=UserInfoResponse, name="user:get-data")
@@ -26,10 +23,7 @@ async def user_info_check(url: str):
         id=user_info["id_str"].iloc[0],
         name=user_info["name"].iloc[0],
         username=user_info["screen_name"].iloc[0],
-        created_at=user_info["created_at"]
-        .iloc[0]
-        .replace(tzinfo=UTC)
-        .astimezone(tz=HCM),
+        created_at=user_info["created_at"].iloc[0],
         is_real=False,
         followers_count=user_info["followers_count"].iloc[0],
         followings_count=user_info["friends_count"].iloc[0],
