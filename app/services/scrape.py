@@ -1,9 +1,9 @@
-from os import wait
+from functools import lru_cache
+
 import numpy as np
 import pandas as pd
 import tweepy  # type: ignore
 from tweepy import TweepyException
-from functools import lru_cache
 
 from app.core.config import settings
 from app.schemas.tweet_info import TweetInfoResponse
@@ -79,16 +79,24 @@ class UserInfoScraper:
         return tweets
 
     def get_frequency(self):
-        tweets = []
-        day_of_week = [0] * 7
-        hour_of_day = [0] * 24
-        for status in tweepy.Cursor(
+        timezone = "Asia/Ho_Chi_Minh"
+        now = pd.Timestamp.now(tz=timezone)
+        day_of_week = pd.Series(
+            index=pd.period_range(end=now, periods=7, freq="D"), dtype=int
+        )
+        start_day_of_week = day_of_week.index[0].start_time.tz_localize(timezone)
+        hour_of_day = pd.Series(
+            index=pd.period_range(end=now, periods=24, freq="H"), dtype=int
+        )
+        start_hour_of_day = hour_of_day.index[0].start_time.tz_localize(timezone)
+        for tweet in tweepy.Cursor(
             self.api.user_timeline, screen_name=self.user_name, exclude_replies=True
-        ).items(100):
-            tweets.append(status.created_at)
+        ).items():
+            tweet_timestamp = pd.Timestamp(tweet.created_at).tz_convert(timezone)
+            if tweet_timestamp < start_day_of_week:
+                break
+            day_of_week[tweet_timestamp] += 1
+            if tweet_timestamp >= start_hour_of_day:
+                hour_of_day[tweet_timestamp] += 1
 
-        for tweet in tweets:
-            day_of_week[tweet.weekday()] += 1
-            hour_of_day[tweet.hour] += 1
-
-        return day_of_week, hour_of_day
+        return list(day_of_week), list(hour_of_day)
