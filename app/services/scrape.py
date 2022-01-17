@@ -99,4 +99,12 @@ class UserInfoScraper:
             if tweet_timestamp >= start_hour_of_day:
                 hour_of_day[tweet_timestamp] += 1
 
-        return list(day_of_week), list(hour_of_day)
+        dow_resp = {
+            "time": day_of_week.index.strftime("%a").tolist(),
+            "value": day_of_week.tolist(),
+        }
+        hod_resp = {
+            "time": hour_of_day.index.strftime("%H:%M").tolist(),
+            "value": hour_of_day.tolist(),
+        }
+        return dow_resp, hod_resp
