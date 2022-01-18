@@ -1,6 +1,5 @@
 from functools import lru_cache
 
-import numpy as np
 import pandas as pd
 import tweepy  # type: ignore
 from tweepy import TweepyException
@@ -41,26 +40,7 @@ class UserInfoScraper:
         return followings
 
     def get_profile_info(self):
-        profile_attribute = [
-            "id_str",
-            "name",
-            "screen_name",
-            "created_at",
-            "followers_count",
-            "friends_count",
-            "profile_image_url",
-            "profile_banner_url",
-        ]
-
-        profile_info = []
-        for attribute in profile_attribute:
-            profile_info.append(getattr(self.user_api, attribute, None))
-
-        profile_info_df = pd.DataFrame(
-            np.array(profile_info).reshape(1, len(profile_attribute)),
-            columns=profile_attribute,
-        )
-        return profile_info_df
+        return self.user_api
 
     def get_tweet_info(self, tweets_numbs):
         tweets = []

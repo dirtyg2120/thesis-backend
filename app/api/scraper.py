@@ -21,15 +21,15 @@ async def user_info_check(url: str):
         raise HTTPException(status_code=500, detail=f"Exception: {e}")
 
     response = UserInfoResponse(
-        id=user_info["id_str"].iloc[0],
-        name=user_info["name"].iloc[0],
-        username=user_info["screen_name"].iloc[0],
-        created_at=user_info["created_at"].iloc[0],
+        id=user_info.id_str,
+        name=user_info.name,
+        username=user_info.screen_name,
+        created_at=user_info.created_at,
         is_real=False,
-        followers_count=user_info["followers_count"].iloc[0],
-        followings_count=user_info["friends_count"].iloc[0],
-        avatar=user_info["profile_image_url"].iloc[0],
-        banner=user_info["profile_banner_url"].iloc[0],
+        followers_count=user_info.followers_count,
+        followings_count=user_info.friends_count,
+        avatar=user_info.profile_image_url,
+        banner=user_info.profile_banner_url,
         tweets=tweets_list,
     )
     return response
