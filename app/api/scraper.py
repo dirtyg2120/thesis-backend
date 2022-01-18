@@ -13,7 +13,8 @@ async def user_info_check(url: str):
     if not url or url[:20] != "https://twitter.com/":
         raise HTTPException(status_code=404, detail="'url_input' argument is invalid!")
     try:
-        user = UserInfoScraper(url)
+        username = url.split("/")[3]
+        user = UserInfoScraper(username)
         user_info = user.get_profile_info()
         tweets_list = user.get_tweet_info(settings.TWEETS_NUMBER)
     except Exception as e:

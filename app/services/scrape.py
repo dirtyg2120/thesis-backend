@@ -11,23 +11,21 @@ from app.schemas.tweet_info import TweetInfoResponse
 
 @lru_cache(maxsize=128)
 class UserInfoScraper:
-    def __init__(self, url_input) -> None:
+    def __init__(self, username) -> None:
         self.auth = tweepy.AppAuthHandler(
             settings.CONSUMER_KEY, settings.CONSUMER_SECRET
         )
         self.api = tweepy.API(self.auth, wait_on_rate_limit=True)
-        # self.client = tweepy.Client(settings.BEARER_TOKEN, wait_on_rate_limit=True)
-        self.user_url = url_input
-        self.user_name = self.user_url.split("/")[3]
+        self.username = username
         try:
-            self.user_api = self.api.get_user(screen_name=self.user_name)
+            self.user_api = self.api.get_user(screen_name=self.username)
         except:
-            raise TweepyException(f"{self.user_name} - User not found!")
+            raise TweepyException(f"{self.username} - User not found!")
 
     def get_followers(self, followers_numbs):
         followers = []
         for follower in tweepy.Cursor(
-            self.api.get_follower_ids, screen_name=self.user_name
+            self.api.get_follower_ids, screen_name=self.username
         ).items(followers_numbs):
             followers.append(follower)
 
@@ -36,7 +34,7 @@ class UserInfoScraper:
     def get_followings(self, followings_numbs):
         followings = []
         for following in tweepy.Cursor(
-            self.api.get_friend_ids, screen_name=self.user_name
+            self.api.get_friend_ids, screen_name=self.username
         ).items(followings_numbs):
             followings.append(following)
 
@@ -68,7 +66,7 @@ class UserInfoScraper:
         tweets = []
         for status in tweepy.Cursor(
             self.api.user_timeline,
-            screen_name=self.user_name,
+            screen_name=self.username,
             exclude_replies=True,
             tweet_mode="extended",
         ).items(tweets_numbs):
@@ -90,7 +88,7 @@ class UserInfoScraper:
         )
         start_hour_of_day = hour_of_day.index[0].start_time.tz_localize(timezone)
         for tweet in tweepy.Cursor(
-            self.api.user_timeline, screen_name=self.user_name, exclude_replies=True
+            self.api.user_timeline, screen_name=self.username, exclude_replies=True
         ).items():
             tweet_timestamp = pd.Timestamp(tweet.created_at).tz_convert(timezone)
             if tweet_timestamp < start_day_of_week:
