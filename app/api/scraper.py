@@ -1,48 +1,43 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from app import schemas
 from app.core.config import settings
-from app.schemas.user_detail import UserDetailResponse
-from app.schemas.user_info import UserInfoResponse
-from app.services.scrape import UserInfoScraper
+from app.services.scrape import TwitterScraper
 
 router = APIRouter()
 
 
-@router.get("/check", response_model=UserInfoResponse, name="user:get-data")
-async def user_info_check(url: str):
+@router.get("/check", response_model=schemas.CheckResponse, name="user:get-data")
+async def user_info_check(url: str, scraper: TwitterScraper = Depends()):
     if not url or url[:20] != "https://twitter.com/":
-        raise HTTPException(status_code=404, detail="'url_input' argument is invalid!")
-    try:
-        username = url.split("/")[3]
-        user = UserInfoScraper(username)
-        user_info = user.get_profile_info()
-        tweets_list = user.get_tweet_info(settings.TWEETS_NUMBER)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Exception: {e}")
+        raise HTTPException(status_code=400, detail="'url_input' argument is invalid!")
 
-    response = UserInfoResponse(
-        id=user_info.id_str,
-        name=user_info.name,
-        username=user_info.screen_name,
-        created_at=user_info.created_at,
-        is_real=False,
-        followers_count=user_info.followers_count,
-        followings_count=user_info.friends_count,
-        avatar=user_info.profile_image_url,
-        banner=user_info.profile_banner_url,
-        tweets=tweets_list,
-    )
+    username = url.split("/")[3]
+    user_info = scraper.get_user_by_username(username)
+    if user_info is None:
+        raise HTTPException(status_code=404, detail=f"User @{username} does not exist")
+
+    response = schemas.CheckResponse(is_real=False, user_info=user_info)
     return response
 
 
-@router.get("/detail", response_model=UserDetailResponse, name="user:get-detail")
-async def user_detail_check(url: str):
+@router.get("/detail", response_model=schemas.DetailResponse, name="user:get-detail")
+async def user_detail_check(url: str, scraper: TwitterScraper = Depends()):
     if not url or url[:20] != "https://twitter.com/":
-        raise HTTPException(status_code=404, detail="'url_input' argument is invalid!")
-    try:
-        user = UserInfoScraper(url)
-        day_of_week, hour_of_day = user.get_frequency()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Exception: {e}")
+        raise HTTPException(status_code=400, detail="'url_input' argument is invalid!")
 
-    return UserDetailResponse(day_of_week=day_of_week, hour_of_day=hour_of_day)
+    username = url.split("/")[3]
+    user_info = scraper.get_user_by_username(username)
+    if user_info is None:
+        raise HTTPException(status_code=404, detail=f"User @{username} does not exist")
+
+    recent_tweets = scraper.get_tweet_info(user_info.id, settings.TWEETS_NUMBER)
+    day_of_week, hour_of_day = scraper.get_frequency(user_info.id)
+    tweet_info = schemas.TweetInfo(
+        day_of_week=day_of_week,
+        hour_of_day=hour_of_day,
+        recent_tweets=recent_tweets,
+    )
+
+    response = schemas.DetailResponse(user_info=user_info, tweet_info=tweet_info)
+    return response
