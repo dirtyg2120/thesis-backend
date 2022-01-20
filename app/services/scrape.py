@@ -44,7 +44,7 @@ class TwitterScraper:
                 followers_count=user.followers_count,
                 followings_count=user.friends_count,
                 avatar=user.profile_image_url,
-                banner=user.profile_banner_url,
+                banner=getattr(user, "profile_banner_url", None),
             )
 
     def get_followers(self, followers_numbs):
