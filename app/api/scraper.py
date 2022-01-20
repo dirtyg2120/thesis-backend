@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 from app.core.config import settings
 from app.schemas.user_detail import UserDetailResponse
 from app.schemas.user_info import UserInfoResponse
-from app.services.scrape import UserInfoScraper
+from app.services.scrape import TwitterScraper
 
 router = APIRouter()
 
@@ -11,14 +11,14 @@ router = APIRouter()
 @router.get("/check", response_model=UserInfoResponse, name="user:get-data")
 async def user_info_check(url: str):
     if not url or url[:20] != "https://twitter.com/":
-        raise HTTPException(status_code=404, detail="'url_input' argument is invalid!")
-    try:
-        username = url.split("/")[3]
-        user = UserInfoScraper(username)
-        user_info = user.get_profile_info()
-        tweets_list = user.get_tweet_info(settings.TWEETS_NUMBER)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Exception: {e}")
+        raise HTTPException(status_code=400, detail="'url_input' argument is invalid!")
+
+    username = url.split("/")[3]
+    scraper = TwitterScraper()
+    user_info = scraper.get_user_by_username(username)
+    if user_info is None:
+        raise HTTPException(status_code=404, detail=f"User @{username} does not exist")
+    tweets_list = scraper.get_tweet_info(user_info.id_str, settings.TWEETS_NUMBER)
 
     response = UserInfoResponse(
         id=user_info.id_str,
@@ -38,11 +38,13 @@ async def user_info_check(url: str):
 @router.get("/detail", response_model=UserDetailResponse, name="user:get-detail")
 async def user_detail_check(url: str):
     if not url or url[:20] != "https://twitter.com/":
-        raise HTTPException(status_code=404, detail="'url_input' argument is invalid!")
-    try:
-        user = UserInfoScraper(url)
-        day_of_week, hour_of_day = user.get_frequency()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Exception: {e}")
+        raise HTTPException(status_code=400, detail="'url_input' argument is invalid!")
+
+    username = url.split("/")[3]
+    scraper = TwitterScraper()
+    user_info = scraper.get_user_by_username(username)
+    if user_info is None:
+        raise HTTPException(status_code=404, detail=f"User @{username} does not exist")
+    day_of_week, hour_of_day = scraper.get_frequency(user_info.id_str)
 
     return UserDetailResponse(day_of_week=day_of_week, hour_of_day=hour_of_day)

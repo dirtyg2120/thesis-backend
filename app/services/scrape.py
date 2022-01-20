@@ -1,25 +1,26 @@
-from functools import lru_cache
+from typing import List, Optional, Tuple
 
 import pandas as pd
 import tweepy  # type: ignore
-from tweepy import TweepyException
 
 from app.core.config import settings
 from app.schemas.tweet_info import TweetInfoResponse
+from app.schemas.user_detail import TimeSeries
 
 
-@lru_cache(maxsize=128)
-class UserInfoScraper:
-    def __init__(self, username) -> None:
-        self.auth = tweepy.AppAuthHandler(
-            settings.CONSUMER_KEY, settings.CONSUMER_SECRET
+class TwitterScraper:
+    def __init__(self) -> None:
+        auth = tweepy.AppAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
+        self.api = tweepy.API(auth, wait_on_rate_limit=True)
+        self.api_v2 = tweepy.Client(
+            bearer_token=auth._bearer_token, wait_on_rate_limit=True
         )
-        self.api = tweepy.API(self.auth, wait_on_rate_limit=True)
-        self.username = username
+
+    def get_user_by_username(self, username) -> Optional[tweepy.User]:
         try:
-            self.user_api = self.api.get_user(screen_name=self.username)
-        except:
-            raise TweepyException(f"{self.username} - User not found!")
+            return self.api.get_user(screen_name=username)
+        except tweepy.NotFound:
+            return None
 
     def get_followers(self, followers_numbs):
         followers = []
@@ -39,24 +40,21 @@ class UserInfoScraper:
 
         return followings
 
-    def get_profile_info(self):
-        return self.user_api
+    def get_tweet_info(self, user_id: str, tweets_num: int) -> List[TweetInfoResponse]:
+        tweet_fields = ["created_at"]
+        return list(
+            tweepy.Paginator(
+                self.api_v2.get_users_tweets,
+                id=user_id,
+                tweet_fields=tweet_fields,
+                exclude=["replies", "retweets"],
+                max_results=min(tweets_num, 100),
+            ).flatten(limit=tweets_num)
+        )
 
-    def get_tweet_info(self, tweets_numbs):
-        tweets = []
-        for status in tweepy.Cursor(
-            self.api.user_timeline,
-            screen_name=self.username,
-            exclude_replies=True,
-            tweet_mode="extended",
-        ).items(tweets_numbs):
-            tweet_object = TweetInfoResponse(
-                id=status.id_str, text=status.full_text, created_at=status.created_at
-            )
-            tweets.append(tweet_object)
-        return tweets
+    def get_frequency(self, user_id: str) -> Tuple[TimeSeries, TimeSeries]:
+        tweet_fields = ["created_at"]
 
-    def get_frequency(self):
         timezone = "Asia/Ho_Chi_Minh"
         now = pd.Timestamp.now(tz=timezone)
         day_of_week = pd.Series(
@@ -67,22 +65,31 @@ class UserInfoScraper:
             index=pd.period_range(end=now, periods=24, freq="H"), dtype=int
         )
         start_hour_of_day = hour_of_day.index[0].start_time.tz_localize(timezone)
-        for tweet in tweepy.Cursor(
-            self.api.user_timeline, screen_name=self.username, exclude_replies=True
-        ).items():
+
+        for tweet in tweepy.Paginator(
+            self.api_v2.get_users_tweets,
+            id=user_id,
+            tweet_fields=tweet_fields,
+            exclude=["replies", "retweets"],
+            start_time=start_day_of_week.astimezone("UTC").strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+            max_results=100,
+        ).flatten():
             tweet_timestamp = pd.Timestamp(tweet.created_at).tz_convert(timezone)
-            if tweet_timestamp < start_day_of_week:
-                break
+
             day_of_week[tweet_timestamp] += 1
+
             if tweet_timestamp >= start_hour_of_day:
+                # Only count tweets in the last 24 hours
                 hour_of_day[tweet_timestamp] += 1
 
-        dow_resp = {
-            "time": day_of_week.index.strftime("%a").tolist(),
-            "value": day_of_week.tolist(),
-        }
-        hod_resp = {
-            "time": hour_of_day.index.strftime("%H:%M").tolist(),
-            "value": hour_of_day.tolist(),
-        }
+        dow_resp = TimeSeries(
+            time=day_of_week.index.strftime("%a").tolist(),
+            value=day_of_week.tolist(),
+        )
+        hod_resp = TimeSeries(
+            time=hour_of_day.index.strftime("%H:%M").tolist(),
+            value=hour_of_day.tolist(),
+        )
         return dow_resp, hod_resp
