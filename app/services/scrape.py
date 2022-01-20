@@ -3,9 +3,9 @@ from typing import List, Optional, Tuple
 import pandas as pd
 import tweepy  # type: ignore
 
+from app import schemas
 from app.core.config import settings
-from app.schemas.tweet_info import TweetInfoResponse
-from app.schemas.user_detail import TimeSeries
+from app.schemas.tweet import TimeSeries
 
 
 class TwitterScraper:
@@ -18,9 +18,20 @@ class TwitterScraper:
 
     def get_user_by_username(self, username) -> Optional[tweepy.User]:
         try:
-            return self.api.get_user(screen_name=username)
+            user = self.api.get_user(screen_name=username)
         except tweepy.NotFound:
             return None
+        else:
+            return schemas.User(
+                id=user.id_str,
+                name=user.name,
+                username=user.screen_name,
+                created_at=user.created_at,
+                followers_count=user.followers_count,
+                followings_count=user.friends_count,
+                avatar=user.profile_image_url,
+                banner=user.profile_banner_url,
+            )
 
     def get_followers(self, followers_numbs):
         followers = []
@@ -40,7 +51,7 @@ class TwitterScraper:
 
         return followings
 
-    def get_tweet_info(self, user_id: str, tweets_num: int) -> List[TweetInfoResponse]:
+    def get_tweet_info(self, user_id: str, tweets_num: int) -> List[tweepy.Tweet]:
         tweet_fields = ["created_at"]
         return list(
             tweepy.Paginator(
