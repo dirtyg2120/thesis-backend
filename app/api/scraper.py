@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.config import settings
 from app.schemas.user_detail import UserDetailResponse
@@ -9,12 +9,11 @@ router = APIRouter()
 
 
 @router.get("/check", response_model=UserInfoResponse, name="user:get-data")
-async def user_info_check(url: str):
+async def user_info_check(url: str, scraper: TwitterScraper = Depends()):
     if not url or url[:20] != "https://twitter.com/":
         raise HTTPException(status_code=400, detail="'url_input' argument is invalid!")
 
     username = url.split("/")[3]
-    scraper = TwitterScraper()
     user_info = scraper.get_user_by_username(username)
     if user_info is None:
         raise HTTPException(status_code=404, detail=f"User @{username} does not exist")
@@ -36,12 +35,11 @@ async def user_info_check(url: str):
 
 
 @router.get("/detail", response_model=UserDetailResponse, name="user:get-detail")
-async def user_detail_check(url: str):
+async def user_detail_check(url: str, scraper: TwitterScraper = Depends()):
     if not url or url[:20] != "https://twitter.com/":
         raise HTTPException(status_code=400, detail="'url_input' argument is invalid!")
 
     username = url.split("/")[3]
-    scraper = TwitterScraper()
     user_info = scraper.get_user_by_username(username)
     if user_info is None:
         raise HTTPException(status_code=404, detail=f"User @{username} does not exist")
