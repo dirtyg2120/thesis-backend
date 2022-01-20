@@ -1,21 +1,35 @@
+from operator import attrgetter
 from typing import List, Optional, Tuple
 
 import pandas as pd
 import tweepy  # type: ignore
+from cachetools import TTLCache, cachedmethod
+from cachetools.keys import hashkey
 
 from app import schemas
 from app.core.config import settings
 from app.schemas.tweet import TimeSeries
 
 
+def _make_key(method_name: str):
+    def method_key(_, *args, **kwargs):
+        return hashkey(method_name, *args, **kwargs)
+
+    return method_key
+
+
 class TwitterScraper:
+    _cache_func = attrgetter("_cache")
+
     def __init__(self) -> None:
         auth = tweepy.AppAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
         self.api = tweepy.API(auth, wait_on_rate_limit=True)
         self.api_v2 = tweepy.Client(
             bearer_token=auth._bearer_token, wait_on_rate_limit=True
         )
+        self._cache: TTLCache = TTLCache(maxsize=1024, ttl=settings.TWEEPY_CACHE_TTL)
 
+    @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_username"))
     def get_user_by_username(self, username) -> Optional[tweepy.User]:
         try:
             user = self.api.get_user(screen_name=username)
@@ -51,6 +65,7 @@ class TwitterScraper:
 
         return followings
 
+    @cachedmethod(cache=_cache_func, key=_make_key("get_tweet_info"))
     def get_tweet_info(self, user_id: str, tweets_num: int) -> List[tweepy.Tweet]:
         tweet_fields = ["created_at"]
         return list(
@@ -63,6 +78,7 @@ class TwitterScraper:
             ).flatten(limit=tweets_num)
         )
 
+    @cachedmethod(cache=_cache_func, key=_make_key("get_frequency"))
     def get_frequency(self, user_id: str) -> Tuple[TimeSeries, TimeSeries]:
         tweet_fields = ["created_at"]
 
