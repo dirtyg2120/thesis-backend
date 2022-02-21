@@ -4,14 +4,15 @@
 
 ## Installation
 
-Create [.env](./.env) file in the root folder. That contain multiple env variables need to be configured:
+1. **Required `Python Version` is `3.9`**
+2. Create [.env](./.env) file in the root folder. That contain multiple env variables need to be configured:
 
-```
-CONSUMER_KEY=<Twitter API key>
-CONSUMER_SECRET=<Twitter API secret key>
-TWEETS_NUMBER=10
-FRONTEND_URL=http://localhost:3000
-```
+    ```
+    CONSUMER_KEY=<Twitter API key>
+    CONSUMER_SECRET=<Twitter API secret key>
+    TWEETS_NUMBER=10
+    FRONTEND_URL=http://localhost:3000
+    ```
 
 ### Method 1:
 
@@ -53,6 +54,8 @@ pytest
 
 Example user: https://twitter.com/TheRock
 
-- API call: http://localhost:8000/api/check?url_input=https://twitter.com/TheRock
+- API call: http://localhost:8000/api/check?url=https://twitter.com/TheRock
+
+- Use doc for more information http://localhost:8000/docs
 
 - Execute on FastAPI docs
