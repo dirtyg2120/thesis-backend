@@ -52,9 +52,9 @@ pytest
 
 ## Usage
 
-Example user: https://twitter.com/TheRock
+Example user: https://twitter.com/JohnCena
 
-- API call: http://localhost:8000/api/check?url=https://twitter.com/TheRock
+- API call: http://localhost:8000/api/check?url=https://twitter.com/JohnCena
 
 - Use doc for more information http://localhost:8000/docs
 
