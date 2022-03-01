@@ -1,5 +1,6 @@
 from operator import attrgetter
 from typing import List, Optional, Tuple
+from fastapi import HTTPException
 
 import pandas as pd
 import tweepy  # type: ignore
@@ -37,12 +38,18 @@ class TwitterScraper:
         Args:
             username (string): The username of Twitter user got from input url.
         Return:
-            myitems (schemas.User | None): User informations if exist else None.
+            myitems (schemas.User): User informations.
         """
         try:
             user = self.api.get_user(screen_name=username)
         except tweepy.NotFound:
-            user = None
+            raise HTTPException(
+                status_code=404, detail=f"User account @{username} not found"
+            )
+        except tweepy.Forbidden:
+            raise HTTPException(
+                status_code=403, detail=f"User account @{username} has been suspended"
+            )
         else:
             user = schemas.User(
                 id=user.id_str,
