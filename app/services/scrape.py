@@ -31,12 +31,20 @@ class TwitterScraper:
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_username"))
     def get_user_by_username(self, username) -> Optional[tweepy.User]:
+        """
+        Get details of Twitter user's information from given username.
+
+        Args:
+            username (string): The username of Twitter user got from input url.
+        Return:
+            myitems (schemas.User | None): User informations if exist else None.
+        """
         try:
             user = self.api.get_user(screen_name=username)
         except tweepy.NotFound:
-            return None
+            user = None
         else:
-            return schemas.User(
+            user = schemas.User(
                 id=user.id_str,
                 name=user.name,
                 username=user.screen_name,
@@ -47,7 +55,17 @@ class TwitterScraper:
                 banner=getattr(user, "profile_banner_url", None),
             )
 
+        return user
+
     def get_followers(self, followers_numbs):
+        """
+        Get list of Twitter user's followers.
+
+        Args:
+            followers_numbs (int): Number of followers to get.
+        Return:
+            followers (list<string>): List of followers' id.
+        """
         followers = []
         for follower in tweepy.Cursor(
             self.api.get_follower_ids, screen_name=self.username
@@ -57,6 +75,14 @@ class TwitterScraper:
         return followers
 
     def get_followings(self, followings_numbs):
+        """
+        Get list of Twitter user's followings.
+
+        Args:
+            followings_numbs (int): Number of followings to get.
+        Return:
+            followings (list<string>): List of followings' id.
+        """
         followings = []
         for following in tweepy.Cursor(
             self.api.get_friend_ids, screen_name=self.username
@@ -67,8 +93,17 @@ class TwitterScraper:
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_tweet_info"))
     def get_tweet_info(self, user_id: str, tweets_num: int) -> List[tweepy.Tweet]:
+        """
+        Get list of a user's tweet (no replies, retweets) from given user's id and desired number of tweets.
+
+        Args:
+            user_id (string): The id of Twitter user.
+            tweets_num (int): The number of tweets to get.
+        Return:
+            tweets (list<tweepy.Tweet>): List of user's tweets.
+        """
         tweet_fields = ["created_at"]
-        return list(
+        tweets = list(
             tweepy.Paginator(
                 self.api_v2.get_users_tweets,
                 id=user_id,
@@ -77,11 +112,21 @@ class TwitterScraper:
                 max_results=min(tweets_num, 100),
             ).flatten(limit=tweets_num)
         )
+        return tweets
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_frequency"))
     def get_frequency(self, user_id: str) -> Tuple[TimeSeries, TimeSeries]:
-        tweet_fields = ["created_at"]
+        """
+        Get the frequency of user's tweets activity in 2 ways: Days of a week and Hours of a day".
 
+        Args:
+            user_id (string): The id of Twitter user.
+        Return:
+            dow_resp, hod_resp (TimeSeries, TimeSeries): Each list contains key-value pairs with:
+                                                                + key: day of week / hour of day when tweet was posted
+                                                                + value: number of tweets posted in the same time
+        """
+        tweet_fields = ["created_at"]
         timezone = "Asia/Ho_Chi_Minh"
         now = pd.Timestamp.now(tz=timezone)
         day_of_week = pd.Series(
@@ -104,7 +149,6 @@ class TwitterScraper:
             max_results=100,
         ).flatten():
             tweet_timestamp = pd.Timestamp(tweet.created_at).tz_convert(timezone)
-
             day_of_week[tweet_timestamp] += 1
 
             if tweet_timestamp >= start_hour_of_day:
