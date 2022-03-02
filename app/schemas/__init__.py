@@ -4,6 +4,7 @@ from .tweet import TweetInfo
 from .user import User
 from .auth import *
 
+
 class CheckResponse(BaseModel):
     is_real: bool
     user_info: User

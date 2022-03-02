@@ -163,8 +163,7 @@ class TwitterScraper:
                 hour_of_day[tweet_timestamp] += 1
 
         dow_resp = TimeSeries(
-            time=day_of_week.index.strftime("%a").tolist(),
-            value=day_of_week.tolist(),
+            time=day_of_week.index.strftime("%a").tolist(), value=day_of_week.tolist(),
         )
         hod_resp = TimeSeries(
             time=hour_of_day.index.strftime("%H:%M").tolist(),
