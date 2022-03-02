@@ -41,7 +41,9 @@ async def user_detail_check(url: str, scraper: TwitterScraper = Depends()):
     recent_tweets = scraper.get_tweet_info(user_info.id, settings.TWEETS_NUMBER)
     day_of_week, hour_of_day = scraper.get_frequency(user_info.id)
     tweet_info = schemas.TweetInfo(
-        day_of_week=day_of_week, hour_of_day=hour_of_day, recent_tweets=recent_tweets,
+        day_of_week=day_of_week,
+        hour_of_day=hour_of_day,
+        recent_tweets=recent_tweets,
     )
 
     response = schemas.DetailResponse(user_info=user_info, tweet_info=tweet_info)

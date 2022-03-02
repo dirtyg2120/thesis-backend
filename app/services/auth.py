@@ -79,7 +79,7 @@ class OperatorAuthHandler(UserAuthHandler):
     def verify_password(self, plain_password, hashed_password):
         """
         Verify non-hashed password matches with hashed_password
-        
+
         Arg:
             plain_password(str)
             hashed_password(str)
@@ -90,7 +90,7 @@ class OperatorAuthHandler(UserAuthHandler):
     def encode_token(self, user_id):
         """
         Encode user_id along with other information into a JWT TOKEN
-        
+
         Arg: user_id(str)
         Ret: access_token(str)
         """
