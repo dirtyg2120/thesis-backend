@@ -10,8 +10,7 @@ class MongoDBPipeline:
             host=settings.MONGO_HOST,
             port=settings.MONGO_PORT,
         )
-        db = connection[settings.MONGO_DB]
-        self.profile_collection = db[settings.MONGO_COLLECTION]
+        self.db = connection[settings.MONGO_DB]
 
     def retrieve_profiles(self):
         profiles = []
@@ -20,12 +19,14 @@ class MongoDBPipeline:
         return profiles
 
     def add_profile(self, profile_data: dict) -> dict:
+        profile_collection = self.db["profile_collection"]
         try:
-            self.profile_collection.insert_one(profile_data)
+            profile_collection.insert_one(profile_data)
         except Exception as e:
             raise e
 
     def retrieve_profile(self, username: str) -> dict:
-        profile = self.profile_collection.find_one({"username": username})
+        profile_collection = self.db[settings.MONGO_COLLECTION]
+        profile = profile_collection.find_one({"username": username})
         if profile:
             return profile_helper(profile)

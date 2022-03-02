@@ -1,6 +1,7 @@
 from operator import attrgetter
 from typing import List, Optional, Tuple
 from fastapi import HTTPException
+from fastapi.encoders import jsonable_encoder
 
 import pandas as pd
 import tweepy  # type: ignore
@@ -10,6 +11,7 @@ from cachetools.keys import hashkey
 from app import schemas
 from app.core.config import settings
 from app.schemas.tweet import TimeSeries
+from app.database.database import MongoDBPipeline
 
 
 def _make_key(method_name: str):
@@ -29,6 +31,7 @@ class TwitterScraper:
             bearer_token=auth._bearer_token, wait_on_rate_limit=True
         )
         self._cache: TTLCache = TTLCache(maxsize=1024, ttl=settings.TWEEPY_CACHE_TTL)
+        self.db = MongoDBPipeline()
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_username"))
     def get_user_by_username(self, username) -> Optional[tweepy.User]:
@@ -52,7 +55,7 @@ class TwitterScraper:
             )
         else:
             user = schemas.User(
-                id=user.id_str,
+                twitter_id=user.id_str,
                 name=user.name,
                 username=user.screen_name,
                 created_at=user.created_at,
@@ -61,6 +64,9 @@ class TwitterScraper:
                 avatar=user.profile_image_url,
                 banner=getattr(user, "profile_banner_url", None),
             )
+
+            profile = jsonable_encoder(user)
+            self.db.add_profile(profile)
 
         return user
 
