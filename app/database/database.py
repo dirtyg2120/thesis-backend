@@ -14,6 +14,7 @@ class MongoDBPipeline:
         self.db = connection[settings.MONGO_DB]
 
     def add_twitter_user(self, twitter_user_data: dict):
+        twitter_user_data["_id"] = twitter_user_data["twitter_id"]
         twitter_user_collection = self.db["twitter_user_collection"]
         try:
             twitter_user_collection.insert_one(twitter_user_data)
