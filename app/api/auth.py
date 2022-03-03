@@ -1,5 +1,6 @@
 from re import T
-from fastapi import APIRouter, Depends, HTTPException
+
+from fastapi import APIRouter, Depends, HTTPException, Response
 
 from app import schemas
 from app.core.config import settings
@@ -36,7 +37,16 @@ def login(auth_details: schemas.AuthDetails):
     ):
         raise HTTPException(status_code=401, detail="Invalid username and/or password")
     token = operator_auth_handler.encode_token(user["username"])
-    return {"token": token}
+    resp = Response()
+    resp.set_cookie("token", token, max_age=3600)
+    return resp
+
+
+@router.post("/logout", name="operator:logout")
+def logout():
+    resp = Response()
+    resp.delete_cookie("token")
+    return resp
 
 
 # NOTE: for normal user to get their session token
