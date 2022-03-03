@@ -1,17 +1,17 @@
 from operator import attrgetter
 from typing import List, Optional, Tuple
-from fastapi import HTTPException
-from fastapi.encoders import jsonable_encoder
 
 import pandas as pd
 import tweepy  # type: ignore
 from cachetools import TTLCache, cachedmethod
 from cachetools.keys import hashkey
+from fastapi import HTTPException
+from fastapi.encoders import jsonable_encoder
 
 from app import schemas
 from app.core.config import settings
-from app.schemas.tweet import TimeSeries
 from app.database.database import MongoDBPipeline
+from app.schemas.tweet import TimeSeries
 
 
 def _make_key(method_name: str):

@@ -1,4 +1,5 @@
 from typing import Optional
+
 from pymongo import MongoClient  # type: ignore
 
 from app.core.config import settings

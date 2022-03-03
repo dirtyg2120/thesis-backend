@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
-from .tweet import TweetInfo
 from .auth import *
+from .tweet import TweetInfo
 from .twitter_user import TwitterUser
 
 

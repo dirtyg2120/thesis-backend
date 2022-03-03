@@ -1,11 +1,12 @@
+from datetime import datetime, timedelta
+from random import randint
+
 import jwt
 from fastapi import HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from passlib.context import CryptContext
-from datetime import datetime, timedelta
+
 from app.core.config import settings
-from datetime import datetime
-from random import randint
 from app.schemas import TokenPayload
 
 
