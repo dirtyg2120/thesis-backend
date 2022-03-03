@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     CONSUMER_SECRET: str
     CALLBACK_URI: str = "oob"
     FRONTEND_URL: str
+    MONGO_HOST: str
+    MONGO_PORT: int
+    MONGO_DB: str
 
     class Config:
         env_file = ".env"

@@ -12,9 +12,15 @@
     CONSUMER_SECRET=<Twitter API secret key>
     TWEETS_NUMBER=10
     FRONTEND_URL=http://localhost:3000
+    MONGO_HOST=localhost
+    MONGO_PORT=27017
+    MONGO_DB=<Database Name>
+    AUTH_HASH_FUNCTION=<Hash Key>
+    AUTH_PRIVATE_KEY=super_private_secret
     ```
 
 ### Method 1:
+- Install MongoDB: https://docs.mongodb.com/manual/administration/install-community/
 
 - Install all required packages
 
@@ -28,7 +34,7 @@ pip install -r requirements.txt
 python -m app.main
 ```
 
-### Method 2 (with Docker):
+### Method 2 (with Docker) NOT UPDATE WITH DB YET:
 
 - Build the image
 

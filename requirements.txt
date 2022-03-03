@@ -7,3 +7,4 @@ pytest==6.2.5
 pydantic[dotenv]
 cachetools==5.0.0
 types-cachetools==4.2.9
+pymongo==3.12.3
