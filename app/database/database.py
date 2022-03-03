@@ -1,3 +1,4 @@
+from typing import Optional
 from pymongo import MongoClient  # type: ignore
 
 from app.core.config import settings
@@ -18,7 +19,7 @@ class MongoDBPipeline:
         except Exception as e:
             raise e
 
-    def retrieve_twitter_user(self, username: str) -> dict:
+    def retrieve_twitter_user(self, username: str) -> Optional[dict]:
         twitter_user_collection = self.db["twitter_user_collection"]
         try:
             twitter_user = twitter_user_collection.find_one({"username": username})
