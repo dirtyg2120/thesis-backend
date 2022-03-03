@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     FRONTEND_URL: str
     AUTH_HASH_FUNCTION: str
     AUTH_PRIVATE_KEY: str
+    MONGO_HOST: str
+    MONGO_PORT: int
+    MONGO_DB: str
 
     class Config:
         env_file = ".env"

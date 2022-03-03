@@ -10,3 +10,4 @@ types-cachetools==4.2.9
 pyjwt==2.3.0
 passlib==1.7.4
 bcrypt==3.2.0
+pymongo==3.12.3
