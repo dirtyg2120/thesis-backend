@@ -22,7 +22,7 @@ def register(auth_details: schemas.AuthDetails):
     return "Success"
 
 
-@router.post("/login", response_model=schemas.AccessToken, name="operator:login")
+@router.post("/login", name="operator:login")
 def login(auth_details: schemas.AuthDetails):
     user = None
     for x in users:
