@@ -1,4 +1,4 @@
-from pymongo import MongoClient
+from pymongo import MongoClient  # type: ignore
 
 from app.core.config import settings
 
