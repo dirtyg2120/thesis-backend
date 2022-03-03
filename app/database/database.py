@@ -28,4 +28,5 @@ class MongoDBPipeline:
         except Exception as e:
             raise e
 
+        twitter_user["id"] = twitter_user.pop("_id")
         return twitter_user
