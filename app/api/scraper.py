@@ -39,7 +39,5 @@ async def user_detail_check(username: str, scraper: TwitterScraper = Depends()):
         recent_tweets=recent_tweets,
     )
 
-    response = schemas.DetailResponse(
-        user_info=user_info, tweet_info=tweet_info
-    )
+    response = schemas.DetailResponse(user_info=user_info, tweet_info=tweet_info)
     return response

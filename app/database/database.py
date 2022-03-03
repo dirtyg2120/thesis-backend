@@ -11,7 +11,7 @@ class MongoDBPipeline:
         )
         self.db = connection[settings.MONGO_DB]
 
-    def add_twitter_user(self, twitter_user_data: dict) -> dict:
+    def add_twitter_user(self, twitter_user_data: dict):
         twitter_user_collection = self.db["twitter_user_collection"]
         try:
             twitter_user_collection.insert_one(twitter_user_data)
@@ -25,7 +25,4 @@ class MongoDBPipeline:
         except Exception as e:
             raise e
 
-        if twitter_user:
-            return twitter_user
-        else:
-            return None
+        return twitter_user
