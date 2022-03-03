@@ -1,5 +1,6 @@
 from operator import attrgetter
 from typing import List, Optional, Tuple
+from app.schemas import twitter_user
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 
@@ -33,8 +34,8 @@ class TwitterScraper:
         self._cache: TTLCache = TTLCache(maxsize=1024, ttl=settings.TWEEPY_CACHE_TTL)
         self.db = MongoDBPipeline()
 
-    @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_username"))
-    def get_user_by_username(self, username) -> Optional[tweepy.User]:
+    @cachedmethod(cache=_cache_func, key=_make_key("get_twitter_user_by_username"))
+    def get_twitter_user_by_username(self, username) -> Optional[tweepy.User]:
         """
         Get details of Twitter user's information from given username.
 
@@ -43,32 +44,37 @@ class TwitterScraper:
         Return:
             myitems (schemas.TwitterUser): TwitterUser informations.
         """
-        try:
-            user = self.api.get_user(screen_name=username)
-        except tweepy.NotFound:
-            raise HTTPException(
-                status_code=404, detail=f"User account @{username} not found"
-            )
-        except tweepy.Forbidden:
-            raise HTTPException(
-                status_code=403, detail=f"User account @{username} has been suspended"
-            )
-        else:
-            user = schemas.TwitterUser(
-                twitter_id=user.id_str,
-                name=user.name,
-                username=user.screen_name,
-                created_at=user.created_at,
-                followers_count=user.followers_count,
-                followings_count=user.friends_count,
-                avatar=user.profile_image_url,
-                banner=getattr(user, "profile_banner_url", None),
-            )
+        twitter_user = self.db.retrieve_twitter_user(username)
 
-            profile = jsonable_encoder(user)
-            self.db.add_profile(profile)
+        if not twitter_user:
+            print("This account is not exist in DB")
+            try:
+                twitter_user = self.api.get_user(screen_name=username)
+            except tweepy.NotFound:
+                raise HTTPException(
+                    status_code=404, detail=f"User account @{username} not found"
+                )
+            except tweepy.Forbidden:
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"User account @{username} has been suspended",
+                )
+            else:
+                twitter_user = schemas.TwitterUser(
+                    twitter_id=twitter_user.id_str,
+                    name=twitter_user.name,
+                    username=twitter_user.screen_name,
+                    created_at=twitter_user.created_at,
+                    followers_count=twitter_user.followers_count,
+                    followings_count=twitter_user.friends_count,
+                    avatar=twitter_user.profile_image_url,
+                    banner=getattr(twitter_user, "profile_banner_url", None),
+                )
 
-        return user
+                twitter_user_json = jsonable_encoder(twitter_user)
+                self.db.add_twitter_user(twitter_user_json)
+
+        return twitter_user
 
     def get_followers(self, followers_numbs):
         """

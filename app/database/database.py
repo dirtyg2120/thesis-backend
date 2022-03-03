@@ -1,7 +1,6 @@
 from pymongo import MongoClient
 
 from app.core.config import settings
-from .database_helper import profile_helper
 
 
 class MongoDBPipeline:
@@ -12,21 +11,21 @@ class MongoDBPipeline:
         )
         self.db = connection[settings.MONGO_DB]
 
-    def retrieve_profiles(self):
-        profiles = []
-        for profile in self.profile_collection.find():
-            profiles.append(profile_helper(profile))
-        return profiles
-
-    def add_profile(self, profile_data: dict) -> dict:
-        profile_collection = self.db["profile_collection"]
+    def add_twitter_user(self, twitter_user_data: dict) -> dict:
+        twitter_user_collection = self.db["twitter_user_collection"]
         try:
-            profile_collection.insert_one(profile_data)
+            twitter_user_collection.insert_one(twitter_user_data)
         except Exception as e:
             raise e
 
-    def retrieve_profile(self, username: str) -> dict:
-        profile_collection = self.db[settings.MONGO_COLLECTION]
-        profile = profile_collection.find_one({"username": username})
-        if profile:
-            return profile_helper(profile)
+    def retrieve_twitter_user(self, username: str) -> dict:
+        twitter_user_collection = self.db["twitter_user_collection"]
+        try:
+            twitter_user = twitter_user_collection.find_one({"username": username})
+        except Exception as e:
+            raise e
+
+        if twitter_user:
+            return twitter_user
+        else:
+            return None
