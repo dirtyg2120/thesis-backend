@@ -1,6 +1,5 @@
 def profile_helper(profile) -> dict:
     return {
-        "id": str(profile["_id"]),
         "twitter_id": str(profile["twitter_id"]),
         "name": profile["name"],
         "username": profile["username"],

@@ -41,7 +41,7 @@ class TwitterScraper:
         Args:
             username (string): The username of Twitter user got from input url.
         Return:
-            myitems (schemas.User): User informations.
+            myitems (schemas.TwitterUser): TwitterUser informations.
         """
         try:
             user = self.api.get_user(screen_name=username)
@@ -54,7 +54,7 @@ class TwitterScraper:
                 status_code=403, detail=f"User account @{username} has been suspended"
             )
         else:
-            user = schemas.User(
+            user = schemas.TwitterUser(
                 twitter_id=user.id_str,
                 name=user.name,
                 username=user.screen_name,

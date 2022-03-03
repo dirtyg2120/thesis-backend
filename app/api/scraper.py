@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Body
+from fastapi import APIRouter, Depends, HTTPException
 
 from app import schemas
 from app.core.config import settings
