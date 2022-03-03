@@ -60,7 +60,7 @@ class TwitterScraper:
                 )
             else:
                 user = schemas.TwitterUser(
-                    twitter_id=user.id_str,
+                    id=user.id_str,
                     name=user.name,
                     username=user.screen_name,
                     created_at=user.created_at,

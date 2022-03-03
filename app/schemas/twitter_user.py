@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 
 class TwitterUser(BaseModel):
-    twitter_id: str
+    id: str
     name: str
     username: str
     created_at: datetime

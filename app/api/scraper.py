@@ -29,10 +29,8 @@ async def user_detail_check(username: str, scraper: TwitterScraper = Depends()):
 
     user_info = scraper.get_user_by_username(username)
 
-    recent_tweets = scraper.get_tweet_info(
-        user_info["twitter_id"], settings.TWEETS_NUMBER
-    )
-    day_of_week, hour_of_day = scraper.get_frequency(user_info["twitter_id"])
+    recent_tweets = scraper.get_tweet_info(user_info["id"], settings.TWEETS_NUMBER)
+    day_of_week, hour_of_day = scraper.get_frequency(user_info["id"])
     tweet_info = schemas.TweetInfo(
         day_of_week=day_of_week,
         hour_of_day=hour_of_day,
