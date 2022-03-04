@@ -11,26 +11,9 @@ router = APIRouter()
 user_auth_handler = UserAuthHandler()
 operator_auth_handler = OperatorAuthHandler()
 
-users = []
-
-# TODO: this is just temporary for operator registering, delete or modify later
-@router.post("/register", status_code=201, response_model=str, name="operator:register")
-def register(auth_details: schemas.AuthDetails):
-    if any(x["username"] == auth_details.username for x in users):
-        raise HTTPException(status_code=400, detail="Username is taken")
-    hashed_password = operator_auth_handler.get_password_hash(auth_details.password)
-    users.append({"username": auth_details.username, "password": hashed_password})
-    return "Success"
-
 
 @router.post("/login", name="operator:login")
 def login(auth_details: schemas.AuthDetails, db: MongoDBPipeline = Depends()):
-    operator = None
-    for x in users:
-        if x["username"] == auth_details.username:
-            operator = x
-            break
-
     operator = db.get_operator(auth_details.username)
     if (operator is None) or (
         not operator_auth_handler.verify_password(
