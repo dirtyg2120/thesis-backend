@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 
 from app import schemas
 from app.core.config import settings
+from app.database.database import MongoDBPipeline
 from app.services.auth import OperatorAuthHandler, UserAuthHandler
 
 router = APIRouter()
@@ -23,20 +24,21 @@ def register(auth_details: schemas.AuthDetails):
 
 
 @router.post("/login", name="operator:login")
-def login(auth_details: schemas.AuthDetails):
-    user = None
+def login(auth_details: schemas.AuthDetails, db: MongoDBPipeline = Depends()):
+    operator = None
     for x in users:
         if x["username"] == auth_details.username:
-            user = x
+            operator = x
             break
 
-    if (user is None) or (
+    operator = db.get_operator(auth_details.username)
+    if (operator is None) or (
         not operator_auth_handler.verify_password(
-            auth_details.password, user["password"]
+            auth_details.password, operator["password"]
         )
     ):
         raise HTTPException(status_code=401, detail="Invalid username and/or password")
-    token = operator_auth_handler.encode_token(user["username"])
+    token = operator_auth_handler.encode_token(operator["username"])
     resp = Response()
     resp.set_cookie("token", token, max_age=3600)
     return resp
