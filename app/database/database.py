@@ -30,3 +30,6 @@ class MongoDBPipeline:
 
         twitter_user["id"] = twitter_user.pop("_id")
         return twitter_user
+
+    def get_operator(self, username: str) -> Optional[dict]:
+        return self.db.find_one({"username": username})
