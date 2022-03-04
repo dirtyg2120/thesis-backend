@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     VERSION: str = "0.1.0"
     API_PREFIX: str = "/api"
     AUTH_PREFIX: str = "/auth"
-    TWEETS_NUMBER: int
+    TWEETS_NUMBER: int = 10
     TWEEPY_CACHE_TTL: int = 3600
     CONSUMER_KEY: str
     CONSUMER_SECRET: str
