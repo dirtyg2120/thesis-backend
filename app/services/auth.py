@@ -100,5 +100,5 @@ class OperatorAuthHandler(UserAuthHandler):
             iat=datetime.utcnow(),
             sub={"user_id": user_id, "role": "operator"},
         ).dict()
-        print("hash func: ", self.hash_function)
+
         return jwt.encode(payload, self.private_key, algorithm=self.hash_function)
