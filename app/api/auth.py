@@ -1,9 +1,6 @@
-from re import T
-
 from fastapi import APIRouter, Depends, HTTPException, Response
 
 from app import schemas
-from app.core.config import settings
 from app.database.database import MongoDBPipeline
 from app.services.auth import OperatorAuthHandler, UserAuthHandler
 
@@ -47,7 +44,7 @@ def get_user_session_token():
 @router.get(
     "/op_protected", response_model=schemas.UserIdentifier, name="operator:test"
 )
-def protected(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
+def op_protected(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
     return user_identifier
 
 
