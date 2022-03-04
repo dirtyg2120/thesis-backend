@@ -33,7 +33,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Lint with flake8
-        run: flake8 --max-line-length=88
+        run: flake8
 
       - name: Lint with mypy
         run: mypy --package=app
