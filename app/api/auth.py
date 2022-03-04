@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
 
 from app import schemas
-from app.database.database import MongoDBPipeline
+from app.models import Operator
 from app.services.auth import OperatorAuthHandler, UserAuthHandler
 
 router = APIRouter()
@@ -10,8 +10,8 @@ operator_auth_handler = OperatorAuthHandler()
 
 
 @router.post("/login", name="operator:login")
-def login(auth_details: schemas.AuthDetails, db: MongoDBPipeline = Depends()):
-    operator = db.get_operator(auth_details.username)
+def login(auth_details: schemas.AuthDetails):
+    operator = Operator.objects(username=auth_details.username).first()
     if (operator is None) or (
         not operator_auth_handler.verify_password(
             auth_details.password, operator["password"]

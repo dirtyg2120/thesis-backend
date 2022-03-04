@@ -13,7 +13,7 @@ class MongoDBPipeline:
         )
         self.db = connection[settings.MONGO_DB]
 
-    def add_twitter_user(self, twitter_user_data: dict):
+    def add_twitter_user(self, twitter_user_data: dict) -> None:
         twitter_user_data["_id"] = twitter_user_data.pop("id")
         twitter_user_collection = self.db["twitter_user_collection"]
         try:
@@ -28,7 +28,8 @@ class MongoDBPipeline:
         except Exception as e:
             raise e
 
-        twitter_user["id"] = twitter_user.pop("_id")
+        if twitter_user is not None:
+            twitter_user["id"] = twitter_user.pop("_id")
         return twitter_user
 
     def get_operator(self, username: str) -> Optional[dict]:

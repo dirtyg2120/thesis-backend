@@ -19,15 +19,27 @@ async def user_info_check(url: str, scraper: TwitterScraper = Depends()):
     else:
         raise HTTPException(status_code=400, detail="'url' argument is invalid!")
 
-    user_info = scraper.get_user_by_username(username)
+    user_db = scraper.get_user_by_username(username)
+    user_info = schemas.TwitterUser(
+        id=user_db.twitter_id,
+        name=user_db.name,
+        username=user_db.username,
+        created_at=user_db.created_at,
+        followers_count=user_db.followers_count,
+        followings_count=user_db.followings_count,
+        avatar=user_db.avatar,
+        banner=user_db.banner,
+    )
     response = schemas.CheckResponse(is_real=False, user_info=user_info)
     return response
 
 
 @router.get("/detail", response_model=schemas.DetailResponse, name="user:get-detail")
 async def user_detail_check(username: str, scraper: TwitterScraper = Depends()):
-
     user_info = scraper.get_user_by_username(username)
+
+    # if user_info is None:
+    #     raise HTTPException(404,
 
     recent_tweets = scraper.get_tweet_info(user_info["id"], settings.TWEETS_NUMBER)
     day_of_week, hour_of_day = scraper.get_frequency(user_info["id"])
