@@ -1,6 +1,18 @@
 from fastapi.testclient import TestClient
+from mongoengine import connect, disconnect
 
 from app.main import app
+
+
+@app.on_event("startup")
+def connect_db():
+    connect("test", host="mongomock://localhost")
+
+
+@app.on_event("shutdown")
+def disconnect_db():
+    disconnect()
+
 
 client = TestClient(app)
 
@@ -19,19 +31,19 @@ def test_main_docs():
 def test_no_input_url():
     response = client.get("/api/check?url=")
     assert response.status_code == 400
-    assert response.json() == {"detail": "'url_input' argument is invalid!"}
+    assert response.json() == {"detail": "'url' argument is invalid!"}
 
 
 def test_invalid_input_url():
-    response = client.get("/api/check?url=TranQuo48955621")
+    response = client.get("/api/check?url=TranQuo48955621/abc")
     assert response.status_code == 400
-    assert response.json() == {"detail": "'url_input' argument is invalid!"}
+    assert response.json() == {"detail": "'url' argument is invalid!"}
 
 
 def test_user_not_found():
     response = client.get("/api/check?url=https://twitter.com/TranQuoc48955621")
     assert response.status_code == 404
-    assert response.json() == {"detail": "User @TranQuoc48955621 does not exist"}
+    assert response.json() == {"detail": "User account @TranQuoc48955621 not found"}
 
 
 def test_user_found():
