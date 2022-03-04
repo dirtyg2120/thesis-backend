@@ -13,7 +13,6 @@ from app.schemas import TokenPayload
 class UserAuthHandler:
     security = HTTPBearer()
     token_lifetime = timedelta(days=0, minutes=15)
-    hash_function = settings.AUTH_HASH_FUNCTION
     private_key = settings.AUTH_PRIVATE_KEY
     supported_roles = ["user", "operator"]
 
@@ -30,7 +29,7 @@ class UserAuthHandler:
             sub={"user_id": user_id, "role": "user"},
         ).dict()
 
-        return jwt.encode(payload, self.private_key, algorithm=self.hash_function)
+        return jwt.encode(payload, self.private_key)
 
     def decode_token(self, token):
         """
@@ -64,7 +63,6 @@ class UserAuthHandler:
 class OperatorAuthHandler(UserAuthHandler):
     security = HTTPBearer()
     token_lifetime = timedelta(days=0, minutes=15)
-    hash_function = settings.AUTH_HASH_FUNCTION
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     private_key = settings.AUTH_PRIVATE_KEY
     supported_roles = ["operator"]
@@ -100,5 +98,4 @@ class OperatorAuthHandler(UserAuthHandler):
             iat=datetime.utcnow(),
             sub={"user_id": user_id, "role": "operator"},
         ).dict()
-        print("hash func: ", self.hash_function)
-        return jwt.encode(payload, self.private_key, algorithm=self.hash_function)
+        return jwt.encode(payload, self.private_key)

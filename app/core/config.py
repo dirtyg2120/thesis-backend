@@ -12,7 +12,6 @@ class Settings(BaseSettings):
     CONSUMER_SECRET: str
     CALLBACK_URI: str = "oob"
     FRONTEND_URL: str
-    AUTH_HASH_FUNCTION: str
     AUTH_PRIVATE_KEY: str
     MONGO_HOST: str
     MONGO_PORT: int
