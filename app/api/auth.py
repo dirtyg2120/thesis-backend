@@ -36,23 +36,3 @@ def logout():
 def get_user_session_token():
     token = user_auth_handler.encode_token()
     return schemas.AccessToken(token=token)
-
-
-# TODO: remove these test endpoints later
-
-# NOTE: only for operator
-@router.get(
-    "/op_protected", response_model=schemas.UserIdentifier, name="operator:test"
-)
-def op_protected(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
-    return user_identifier
-
-
-@router.get("/user_protected", response_model=schemas.UserIdentifier, name="user:test")
-def protected(user_identifier=Depends(user_auth_handler.auth_wrapper)):
-    return user_identifier
-
-
-@router.get("/unprotected", name="test open endpoint")
-def unprotected():
-    return {"hello": "world"}
