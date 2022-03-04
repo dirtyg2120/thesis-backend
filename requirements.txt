@@ -12,4 +12,3 @@ passlib==1.7.4
 bcrypt==3.2.0
 mongoengine==0.23.1
 mongomock==4.0.0
-sentinels==1.0.0

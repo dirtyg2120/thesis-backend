@@ -14,7 +14,7 @@ async def user_info_check(url: str, scraper: TwitterScraper = Depends()):
         username = url.split("/")[3]
     elif url[:12] == "twitter.com/":
         username = url.split("/")[1]
-    elif url:
+    elif url != "" and "/" not in url:
         username = url
     else:
         raise HTTPException(status_code=400, detail="'url' argument is invalid!")

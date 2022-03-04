@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+
 from app.main import app
 from app.models import Operator
 from app.services.auth import OperatorAuthHandler
@@ -32,11 +33,9 @@ def test_no_input_url():
 
 
 def test_invalid_input_url():
-    # TODO: some one fix this one :v
-    pass
-    # response = client.get("/api/check?url=TranQuo48955621")
-    # assert response.status_code == 400
-    # assert response.json() == {"detail": "'url' argument is invalid!"}
+    response = client.get("/api/check?url=TranQuo48955621/abc")
+    assert response.status_code == 400
+    assert response.json() == {"detail": "'url' argument is invalid!"}
 
 
 def test_twitter_user_not_found():

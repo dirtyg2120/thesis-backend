@@ -54,7 +54,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pytest
+          pip install pytest mongomock
           pip install -r requirements.txt
 
       - name: Run functional tests with pytest

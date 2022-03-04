@@ -6,17 +6,16 @@ class Settings(BaseSettings):
     VERSION: str = "0.1.0"
     API_PREFIX: str = "/api"
     AUTH_PREFIX: str = "/auth"
-    TWEETS_NUMBER: int
+    TWEETS_NUMBER: int = 10
     TWEEPY_CACHE_TTL: int = 3600
     CONSUMER_KEY: str
     CONSUMER_SECRET: str
     CALLBACK_URI: str = "oob"
     FRONTEND_URL: str
-    AUTH_HASH_FUNCTION = "HS256"
     AUTH_PRIVATE_KEY: str
-    MONGO_HOST: str
-    MONGO_PORT: int
-    MONGO_DB: str
+    MONGO_HOST: str = "localhost"
+    MONGO_PORT: int = 27017
+    MONGO_DB: str = "test"
 
     class Config:
         env_file = ".env"
