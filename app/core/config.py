@@ -13,9 +13,9 @@ class Settings(BaseSettings):
     CALLBACK_URI: str = "oob"
     FRONTEND_URL: str
     AUTH_PRIVATE_KEY: str
-    MONGO_HOST: str
-    MONGO_PORT: int
-    MONGO_DB: str
+    MONGO_HOST: str = "localhost"
+    MONGO_PORT: int = 27017
+    MONGO_DB: str = "test"
 
     class Config:
         env_file = ".env"
