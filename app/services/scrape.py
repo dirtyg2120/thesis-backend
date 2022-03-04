@@ -112,7 +112,8 @@ class TwitterScraper:
     @cachedmethod(cache=_cache_func, key=_make_key("get_tweet_info"))
     def get_tweet_info(self, user_id: str, tweets_num: int) -> List[tweepy.Tweet]:
         """
-        Get list of a user's tweet (no replies, retweets) from given user's id and desired number of tweets.
+        Get list of a user's tweet (no replies, retweets)
+        from given user's id and desired number of tweets.
 
         Args:
             user_id (string): The id of Twitter user.
@@ -135,14 +136,16 @@ class TwitterScraper:
     @cachedmethod(cache=_cache_func, key=_make_key("get_frequency"))
     def get_frequency(self, user_id: str) -> Tuple[TimeSeries, TimeSeries]:
         """
-        Get the frequency of user's tweets activity in 2 ways: Days of a week and Hours of a day".
+        Get the frequency of user's tweets activity in 2 ways:
+        Days of a week and Hours of a day.
 
         Args:
             user_id (string): The id of Twitter user.
         Return:
-            dow_resp, hod_resp (TimeSeries, TimeSeries): Each list contains key-value pairs with:
-                                                                + key: day of week / hour of day when tweet was posted
-                                                                + value: number of tweets posted in the same time
+            dow_resp, hod_resp (TimeSeries, TimeSeries):
+            Each list contains key-value pairs with:
+            + key: day of week / hour of day when tweet was posted
+            + value: number of tweets posted in the same time
         """
         tweet_fields = ["created_at"]
         timezone = "Asia/Ho_Chi_Minh"
