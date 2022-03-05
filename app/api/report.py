@@ -4,7 +4,7 @@ These are endpoints to handle
 - Operator viewing reports
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends
 
 from app import schemas
 from app.services.auth import OperatorAuthHandler, UserAuthHandler
@@ -14,6 +14,8 @@ user_auth_handler = UserAuthHandler()
 operator_auth_handler = OperatorAuthHandler()
 
 # Note: Operator only
+
+
 @router.get(
     "/view-reports", response_model=schemas.AccountReport, name="operator:view-report"
 )

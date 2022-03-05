@@ -1,7 +1,5 @@
 import pytest
 
-from app.models import Operator
-
 from . import client
 
 
