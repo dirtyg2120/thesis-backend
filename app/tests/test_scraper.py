@@ -1,19 +1,5 @@
-from fastapi.testclient import TestClient
+from . import client
 
-from app.main import app
-from app.models import Operator
-from app.services.auth import OperatorAuthHandler
-
-client = TestClient(app)
-
-def setup():
-    username='test'
-    password='test'
-    hashed_password = OperatorAuthHandler().get_password_hash(password)
-    Operator(username=username, password=hashed_password).save()
-
-
-setup()
 
 def test_main_404():
     response = client.get("/")
@@ -22,6 +8,7 @@ def test_main_404():
 
 
 def test_main_docs():
+    print("test main dock")
     response = client.get("/docs")
     assert response.status_code == 200
 
@@ -48,21 +35,3 @@ def test_twitter_user_found():
     response = client.get("/api/check?url=https://twitter.com/TranQuo48955621")
     assert response.status_code == 200
     assert response.json()["user_info"]["name"] == "Tran Quoc Anh"
-
-def test_login():
-    pass
-
-def test_logout():
-    pass
-
-def test_get_user_session_token():
-    pass
-
-def test_operator_view_reports():
-    pass
-
-def test_operator_add_report_to_ml_data():
-    pass
-
-def test_user_report_twitter_account():
-    pass
