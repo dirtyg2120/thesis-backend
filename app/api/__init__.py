@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app.core.config import settings
 
-from . import auth, scraper, report, ml
+from . import auth, ml, report, scraper
 
 api_router = APIRouter()
 api_router.include_router(auth.router, tags=["auth"], prefix=settings.AUTH_PREFIX)
