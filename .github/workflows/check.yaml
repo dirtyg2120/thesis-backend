@@ -27,15 +27,32 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install dependencies
-        run: |
-          pip install flake8 flake8-black flake8-isort mypy
-          pip install -r requirements.txt
+      - name: Install flake8 and plugins
+        run: pip install flake8 flake8-black flake8-isort
 
       - name: Lint with flake8
         run: flake8
 
-      - name: Lint with mypy
+  check-type:
+    name: Run type checker
+    runs-on: ubuntu-latest
+    needs: lint
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install mypy
+          pip install -r requirements.txt
+
+      - name: Check type with mypy
         run: mypy --package=app
 
   test:
