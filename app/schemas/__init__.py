@@ -14,6 +14,7 @@ class DetailResponse(BaseModel):
     user_info: TwitterUser
     tweet_info: TweetInfo
 
+
 class AccountReport(BaseModel):
     # NOTE: this is just prototype, add more fields later!
     user_info: TwitterUser
