@@ -24,15 +24,17 @@ def login(auth_details: schemas.AuthDetails):
     return resp
 
 
-@router.post("/logout", name="operator:logout")
-def logout():
+@router.get("/logout", name="operator:logout")
+def logout(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
     resp = Response()
     resp.delete_cookie("token")
     return resp
 
 
 # NOTE: for normal user to get their session token
-@router.post("/session_token", response_model=schemas.AccessToken, name="user:login")
+@router.get("/session-token", name="user:login")
 def get_user_session_token():
     token = user_auth_handler.encode_token()
-    return schemas.AccessToken(token=token)
+    resp = Response()
+    resp.set_cookie("token", token, max_age=3600)
+    return resp
