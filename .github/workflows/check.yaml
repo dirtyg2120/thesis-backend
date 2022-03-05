@@ -31,7 +31,7 @@ jobs:
         run: pip install flake8 flake8-black flake8-isort
 
       - name: Lint with flake8
-        run: flake8
+        run: flake8 --show-source --statistics --count
 
   check-type:
     name: Run type checker
