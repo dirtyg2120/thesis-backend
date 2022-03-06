@@ -85,4 +85,9 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run functional tests with pytest
+        env:
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+          AUTH_PRIVATE_KEY: ${{ secrets.AUTH_PRIVATE_KEY }}
+          FRONTEND_URL: http://0.0.0.0
         run: pytest
