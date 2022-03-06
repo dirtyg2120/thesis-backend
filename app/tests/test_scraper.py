@@ -1,18 +1,6 @@
 from . import client
 
 
-def test_main_404():
-    response = client.get("/")
-    assert response.status_code == 404
-    assert response.json() == {"detail": "Not Found"}
-
-
-def test_main_docs():
-    print("test main dock")
-    response = client.get("/docs")
-    assert response.status_code == 200
-
-
 def test_no_input_url():
     response = client.get("/api/check?url=")
     assert response.status_code == 400
