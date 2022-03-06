@@ -53,7 +53,7 @@ def test_get_user_session_token():
     cookie_jar = []
     for _ in range(20):
         response = client.get(
-            "/auth/session-token", headers={"accept": "application/json"},
+            "/auth/session-token", headers={"accept": "application/json"}
         )
         assert response.status_code == 200
         cookie = response.headers["set-cookie"]
