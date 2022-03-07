@@ -35,13 +35,13 @@ Endpoint<--Scraper: Account information
 deactivate Scraper
 Endpoint->ML Service: Run model on account
 activate ML Service
-ML Service-->Endpoint: Return check result
+ML Service-->Endpoint: Check result
 deactivate ML Service
-Endpoint->Database: Save result
+Endpoint->Database: Save check result\nand account information
 deactivate Database
 end
 
-Endpoint-->Frontend: Return result
+Endpoint-->Frontend: Check result and\naccount information
 deactivate Endpoint
 Frontend-->User: Show result
 deactivate Frontend
