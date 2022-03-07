@@ -38,9 +38,6 @@ async def user_info_check(url: str, scraper: TwitterScraper = Depends()):
 async def user_detail_check(username: str, scraper: TwitterScraper = Depends()):
     user_info = scraper.get_user_by_username(username)
 
-    # if user_info is None:
-    #     raise HTTPException(404,
-
     recent_tweets = scraper.get_tweet_info(user_info["id"], settings.TWEETS_NUMBER)
     day_of_week, hour_of_day = scraper.get_frequency(user_info["id"])
     tweet_info = schemas.TweetInfo(
