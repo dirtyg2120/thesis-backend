@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     CALLBACK_URI: str = "oob"
     FRONTEND_URL: str
     AUTH_PRIVATE_KEY: str
+    TOKEN_EXPIRATION_TIME: int = 15
     MONGO_HOST: str = "localhost"
     MONGO_PORT: int = 27017
     MONGO_DB: str = "test"

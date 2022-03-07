@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
 
 from app import schemas
+from app.core.config import settings
 from app.models import Operator
 from app.services.auth import OperatorAuthHandler, UserAuthHandler
 
@@ -20,7 +21,7 @@ def login(auth_details: schemas.AuthDetails):
         raise HTTPException(status_code=401, detail="Invalid username and/or password")
     token = operator_auth_handler.encode_token(operator["username"])
     resp = Response()
-    resp.set_cookie("token", token, max_age=3600)
+    resp.set_cookie("token", token, max_age=settings.TOKEN_EXPIRATION_TIME * 60)
     return resp
 
 

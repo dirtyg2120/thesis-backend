@@ -12,7 +12,7 @@ from app.schemas import TokenPayload
 
 class UserAuthHandler:
     security = HTTPBearer()
-    token_lifetime = timedelta(days=0, minutes=15)
+    token_lifetime = timedelta(minutes=settings.TOKEN_EXPIRATION_TIME)
     private_key = settings.AUTH_PRIVATE_KEY
     supported_roles = ["user", "operator"]
 
@@ -61,10 +61,7 @@ class UserAuthHandler:
 
 
 class OperatorAuthHandler(UserAuthHandler):
-    security = HTTPBearer()
-    token_lifetime = timedelta(days=0, minutes=15)
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    private_key = settings.AUTH_PRIVATE_KEY
     supported_roles = ["operator"]
 
     def get_password_hash(self, password):
