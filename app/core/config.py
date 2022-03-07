@@ -10,7 +10,6 @@ class Settings(BaseSettings):
     TWEEPY_CACHE_TTL: int = 3600
     CONSUMER_KEY: str
     CONSUMER_SECRET: str
-    CALLBACK_URI: str = "oob"
     FRONTEND_URL: str
     AUTH_PRIVATE_KEY: str
     TOKEN_EXPIRATION_TIME: int = 15
