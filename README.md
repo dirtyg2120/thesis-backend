@@ -15,7 +15,6 @@
     MONGO_HOST=localhost
     MONGO_PORT=27017
     MONGO_DB=<Database Name>
-    AUTH_HASH_FUNCTION=<Hash Key>
     AUTH_PRIVATE_KEY=super_private_secret
     ```
 

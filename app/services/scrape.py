@@ -1,17 +1,15 @@
 from operator import attrgetter
-from typing import List, Optional, Tuple
-from fastapi import HTTPException
-from fastapi.encoders import jsonable_encoder
+from typing import List, Tuple
 
 import pandas as pd
 import tweepy  # type: ignore
 from cachetools import TTLCache, cachedmethod
 from cachetools.keys import hashkey
+from fastapi import HTTPException
 
-from app import schemas
 from app.core.config import settings
+from app.models import TwitterUser
 from app.schemas.tweet import TimeSeries
-from app.database.database import MongoDBPipeline
 
 
 def _make_key(method_name: str):
@@ -31,10 +29,9 @@ class TwitterScraper:
             bearer_token=auth._bearer_token, wait_on_rate_limit=True
         )
         self._cache: TTLCache = TTLCache(maxsize=1024, ttl=settings.TWEEPY_CACHE_TTL)
-        self.db = MongoDBPipeline()
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_username"))
-    def get_user_by_username(self, username) -> Optional[tweepy.User]:
+    def get_user_by_username(self, username) -> TwitterUser:
         """
         Get details of Twitter user's information from given username.
 
@@ -43,9 +40,9 @@ class TwitterScraper:
         Return:
             myitems (schemas.TwitterUser): TwitterUser informations.
         """
-        user = self.db.retrieve_twitter_user(username)
+        user_db = TwitterUser.objects(username=username).first()
 
-        if not user:
+        if user_db is None:
             print("This account is not exist in DB")
             try:
                 user = self.api.get_user(screen_name=username)
@@ -59,7 +56,8 @@ class TwitterScraper:
                     detail=f"User account @{username} has been suspended",
                 )
             else:
-                user = schemas.TwitterUser(
+                print(type(user))
+                user_db = TwitterUser(
                     twitter_id=user.id_str,
                     name=user.name,
                     username=user.screen_name,
@@ -70,10 +68,9 @@ class TwitterScraper:
                     banner=getattr(user, "profile_banner_url", None),
                 )
 
-                twitter_user_json = jsonable_encoder(user)
-                self.db.add_twitter_user(twitter_user_json)
+                user_db.save()
 
-        return user
+        return user_db
 
     def get_followers(self, followers_numbs):
         """
@@ -112,7 +109,8 @@ class TwitterScraper:
     @cachedmethod(cache=_cache_func, key=_make_key("get_tweet_info"))
     def get_tweet_info(self, user_id: str, tweets_num: int) -> List[tweepy.Tweet]:
         """
-        Get list of a user's tweet (no replies, retweets) from given user's id and desired number of tweets.
+        Get list of a user's tweet (no replies, retweets)
+        from given user's id and desired number of tweets.
 
         Args:
             user_id (string): The id of Twitter user.
@@ -135,14 +133,16 @@ class TwitterScraper:
     @cachedmethod(cache=_cache_func, key=_make_key("get_frequency"))
     def get_frequency(self, user_id: str) -> Tuple[TimeSeries, TimeSeries]:
         """
-        Get the frequency of user's tweets activity in 2 ways: Days of a week and Hours of a day".
+        Get the frequency of user's tweets activity in 2 ways:
+        Days of a week and Hours of a day.
 
         Args:
             user_id (string): The id of Twitter user.
         Return:
-            dow_resp, hod_resp (TimeSeries, TimeSeries): Each list contains key-value pairs with:
-                                                                + key: day of week / hour of day when tweet was posted
-                                                                + value: number of tweets posted in the same time
+            dow_resp, hod_resp (TimeSeries, TimeSeries):
+            Each list contains key-value pairs with:
+            + key: day of week / hour of day when tweet was posted
+            + value: number of tweets posted in the same time
         """
         tweet_fields = ["created_at"]
         timezone = "Asia/Ho_Chi_Minh"
