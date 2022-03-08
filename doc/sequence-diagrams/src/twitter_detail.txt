@@ -28,7 +28,7 @@ Endpoint<--Database: Check result
 deactivate Database
 Endpoint->Scraper: Get recent tweets
 activate Scraper
-Scraper->TwitterAPI: Get recent tweets
+Scraper->TwitterAPI: getUsersTweets\n(userId,limit)
 Endpoint<--Scraper: Recent tweets
 deactivate Scraper
 Endpoint-->Frontend: Profile detail\nand result

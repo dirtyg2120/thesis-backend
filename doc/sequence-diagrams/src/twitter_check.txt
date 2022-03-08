@@ -30,7 +30,7 @@ activate Database
 opt account not in database
 Endpoint->Scraper: Fetch account\ninformation
 activate Scraper
-Scraper->TwitterAPI: Fetch account\ninformation
+Scraper->TwitterAPI: getUser(username)
 Endpoint<--Scraper: Account information
 deactivate Scraper
 Endpoint->ML Service: Run model on account
