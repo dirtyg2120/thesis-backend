@@ -26,10 +26,10 @@ def login(auth_details: schemas.AuthDetails):
         NOTE: This could potentially break during deployment
         https://stackoverflow.com/questions/63010545/issue-with-cross-site-cookies-how-to-set-cookie-from-backend-to-frontend
         https://web.dev/samesite-cookies-explained/
-        
+
     """
     resp.set_cookie(
-        "token",
+        "accessToken",
         token,
         max_age=settings.TOKEN_EXPIRATION_TIME * 60,
     )
@@ -39,7 +39,7 @@ def login(auth_details: schemas.AuthDetails):
 @router.get("/logout", name="operator:logout")
 def logout(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
     resp = Response()
-    resp.delete_cookie("token")
+    resp.delete_cookie("accessToken")
     return resp
 
 
