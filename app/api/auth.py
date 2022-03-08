@@ -21,7 +21,18 @@ def login(auth_details: schemas.AuthDetails):
         raise HTTPException(status_code=401, detail="Invalid username and/or password")
     token = operator_auth_handler.encode_token(operator["username"])
     resp = Response()
-    resp.set_cookie("token", token, max_age=settings.TOKEN_EXPIRATION_TIME * 60)
+
+    """
+        NOTE: This could potentially break during deployment
+        https://stackoverflow.com/questions/63010545/issue-with-cross-site-cookies-how-to-set-cookie-from-backend-to-frontend
+        https://web.dev/samesite-cookies-explained/
+        
+    """
+    resp.set_cookie(
+        "token",
+        token,
+        max_age=settings.TOKEN_EXPIRATION_TIME * 60,
+    )
     return resp
 
 
