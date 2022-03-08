@@ -24,14 +24,14 @@ Frontend->Endpoint: Request check result
 activate Endpoint
 Endpoint->Database: Get check result
 activate Database
-Endpoint<--Database: Return result
+Endpoint<--Database: Check result
 deactivate Database
 Endpoint->Scraper: Get recent tweets
 activate Scraper
 Scraper->TwitterAPI: Get recent tweets
-Endpoint<--Scraper: Return tweets
+Endpoint<--Scraper: Recent tweets
 deactivate Scraper
-Endpoint-->Frontend: Return profile detail\nand result
+Endpoint-->Frontend: Profile detail\nand result
 deactivate Endpoint
 Frontend-->User: Show result
 deactivate Frontend
