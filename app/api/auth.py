@@ -36,7 +36,7 @@ def login(auth_details: schemas.AuthDetails):
     return resp
 
 
-@router.get("/logout", name="operator:logout")
+@router.post("/logout", name="operator:logout")
 def logout(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
     resp = Response()
     resp.delete_cookie("accessToken")

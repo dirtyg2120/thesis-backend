@@ -28,7 +28,7 @@ def test_login_success(create_operator):
 
 
 def test_logout_not_logged_in(create_operator):
-    response = client.get("/auth/logout", headers={"accept": "application/json"})
+    response = client.post("/auth/logout", headers={"accept": "application/json"})
     assert response.status_code == 403
     assert response.json() == {"detail": "Not authenticated"}
 
@@ -41,7 +41,7 @@ def test_logout_success(create_operator):
     )
     access_token = login_response.headers["set-cookie"].split(";")[0].split("=")[1]
 
-    logout_response = client.get(
+    logout_response = client.post(
         "/auth/logout",
         headers={
             "accept": "application/json",
