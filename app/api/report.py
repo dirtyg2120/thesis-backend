@@ -4,7 +4,9 @@ These are endpoints to handle
 - Operator viewing reports
 """
 
-from fastapi import APIRouter, Depends
+from random import randint
+
+from fastapi import APIRouter, Depends, HTTPException
 
 from app import schemas
 from app.services.auth import OperatorAuthHandler, UserAuthHandler
@@ -29,10 +31,8 @@ def view_reports(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
 
 
 # NOTE: User only
-@router.post("/send-report", name="user:send-report")
-def send_report(
-    account_id: str, user_identifier=Depends(user_auth_handler.auth_wrapper)
-):
+@router.get("/send-report/{user_id}", name="user:send-report")
+def send_report(user_id: str, user_identifier=Depends(user_auth_handler.auth_wrapper)):
     """
     TODO:
     1. If first report:
@@ -43,4 +43,10 @@ def send_report(
     2. Else:
         - Increase report count
     """
+    user_already_reported = randint(0, 1) == 0
+    if user_already_reported:
+        raise HTTPException(
+            status_code=420,
+            detail="User already reported this Twitter Account Recently!",
+        )
     return {"status": "success", "account": "twitter_account_1"}
