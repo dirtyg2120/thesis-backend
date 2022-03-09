@@ -1,0 +1,38 @@
+# ----- font -----
+fontfamily monospace
+
+# ----- setup components -----
+title User get Twitter account details and tweets
+actor #blue:0.5 User
+
+participant #orange Frontend
+participantgroup #e4fcd9 Backend API
+boundary #green:0.7 Endpoint
+control #red:0.7 Scraper
+end
+
+database Database #pink
+entity #gray TwitterAPI
+
+# ----- to show bottom icons -----
+bottomparticipants
+
+# ----- START OF SEQUENCE -----
+User->Frontend: Input Twitter\naccount URL
+activate Frontend
+Frontend->Endpoint: Request check result
+activate Endpoint
+Endpoint->Database: Get check result
+activate Database
+Endpoint<--Database: Check result
+deactivate Database
+Endpoint->Scraper: Get recent tweets
+activate Scraper
+Scraper->TwitterAPI: getUsersTweets\n(userId,limit)
+Endpoint<--Scraper: Recent tweets
+deactivate Scraper
+Endpoint-->Frontend: Profile detail\nand result
+deactivate Endpoint
+Frontend-->User: Show result
+deactivate Frontend
+# ----- END OF SEQUENCE -----

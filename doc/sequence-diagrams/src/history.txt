@@ -1,0 +1,31 @@
+# ----- font -----
+fontfamily monospace
+
+# ----- setup components -----
+title History
+actor #blue:0.5 User
+participant #orange Frontend
+
+# ----- to show bottom icons -----
+bottomparticipants
+
+# ----- START OF SEQUENCE -----
+User->Frontend: Click an account\nin history
+activate Frontend
+User<--Frontend: Show check result and\nbrief account information
+deactivate Frontend
+
+opt user dismiss failed check
+User->Frontend: Dismiss a failed check
+activate Frontend
+User<--Frontend: Remove failed check\nfrom history widget
+deactivate Frontend
+end
+
+opt user clear history
+User->Frontend: Click "Clear History" button
+activate Frontend
+User<--Frontend: Clear history
+deactivate Frontend
+end
+# ----- END OF SEQUENCE -----

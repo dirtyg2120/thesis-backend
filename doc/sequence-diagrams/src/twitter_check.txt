@@ -1,0 +1,48 @@
+# ----- font -----
+fontfamily monospace
+
+# ----- setup components -----
+title User check Twitter account
+actor #blue:0.5 User
+
+participant #orange Frontend
+participantgroup #e4fcd9 Backend API
+boundary #green:0.7 Endpoint
+control #red:0.7 Scraper
+end
+
+database Database #pink
+entity #lightblue:2 ML Service
+entity #gray TwitterAPI
+
+# ----- to show bottom icons -----
+bottomparticipants
+
+#autoactivation on
+# ----- START OF SEQUENCE -----
+User->Frontend: Input Twitter\naccount URL
+activate Frontend
+Frontend->Endpoint: Request check result
+activate Endpoint
+Endpoint->Database: Get check result
+activate Database
+
+opt account not in database
+Endpoint->Scraper: Fetch account\ninformation
+activate Scraper
+Scraper->TwitterAPI: getUser(username)
+Endpoint<--Scraper: Account information
+deactivate Scraper
+Endpoint->ML Service: Run model on account
+activate ML Service
+ML Service-->Endpoint: Check result
+deactivate ML Service
+Endpoint->Database: Save check result\nand account information
+deactivate Database
+end
+
+Endpoint-->Frontend: Check result and\naccount information
+deactivate Endpoint
+Frontend-->User: Show result
+deactivate Frontend
+# ----- END OF SEQUENCE -----
