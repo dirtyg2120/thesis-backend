@@ -1,3 +1,4 @@
+import logging.config
 from datetime import timedelta
 
 from fastapi import FastAPI
@@ -7,7 +8,10 @@ from mongoengine import connect, disconnect
 
 from .api import api_router
 from .core.config import settings
+from .core.logging_config import LOGGING_CONFIG
 from .services.clean_database import clean_database
+
+logging.config.dictConfig(LOGGING_CONFIG)
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION)
 
@@ -33,7 +37,7 @@ def connect_db():
 
 
 @app.on_event("startup")
-@repeat_every(seconds=settings.RESULT_MAX_AGE * 86400, raise_exceptions=True)
+@repeat_every(seconds=settings.RESULT_MAX_AGE * 86400)
 def clear_db():
     clean_database(timedelta(days=settings.RESULT_MAX_AGE))
 
