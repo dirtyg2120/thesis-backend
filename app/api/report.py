@@ -43,6 +43,7 @@ def send_report(user_id: str, user_identifier=Depends(user_auth_handler.auth_wra
     2. Else:
         - Increase report count
     """
+    # NOTE: remove this fake check when implemented
     user_already_reported = randint(0, 1) == 0
     if user_already_reported:
         raise HTTPException(
