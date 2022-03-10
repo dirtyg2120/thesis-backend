@@ -6,12 +6,15 @@ These are endpoints to handle
 from fastapi import APIRouter, Depends
 
 from app.services.auth import OperatorAuthHandler, UserAuthHandler
+from app.services.ml import ML
 
 router = APIRouter()
 user_auth_handler = UserAuthHandler()
 operator_auth_handler = OperatorAuthHandler()
 
 # Note: Operator only
+
+ml_service = ML()
 
 
 @router.get("/add-ml-data", name="operator:add-ml-data")
@@ -20,3 +23,9 @@ def add_ml_data(
 ):
     # TODO: Take report from db, scape needed data and add to ML's database somehow!
     return "success"
+
+
+@router.get("/get-analysis-result", name="user:get-analysis-result")
+def add_ml_data():
+    result = ml_service.get_analysis_result()
+    return result
