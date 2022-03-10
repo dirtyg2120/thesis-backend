@@ -13,5 +13,6 @@ class User(Document):
     followings_count: int = IntField(required=True)
     avatar: str = StringField(required=True)
     banner: Optional[str] = StringField()
+    timestamp: datetime = DateTimeField(default=datetime.utcnow)
 
     meta = {"collection": "twitter_user_collection"}
