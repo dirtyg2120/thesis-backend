@@ -31,8 +31,10 @@ def view_reports(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
 
 
 # NOTE: User only
-@router.post("/send-report", name="user:send-report")
-def send_report(user_identifier=Depends(user_auth_handler.auth_wrapper)):
+@router.post("/send-report/{twitter_user_id}", name="user:send-report")
+def send_report(
+    twitter_user_id: str, user_identifier=Depends(user_auth_handler.auth_wrapper)
+):
     """
     TODO:
     1. If first report:
