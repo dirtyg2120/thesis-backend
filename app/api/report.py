@@ -3,10 +3,11 @@ These are endpoints to handle
 - User reporting wrong prediction result
 - Operator viewing reports
 """
-
 from random import randint
+from typing import Optional
+from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Cookie, Depends, HTTPException
 
 from app import schemas
 from app.services.auth import OperatorAuthHandler, UserAuthHandler
@@ -32,9 +33,7 @@ def view_reports(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
 
 # NOTE: User only
 @router.post("/send-report/{twitter_user_id}", name="user:send-report")
-def send_report(
-    twitter_user_id: str, user_identifier=Depends(user_auth_handler.auth_wrapper)
-):
+def send_report(twitter_user_id: str, session_id: Optional[str] = Cookie(None)):
     """
     TODO:
     1. If first report:
@@ -45,6 +44,8 @@ def send_report(
     2. Else:
         - Increase report count
     """
+    if session_id is None:
+        session_id = str(uuid4())
     # NOTE: remove this fake check when implemented
     user_already_reported = randint(0, 1) == 0
     if user_already_reported:
