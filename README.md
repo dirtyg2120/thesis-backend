@@ -16,6 +16,7 @@
     MONGO_PORT=27017
     MONGO_DB=<Database Name>
     AUTH_PRIVATE_KEY=super_private_secret
+    RESULT_MAX_AGE=3
     ```
 
 ### Method 1:

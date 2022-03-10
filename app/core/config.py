@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     MONGO_HOST: str = "localhost"
     MONGO_PORT: int = 27017
     MONGO_DB: str = "test"
+    # Number of days before analysis result get cleared
+    RESULT_MAX_AGE: int
 
     class Config:
         env_file = ".env"

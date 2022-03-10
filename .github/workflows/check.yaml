@@ -90,4 +90,5 @@ jobs:
           CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
           AUTH_PRIVATE_KEY: ${{ secrets.AUTH_PRIVATE_KEY }}
           FRONTEND_URL: http://0.0.0.0
+          RESULT_MAX_AGE: 3
         run: pytest
