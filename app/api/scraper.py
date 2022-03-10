@@ -8,7 +8,7 @@ router = APIRouter()
 
 
 @router.get("/check", response_model=schemas.CheckResponse, name="user:get-data")
-async def user_info_check(url: str, scraper: TwitterScraper = Depends()):
+def user_info_check(url: str, scraper: TwitterScraper = Depends()):
     # Validate input url
     if url[:20] == "https://twitter.com/":
         username = url.split("/")[3]
@@ -35,7 +35,7 @@ async def user_info_check(url: str, scraper: TwitterScraper = Depends()):
 
 
 @router.get("/detail", response_model=schemas.DetailResponse, name="user:get-detail")
-async def user_detail_check(url: str, scraper: TwitterScraper = Depends()):
+def user_detail_check(url: str, scraper: TwitterScraper = Depends()):
     # Validate input url
     if url[:20] == "https://twitter.com/":
         username = url.split("/")[3]
