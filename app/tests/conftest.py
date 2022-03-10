@@ -4,6 +4,8 @@ from pytest import fixture
 from app.models import Operator, TwitterUser
 from app.services.auth import OperatorAuthHandler
 
+from . import client
+
 DB_NAME = "mongoenginetest"
 OP_UNAME = "test"
 OP_PASS = "test"
@@ -17,6 +19,7 @@ def setup_teardown():
     yield
     print("Teardown")
     disconnect()
+    client.cookies.clear()
 
 
 @fixture(autouse=True, scope="function")

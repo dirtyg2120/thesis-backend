@@ -21,21 +21,33 @@ def login(auth_details: schemas.AuthDetails):
         raise HTTPException(status_code=401, detail="Invalid username and/or password")
     token = operator_auth_handler.encode_token(operator["username"])
     resp = Response()
-    resp.set_cookie("token", token, max_age=settings.TOKEN_EXPIRATION_TIME * 60)
+
+    """
+        NOTE: This could potentially break during deployment
+        https://stackoverflow.com/questions/63010545/issue-with-cross-site-cookies-how-to-set-cookie-from-backend-to-frontend
+        https://web.dev/samesite-cookies-explained/
+
+    """
+    resp.set_cookie(
+        "access_token",
+        token,
+        max_age=settings.TOKEN_EXPIRATION_TIME * 60,
+    )
     return resp
 
 
-@router.get("/logout", name="operator:logout")
+@router.post("/logout", name="operator:logout")
 def logout(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
     resp = Response()
-    resp.delete_cookie("token")
+    resp.delete_cookie("access_token")
     return resp
 
 
 # NOTE: for normal user to get their session token
-@router.get("/session-token", name="user:login")
-def get_user_session_token():
-    token = user_auth_handler.encode_token()
+@router.get("/session-id", name="user:login")
+def get_user_session_id():
+    session_id = user_auth_handler.encode_token()
     resp = Response()
-    resp.set_cookie("token", token, max_age=3600)
+    # NOTE: age is 1 year cause we don't wanna user to keep changing ID
+    resp.set_cookie("session_id", session_id, max_age=31556952)
     return resp

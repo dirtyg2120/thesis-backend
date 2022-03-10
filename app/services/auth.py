@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 from random import randint
 
 import jwt
-from fastapi import HTTPException, Security
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import Cookie, HTTPException
+from fastapi.security import HTTPBearer
 from passlib.context import CryptContext  # type: ignore
 
 from app.core.config import settings
@@ -51,13 +51,13 @@ class UserAuthHandler:
         except jwt.InvalidTokenError:
             raise HTTPException(status_code=401, detail="Invalid token")
 
-    def auth_wrapper(self, auth: HTTPAuthorizationCredentials = Security(security)):
+    def auth_wrapper(self, session_id: str = Cookie(None)):
         """
         This is the wrapper used to enforce authentication on protected endpoints
         Use this by declaring endpoints with Dependency
             'def protected_endpoint(username=Depends(auth_handler.auth_wrapper))'
         """
-        return self.decode_token(auth.credentials)
+        return self.decode_token(session_id)
 
 
 class OperatorAuthHandler(UserAuthHandler):
@@ -96,3 +96,6 @@ class OperatorAuthHandler(UserAuthHandler):
             sub={"user_id": user_id, "role": "operator"},
         ).dict()
         return jwt.encode(payload, self.private_key)
+
+    def auth_wrapper(self, access_token: str = Cookie(None)):
+        return self.decode_token(access_token)
