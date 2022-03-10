@@ -26,6 +26,6 @@ def add_ml_data(
 
 
 @router.get("/get-analysis-result", name="user:get-analysis-result")
-def add_ml_data():
+def get_analysis_result():
     result = ml_service.get_analysis_result()
     return result
