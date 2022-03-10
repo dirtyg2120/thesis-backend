@@ -29,7 +29,7 @@ def login(auth_details: schemas.AuthDetails):
 
     """
     resp.set_cookie(
-        "accessToken",
+        "access_token",
         token,
         max_age=settings.TOKEN_EXPIRATION_TIME * 60,
     )
@@ -39,7 +39,7 @@ def login(auth_details: schemas.AuthDetails):
 @router.post("/logout", name="operator:logout")
 def logout(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
     resp = Response()
-    resp.delete_cookie("accessToken")
+    resp.delete_cookie("access_token")
     return resp
 
 
@@ -49,5 +49,5 @@ def get_user_session_id():
     session_id = user_auth_handler.encode_token()
     resp = Response()
     # NOTE: age is 1 year cause we don't wanna user to keep changing ID
-    resp.set_cookie("sessionID", session_id, max_age=31556952)
+    resp.set_cookie("session_id", session_id, max_age=31556952)
     return resp

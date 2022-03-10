@@ -29,24 +29,19 @@ def test_login_success(create_operator):
 
 def test_logout_not_logged_in(create_operator):
     response = client.post("/auth/logout", headers={"accept": "application/json"})
-    assert response.status_code == 403
-    assert response.json() == {"detail": "Not authenticated"}
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Invalid token"}
 
 
 def test_logout_success(create_operator):
-    login_response = client.post(
+    client.post(
         "/auth/login",
         headers={"accept": "application/json", "Content-Type": "application/json"},
         json={"username": "test", "password": "test"},
     )
-    access_token = login_response.headers["set-cookie"].split(";")[0].split("=")[1]
 
     logout_response = client.post(
         "/auth/logout",
-        headers={
-            "accept": "application/json",
-            "Authorization": f"Bearer {access_token}",
-        },
     )
     assert logout_response.status_code == 200
 
@@ -59,6 +54,6 @@ def test_get_user_session_token():
         )
         assert response.status_code == 200
         cookie = cookies.SimpleCookie(response.headers["set-cookie"])
-        session_id = cookie["sessionID"].value
+        session_id = cookie["session_id"].value
         assert session_id not in issued_ids
         issued_ids.append(session_id)
