@@ -36,7 +36,7 @@ def user_info_check(url: str, scraper: TwitterScraper = Depends()):
 
 @router.get("/detail", response_model=schemas.DetailResponse, name="user:get-detail")
 def user_detail_check(username: str, scraper: TwitterScraper = Depends()):
-    # No need to validate because user can only click detail button after user_info_check()
+    # No need to validate because user can only click detail button after info check
     user_db = scraper.get_user_by_username(username)
 
     recent_tweets = scraper.get_tweet_info(

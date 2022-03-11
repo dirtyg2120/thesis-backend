@@ -1,8 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
 
-from app.schemas.tweet import Tweet
-
 
 class ReportResponse(BaseModel):
     id: str

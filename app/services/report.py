@@ -16,10 +16,9 @@ class ReportService:
 
     def add_report(self, username: str) -> Report:
         """
-        Precondition: User must check_user before send report, 
-                      so no need to validate username or check if 
+        Precondition: User must check_user before send report,
+                      so no need to validate username or check if
                       user exist in DB
-
         Check if report exist in DB, if yes -> +1 to report_count
                                      if no -> add report to DB
         """
