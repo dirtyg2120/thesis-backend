@@ -4,7 +4,7 @@ from typing import List
 from pydantic import BaseModel
 
 
-class Tweet(BaseModel):
+class TweetResponse(BaseModel):
     id: str
     text: str
     created_at: datetime
@@ -21,4 +21,4 @@ class TweetStatistics(BaseModel):
 
 
 class TweetInfo(TweetStatistics):
-    recent_tweets: List[Tweet]
+    recent_tweets: List[TweetResponse]

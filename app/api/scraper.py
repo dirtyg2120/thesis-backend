@@ -35,18 +35,30 @@ def user_info_check(url: str, scraper: TwitterScraper = Depends()):
 
 
 @router.get("/detail", response_model=schemas.DetailResponse, name="user:get-detail")
-def user_detail_check(username: str, scraper: TwitterScraper = Depends()):
-    # No need to validate because user can only click detail button after info check
+def user_detail_check(url: str, scraper: TwitterScraper = Depends()):
+    # Validate input url
+    if url[:20] == "https://twitter.com/":
+        username = url.split("/")[3]
+    elif url[:12] == "twitter.com/":
+        username = url.split("/")[1]
+    elif url != "" and "/" not in url:
+        username = url
+    else:
+        raise HTTPException(status_code=400, detail="'url' argument is invalid!")
+
     user_db = scraper.get_user_by_username(username)
 
     recent_tweets = scraper.get_tweet_info(
         user_db["twitter_id"], settings.TWEETS_NUMBER
     )
+
+    recent_tweets_response = [tweet.to_response() for tweet in recent_tweets]
+
     day_of_week, hour_of_day = scraper.get_frequency(user_db["twitter_id"])
     tweet_info = schemas.TweetInfo(
         day_of_week=day_of_week,
         hour_of_day=hour_of_day,
-        recent_tweets=recent_tweets,
+        recent_tweets=recent_tweets_response,
     )
 
     user_info = schemas.TwitterUser(
