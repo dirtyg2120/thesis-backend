@@ -16,3 +16,8 @@ class User(Document):
     timestamp: datetime = DateTimeField(default=datetime.utcnow)
 
     meta = {"collection": "twitter_user_collection"}
+
+class Tweet(Document):
+    tweet_id = StringField(primary_key=True)
+    text: str = StringField(required=True)
+    created_at: datetime = DateTimeField(required=True)

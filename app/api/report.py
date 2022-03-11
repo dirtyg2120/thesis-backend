@@ -10,8 +10,10 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app import schemas
 from app.services.auth import OperatorAuthHandler, UserAuthHandler
+from app.services.report import ReportService
 
 router = APIRouter()
+report_service = ReportService()
 user_auth_handler = UserAuthHandler()
 operator_auth_handler = OperatorAuthHandler()
 
@@ -27,6 +29,7 @@ def view_reports(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
     - Take report from DB
     - Show needed information
     """
+
     return [{"name": "report 1"}, {"name": "report 2"}]
 
 
