@@ -56,7 +56,6 @@ class TwitterScraper:
                     detail=f"User account @{username} has been suspended",
                 )
             else:
-                print(type(user))
                 user_db = TwitterUser(
                     twitter_id=user.id_str,
                     name=user.name,
