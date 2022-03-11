@@ -12,7 +12,6 @@ class ReportResponse(BaseModel):
     created_at: datetime
     followers_count: int
     followings_count: int
-    tweets: List[Tweet]
     scrape_date: datetime
     reset_date: datetime
     report_count: int

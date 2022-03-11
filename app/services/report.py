@@ -1,6 +1,6 @@
 from datetime import datetime
-from re import T
 from typing import List
+from app.core.config import settings
 from app.models import Report
 from app.models import TwitterUser
 from app.services.scrape import TwitterScraper
@@ -8,31 +8,40 @@ from app.services.scrape import TwitterScraper
 
 class ReportService:
     def get_report_list(self) -> List[Report]:
-        try:
-            report_list = Report.objects
-            test = []
-            for report in report_list:
-                test.append(report.to_response())
-        except Exception as e:
-            print("error: " + str(e))
-        return test
+        """
+        Get report list to display to Operator, but not display tweets
+        """
+        report_list = [report.to_response() for report in Report.objects]
+        return report_list
 
-    def add_report(self, username) -> Report:
+    def add_report(self, username: str) -> Report:
+        """
+        Precondition: User must check_user before send report, so no need to validate
+                      username or check if user exist in DB
+
+        Check if report exist in DB, if yes -> +1 to report_count
+                                     if no -> add report to DB
+        """
         report_db = Report.objects(username=username).first()
 
         if report_db is None:
             try:
                 user = TwitterUser.objects(username=username).first()
+                recent_tweets = TwitterScraper().get_tweet_info(
+                    user.twitter_id, settings.TWEETS_NUMBER
+                )
             except Exception as e:
-                print("error: " + str(e))
+                # Dunno wat wrong :))
+                print("Something wrong: " + str(e))
             else:
                 report_db = Report(
-                    twitter_id=str(user.pk),
+                    twitter_id=user.twitter_id,
                     name=user.name,
                     username=user.username,
                     created_at=user.created_at,
                     followers_count=user.followers_count,
                     followings_count=user.followings_count,
+                    tweets=recent_tweets,
                     scrape_date=user.timestamp,
                     reset_date=datetime.now(),
                     report_count=1,
