@@ -17,6 +17,7 @@ class User(Document):
 
     meta = {"collection": "twitter_user_collection"}
 
+
 class Tweet(Document):
     tweet_id = StringField(primary_key=True)
     text: str = StringField(required=True)
