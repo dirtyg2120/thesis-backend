@@ -32,6 +32,6 @@ class Report(Document):
             tweets=self.tweets,
             scrape_date=self.scrape_date,
             reset_date=self.reset_date,
-            report_count=self.report_count
+            report_count=self.report_count,
         )
         return response

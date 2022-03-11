@@ -22,7 +22,9 @@ operator_auth_handler = OperatorAuthHandler()
 
 
 @router.get(
-    "/view-reports", response_model=List[schemas.AccountReport], name="operator:view-report"
+    "/view-reports",
+    response_model=List[schemas.AccountReport],
+    name="operator:view-report",
 )
 def view_reports(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
     report_list = report_service.get_report_list()
@@ -31,10 +33,7 @@ def view_reports(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
 
 # NOTE: User only
 @router.post("/send-report/{twitter_user_id}", name="user:send-report")
-def send_report(
-    username: str, user_identifier=Depends(user_auth_handler.auth_wrapper)
-):
-    """
+def send_report(username: str, user_identifier=Depends(user_auth_handler.auth_wrapper)):
     report = report_service.add_report(username)
 
     # NOTE: remove this fake check when implemented
