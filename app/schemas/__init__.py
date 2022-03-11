@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 
 from .auth import AccessToken, AuthDetails, TokenPayload, UserIdentifier
+from .report import ReportResponse
 from .tweet import TweetInfo
 from .twitter_user import TwitterUser
-from .report import ReportResponse
 
 
 class CheckResponse(BaseModel):

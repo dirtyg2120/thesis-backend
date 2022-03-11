@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import List
+
 from app.core.config import settings
-from app.models import Report
-from app.models import TwitterUser
+from app.models import Report, TwitterUser
 from app.services.scrape import TwitterScraper
 
 

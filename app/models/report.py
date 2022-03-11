@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import List
-from mongoengine import Document, DateTimeField, IntField, ListField, StringField
+
 import tweepy
+from mongoengine import DateTimeField, Document, IntField, ListField, StringField
 
 from app.schemas import ReportResponse
 
