@@ -3,7 +3,7 @@ from typing import List
 from mongoengine import Document, DateTimeField, IntField, ListField, StringField
 
 from app.models.twitter import Tweet
-from app.schemas import AccountReport
+from app.schemas import ReportResponse
 
 
 class Report(Document):
@@ -21,8 +21,8 @@ class Report(Document):
 
     meta = {"collection": "report_collection"}
 
-    def to_response(self) -> AccountReport:
-        response = AccountReport(
+    def to_response(self) -> ReportResponse:
+        response = ReportResponse(
             id=self.twitter_id,
             name=self.name,
             username=self.username,

@@ -23,7 +23,7 @@ operator_auth_handler = OperatorAuthHandler()
 
 @router.get(
     "/view-reports",
-    response_model=List[schemas.AccountReport],
+    response_model=List[schemas.ReportResponse],
     name="operator:view-report",
 )
 def view_reports(user_identifier=Depends(operator_auth_handler.auth_wrapper)):

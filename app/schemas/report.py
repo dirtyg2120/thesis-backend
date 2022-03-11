@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from app.schemas.tweet import Tweet
 
 
-class AccountReport(BaseModel):
+class ReportResponse(BaseModel):
     id: str
     name: str
     username: str
