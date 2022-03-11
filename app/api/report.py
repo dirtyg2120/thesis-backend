@@ -3,9 +3,9 @@ These are endpoints to handle
 - User reporting wrong prediction result
 - Operator viewing reports
 """
+import secrets
 from random import randint
 from typing import Optional
-from uuid import uuid4
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException
 
@@ -45,7 +45,7 @@ def send_report(twitter_user_id: str, session_id: Optional[str] = Cookie(None)):
         - Increase report count
     """
     if session_id is None:
-        session_id = str(uuid4())
+        session_id = secrets.token_hex()
     # NOTE: remove this fake check when implemented
     user_already_reported = randint(0, 1) == 0
     if user_already_reported:
