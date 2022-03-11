@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 
 from app.core.config import settings
-from app.models import Report, TwitterUser
+from app.models import Report
 
 from .scrape import TwitterScraper
 
