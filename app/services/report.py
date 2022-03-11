@@ -3,7 +3,8 @@ from typing import List
 
 from app.core.config import settings
 from app.models import Report, TwitterUser
-from app.services.scrape import TwitterScraper
+
+from .scrape import TwitterScraper
 
 
 class ReportService:
