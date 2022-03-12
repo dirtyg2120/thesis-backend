@@ -11,5 +11,4 @@ class ReportResponse(BaseModel):
     followers_count: int
     followings_count: int
     scrape_date: datetime
-    reset_date: datetime
     report_count: int

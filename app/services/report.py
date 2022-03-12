@@ -40,7 +40,6 @@ class ReportService:
                 followings_count=user.followings_count,
                 tweets=recent_tweets,
                 scrape_date=user.timestamp,
-                reset_date=datetime.now(),
                 report_count=1,
             )
         else:
