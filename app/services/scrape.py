@@ -69,10 +69,8 @@ class TwitterScraper:
                     banner=getattr(user, "profile_banner_url", None),
                     tweets=recent_tweets,
                 )
-                try:
-                    user_db.save()
-                except Exception as e:
-                    print(e)
+
+                user_db.save()
 
         return user_db
 
