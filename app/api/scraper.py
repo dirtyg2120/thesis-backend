@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from app import schemas
-from app.core.config import settings
 from app.services.scrape import TwitterScraper
 
 router = APIRouter()
@@ -20,6 +19,7 @@ def user_info_check(url: str, scraper: TwitterScraper = Depends()):
         raise HTTPException(status_code=400, detail="'url' argument is invalid!")
 
     user_db = scraper.get_user_by_username(username)
+
     user_info = schemas.TwitterUser(
         id=user_db.twitter_id,
         name=user_db.name,
@@ -48,10 +48,7 @@ def user_detail_check(url: str, scraper: TwitterScraper = Depends()):
 
     user_db = scraper.get_user_by_username(username)
 
-    recent_tweets = scraper.get_tweet_info(
-        user_db["twitter_id"], settings.TWEETS_NUMBER
-    )
-
+    recent_tweets = user_db.tweets
     recent_tweets_response = [tweet.to_response() for tweet in recent_tweets]
 
     day_of_week, hour_of_day = scraper.get_frequency(user_db["twitter_id"])

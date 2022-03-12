@@ -1,6 +1,5 @@
 from typing import List
 
-from app.core.config import settings
 from app.models import Report
 
 from .scrape import TwitterScraper
@@ -27,9 +26,6 @@ class ReportService:
         if report_db is None:
             user = TwitterScraper().get_user_by_username(username)
 
-            recent_tweets = TwitterScraper().get_tweet_info(
-                user.twitter_id, settings.TWEETS_NUMBER
-            )
             report_db = Report(
                 twitter_id=user.twitter_id,
                 name=user.name,
@@ -37,7 +33,7 @@ class ReportService:
                 created_at=user.created_at,
                 followers_count=user.followers_count,
                 followings_count=user.followings_count,
-                tweets=recent_tweets,
+                tweets=user.tweets,
                 scrape_date=user.timestamp,
                 report_count=1,
             )

@@ -56,8 +56,10 @@ class TwitterScraper:
                     detail=f"User account @{username} has been suspended",
                 )
             else:
+                recent_tweets = self.get_tweet_info(user.id_str, settings.TWEETS_NUMBER)
+
                 user_db = TwitterUser(
-                    twitter_id=user.id_str,
+                    twitter_id=str(user.id_str),
                     name=user.name,
                     username=user.screen_name,
                     created_at=user.created_at,
@@ -65,9 +67,12 @@ class TwitterScraper:
                     followings_count=user.friends_count,
                     avatar=user.profile_image_url,
                     banner=getattr(user, "profile_banner_url", None),
+                    tweets=recent_tweets,
                 )
-
-                user_db.save()
+                try:
+                    user_db.save()
+                except Exception as e:
+                    print(e)
 
         return user_db
 
@@ -129,7 +134,7 @@ class TwitterScraper:
         )
 
         tweets_model = [
-            Tweet(tweet_id=tweet.id, text=tweet.text, created_at=tweet.created_at)
+            Tweet(tweet_id=str(tweet.id), text=tweet.text, created_at=tweet.created_at)
             for tweet in tweets
         ]
         return tweets_model

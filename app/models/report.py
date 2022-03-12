@@ -1,7 +1,13 @@
 from datetime import datetime
 from typing import List
 
-from mongoengine import DateTimeField, Document, IntField, ListField, StringField
+from mongoengine import (
+    DateTimeField,
+    Document,
+    EmbeddedDocumentListField,
+    IntField,
+    StringField,
+)
 
 from app.schemas import ReportResponse
 
@@ -15,7 +21,7 @@ class Report(Document):
     created_at: datetime = DateTimeField(required=True)
     followers_count: int = IntField(required=True)
     followings_count: int = IntField(required=True)
-    tweets: List[Tweet] = ListField(default=[])
+    tweets: List[Tweet] = EmbeddedDocumentListField(Tweet, default=[])
     scrape_date: datetime = DateTimeField(required=True)
     report_count: int = IntField(required=True)
 
