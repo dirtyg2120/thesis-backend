@@ -12,7 +12,7 @@ from mongoengine import (
     StringField,
 )
 
-from app.schemas import TweetResponse
+from app.schemas import TweetResponse, TwitterUser
 
 
 class Tweet(EmbeddedDocument):
@@ -42,3 +42,18 @@ class User(Document):
     timestamp: datetime = DateTimeField(default=datetime.utcnow)
 
     meta = {"collection": "twitter_user_collection"}
+
+    def to_response(self):
+        response = TwitterUser(
+            id=self.twitter_id,
+            name=self.name,
+            username=self.username,
+            created_at=self.created_at,
+            followers_count=self.followers_count,
+            followings_count=self.followings_count,
+            verified=self.verified,
+            avatar=self.avatar,
+            banner=self.banner,
+            score=self.score,
+        )
+        return response
