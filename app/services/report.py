@@ -1,12 +1,13 @@
 from typing import List
 
 from app.models import Report
+from app.schemas.report import ReportResponse
 
 from .scrape import TwitterScraper
 
 
 class ReportService:
-    def get_report_list(self) -> List[Report]:
+    def get_report_list(self) -> List[ReportResponse]:
         """
         Get report list to display to Operator, but not display tweets
         """
