@@ -59,7 +59,7 @@ class TwitterScraper:
                 recent_tweets = self.get_tweet_info(user.id_str, settings.TWEETS_NUMBER)
 
                 user_db = TwitterUser(
-                    twitter_id=str(user.id_str),
+                    twitter_id=user.id_str,
                     name=user.name,
                     username=user.screen_name,
                     created_at=user.created_at,
