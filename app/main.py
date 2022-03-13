@@ -1,4 +1,3 @@
-import logging.config
 from datetime import timedelta
 
 from fastapi import FastAPI
@@ -8,10 +7,7 @@ from mongoengine import connect, disconnect
 
 from .api import api_router
 from .core.config import settings
-from .core.logging_config import LOGGING_CONFIG
 from .services.clean_database import clean_database
-
-logging.config.dictConfig(LOGGING_CONFIG)
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION)
 
@@ -50,4 +46,14 @@ def disconnect_db():
 if __name__ == "__main__":
     import uvicorn  # type: ignore
 
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True, debug=False)
+    log_config = uvicorn.config.LOGGING_CONFIG
+    log_config["loggers"]["app"] = {"level": "INFO", "handlers": ["default"]}
+
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+        debug=False,
+        log_config=log_config,
+    )
