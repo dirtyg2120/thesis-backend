@@ -10,5 +10,7 @@ class ReportResponse(BaseModel):
     created_at: datetime
     followers_count: int
     followings_count: int
+    verified: bool
     scrape_date: datetime
     report_count: int
+    score: float

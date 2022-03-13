@@ -2,9 +2,11 @@ from datetime import datetime
 from typing import List
 
 from mongoengine import (
+    BooleanField,
     DateTimeField,
     Document,
     EmbeddedDocumentListField,
+    FloatField,
     IntField,
     StringField,
 )
@@ -21,9 +23,11 @@ class Report(Document):
     created_at: datetime = DateTimeField(required=True)
     followers_count: int = IntField(required=True)
     followings_count: int = IntField(required=True)
+    verified: bool = BooleanField(required=True)
     tweets: List[Tweet] = EmbeddedDocumentListField(Tweet, default=[])
     scrape_date: datetime = DateTimeField(required=True)
     report_count: int = IntField(required=True)
+    score: float = FloatField(required=True)
 
     meta = {"collection": "report_collection"}
 
@@ -35,8 +39,10 @@ class Report(Document):
             created_at=self.created_at,
             followers_count=self.followers_count,
             followings_count=self.followings_count,
+            verified=self.verified,
             tweets=self.tweets,
             scrape_date=self.scrape_date,
             report_count=self.report_count,
+            score=self.score,
         )
         return response

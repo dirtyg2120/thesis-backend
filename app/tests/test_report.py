@@ -4,6 +4,7 @@ from . import client
 
 USERNAME = "JohnCena"
 
+
 def test_user_report_twitter_account():
     auth_response = client.get(
         "/auth/session-id", headers={"accept": "application/json"}

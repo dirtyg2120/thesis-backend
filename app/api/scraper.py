@@ -27,10 +27,11 @@ def user_info_check(url: str, scraper: TwitterScraper = Depends()):
         created_at=user_db.created_at,
         followers_count=user_db.followers_count,
         followings_count=user_db.followings_count,
+        verified=user_db.verified,
         avatar=user_db.avatar,
         banner=user_db.banner,
     )
-    response = schemas.CheckResponse(is_real=False, user_info=user_info)
+    response = schemas.CheckResponse(score=user_db.score, user_info=user_info)
     return response
 
 
@@ -65,8 +66,11 @@ def user_detail_check(url: str, scraper: TwitterScraper = Depends()):
         created_at=user_db.created_at,
         followers_count=user_db.followers_count,
         followings_count=user_db.followings_count,
+        verified=user_db.verified,
         avatar=user_db.avatar,
         banner=user_db.banner,
     )
-    response = schemas.DetailResponse(user_info=user_info, tweet_info=tweet_info)
+    response = schemas.DetailResponse(
+        user_info=user_info, tweet_info=tweet_info, score=user_db.score
+    )
     return response

@@ -10,6 +10,9 @@ from fastapi import HTTPException
 from app.core.config import settings
 from app.models import Tweet, TwitterUser
 from app.schemas.tweet import TimeSeries
+from app.services.ml import ML
+
+ml_service = ML()
 
 
 def _make_key(method_name: str):
@@ -65,9 +68,11 @@ class TwitterScraper:
                     created_at=user.created_at,
                     followers_count=user.followers_count,
                     followings_count=user.friends_count,
+                    verified=user.verified,
                     avatar=user.profile_image_url,
                     banner=getattr(user, "profile_banner_url", None),
                     tweets=recent_tweets,
+                    score=ml_service.get_analysis_result(user.screen_name),
                 )
 
                 user_db.save()

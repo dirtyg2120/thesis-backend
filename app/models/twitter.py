@@ -2,10 +2,12 @@ from datetime import datetime
 from typing import List, Optional
 
 from mongoengine import (
+    BooleanField,
     DateTimeField,
     Document,
     EmbeddedDocument,
     EmbeddedDocumentListField,
+    FloatField,
     IntField,
     StringField,
 )
@@ -32,9 +34,11 @@ class User(Document):
     created_at: datetime = DateTimeField(required=True)
     followers_count: int = IntField(required=True)
     followings_count: int = IntField(required=True)
+    verified: bool = BooleanField(required=True)
     avatar: str = StringField(required=True)
     banner: Optional[str] = StringField()
     tweets: List[Tweet] = EmbeddedDocumentListField(Tweet, default=[])
+    score: float = FloatField(required=True)
     timestamp: datetime = DateTimeField(default=datetime.utcnow)
 
     meta = {"collection": "twitter_user_collection"}

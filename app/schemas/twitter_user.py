@@ -11,5 +11,6 @@ class TwitterUser(BaseModel):
     created_at: datetime
     followers_count: int
     followings_count: int
+    verified: bool
     avatar: str
     banner: Optional[str]

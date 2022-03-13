@@ -34,9 +34,11 @@ class ReportService:
                 created_at=user.created_at,
                 followers_count=user.followers_count,
                 followings_count=user.followings_count,
+                verified=user.verified,
                 tweets=user.tweets,
                 scrape_date=user.timestamp,
                 report_count=1,
+                score=user.score,
             )
         else:
             report_db.report_count += 1
