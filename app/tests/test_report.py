@@ -1,8 +1,4 @@
-from email import header
 from http import cookies
-from typing import List
-
-from app.schemas.report import ReportResponse
 
 from . import client
 
