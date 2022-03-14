@@ -1,10 +1,9 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
 
-class TwitterUser(BaseModel):
+class ReportResponse(BaseModel):
     id: str
     name: str
     username: str
@@ -12,5 +11,6 @@ class TwitterUser(BaseModel):
     followers_count: int
     followings_count: int
     verified: bool
-    avatar: str
-    banner: Optional[str]
+    scrape_date: datetime
+    report_count: int
+    score: float

@@ -11,3 +11,7 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "mongoengine"
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tweepy"
+ignore_missing_imports = true
