@@ -19,6 +19,12 @@ def test_user_report_twitter_account():
     )
     assert report_response.json() == {"status": "success", "account": USERNAME}
 
+    re_report_response = client.post(
+        f"/api/send-report?username={USERNAME}",
+        headers={"accept": "application/json", "Cookie": f"session_id={session_id}"},
+    )
+    assert re_report_response.status_code == 420
+
 
 def test_operator_view_reports(create_operator):
     # Send data to check

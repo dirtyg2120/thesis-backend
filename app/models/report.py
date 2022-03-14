@@ -8,6 +8,7 @@ from mongoengine import (
     EmbeddedDocumentListField,
     FloatField,
     IntField,
+    ListField,
     StringField,
 )
 
@@ -26,7 +27,7 @@ class Report(Document):
     verified: bool = BooleanField(required=True)
     tweets: List[Tweet] = EmbeddedDocumentListField(Tweet, default=[])
     scrape_date: datetime = DateTimeField(required=True)
-    report_count: int = IntField(required=True)
+    reporters: List[str] = ListField(required=True)
     score: float = FloatField(required=True)
 
     meta = {"collection": "report_collection"}
@@ -42,7 +43,7 @@ class Report(Document):
             verified=self.verified,
             tweets=self.tweets,
             scrape_date=self.scrape_date,
-            report_count=self.report_count,
+            report_count=len(self.reporters),
             score=self.score,
         )
         return response

@@ -1,5 +1,7 @@
 from typing import List
 
+from fastapi import HTTPException
+
 from app.models import Report
 from app.schemas.report import ReportResponse
 
@@ -14,7 +16,7 @@ class ReportService:
         report_list = [report.to_response() for report in Report.objects]
         return report_list
 
-    def add_report(self, username: str) -> Report:
+    def add_report(self, username: str, reporter_id: str) -> Report:
         """
         Precondition: User must check_user before send report,
                       so no need to validate username or check if
@@ -23,7 +25,6 @@ class ReportService:
                                      if no -> add report to DB
         """
         report_db = Report.objects(username=username).first()
-
         if report_db is None:
             user = TwitterScraper().get_user_by_username(username)
 
@@ -37,11 +38,17 @@ class ReportService:
                 verified=user.verified,
                 tweets=user.tweets,
                 scrape_date=user.timestamp,
-                report_count=1,
+                reporters=[reporter_id],
                 score=user.score,
             )
         else:
-            report_db.report_count += 1
+            if reporter_id in report_db.reporters:
+                raise HTTPException(
+                    status_code=420,
+                    detail="User already reported this Twitter Account Recently!",
+                )
+
+            report_db.reporters.append(reporter_id)
 
         report_db.save()
 

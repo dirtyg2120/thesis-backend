@@ -17,29 +17,18 @@ user_auth_handler = UserAuthHandler()
 operator_auth_handler = OperatorAuthHandler()
 
 
-# Note: Operator only
 @router.get(
     "/view-reports",
     response_model=List[schemas.ReportResponse],
     name="operator:view-report",
 )
-# def view_reports():
 def view_reports(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
     report_list = report_service.get_report_list()
     return report_list
 
 
-# NOTE: User only
 @router.post("/send-report", name="user:send-report")
-# def send_report(username: str):
 def send_report(username: str, user_identifier=Depends(user_auth_handler.auth_wrapper)):
-    report = report_service.add_report(username)
+    report = report_service.add_report(username, reporter_id=user_identifier["user_id"])
 
-    # NOTE: remove this fake check when implemented
-    # user_already_reported = randint(0, 1) == 0
-    # if user_already_reported:
-    #     raise HTTPException(
-    #         status_code=420,
-    #         detail="User already reported this Twitter Account Recently!",
-    #     )
     return {"status": "success", "account": report.username}
