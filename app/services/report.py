@@ -19,7 +19,7 @@ class ReportService:
         report_list = [report.to_response() for report in Report.objects]
         return report_list
 
-    def add_report(self, username: str, reporter_id: str) -> Report:
+    def add_report(self, twitter_id: str, reporter_id: str) -> Report:
         """
         Precondition: User must check_user before send report,
                       so no need to validate username or check if
@@ -27,9 +27,9 @@ class ReportService:
         Check if report exist in DB, if yes -> +1 to report_count
                                      if no -> add report to DB
         """
-        report_db = Report.objects(username=username).first()
+        report_db = Report.objects(twitter_id=twitter_id).first()
         if report_db is None:
-            user = self.twitter_scraper.get_user_by_username(username)
+            user = self.twitter_scraper.get_user_by_id(twitter_id)
 
             report_db = Report(
                 twitter_id=user.twitter_id,
