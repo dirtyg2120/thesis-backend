@@ -27,7 +27,7 @@ class Report(Document):
     verified: bool = BooleanField(required=True)
     tweets: List[Tweet] = EmbeddedDocumentListField(Tweet, default=[])
     scrape_date: datetime = DateTimeField(required=True)
-    reporters: List[str] = ListField(required=True)
+    reporters: List[str] = ListField(StringField(), required=True)
     score: float = FloatField(required=True)
 
     meta = {"collection": "report_collection"}
