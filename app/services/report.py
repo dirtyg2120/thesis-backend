@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
 
 from app.models import Report
 from app.schemas.report import ReportResponse
@@ -9,6 +9,9 @@ from .scrape import TwitterScraper
 
 
 class ReportService:
+    def __init__(self, twitter_scraper: TwitterScraper = Depends()):
+        self.twitter_scraper = twitter_scraper
+
     def get_report_list(self) -> List[ReportResponse]:
         """
         Get report list to display to Operator, but not display tweets
@@ -26,7 +29,7 @@ class ReportService:
         """
         report_db = Report.objects(username=username).first()
         if report_db is None:
-            user = TwitterScraper().get_user_by_username(username)
+            user = self.twitter_scraper.get_user_by_username(username)
 
             report_db = Report(
                 twitter_id=user.twitter_id,
