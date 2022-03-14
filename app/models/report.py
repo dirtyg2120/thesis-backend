@@ -1,33 +1,23 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 from mongoengine import (
     BooleanField,
     DateTimeField,
     Document,
-    EmbeddedDocument,
     EmbeddedDocumentListField,
     FloatField,
     IntField,
+    ListField,
     StringField,
 )
 
-from app.schemas import TweetResponse, TwitterUser
+from app.schemas import ReportResponse
+
+from .twitter import Tweet
 
 
-class Tweet(EmbeddedDocument):
-    tweet_id = StringField(primary_key=True)
-    text: str = StringField(required=True)
-    created_at: datetime = DateTimeField(required=True)
-
-    def to_response(self) -> TweetResponse:
-        response = TweetResponse(
-            id=self.tweet_id, text=self.text, created_at=self.created_at
-        )
-        return response
-
-
-class User(Document):
+class Report(Document):
     twitter_id = StringField(primary_key=True)
     name: str = StringField(required=True)
     username: str = StringField(required=True)
@@ -35,16 +25,15 @@ class User(Document):
     followers_count: int = IntField(required=True)
     followings_count: int = IntField(required=True)
     verified: bool = BooleanField(required=True)
-    avatar: str = StringField(required=True)
-    banner: Optional[str] = StringField()
     tweets: List[Tweet] = EmbeddedDocumentListField(Tweet, default=[])
+    scrape_date: datetime = DateTimeField(required=True)
+    reporters: List[str] = ListField(StringField(), required=True)
     score: float = FloatField(required=True)
-    timestamp: datetime = DateTimeField(default=datetime.utcnow)
 
-    meta = {"collection": "twitter_user_collection"}
+    meta = {"collection": "report_collection"}
 
-    def to_response(self):
-        response = TwitterUser(
+    def to_response(self) -> ReportResponse:
+        response = ReportResponse(
             id=self.twitter_id,
             name=self.name,
             username=self.username,
@@ -52,8 +41,9 @@ class User(Document):
             followers_count=self.followers_count,
             followings_count=self.followings_count,
             verified=self.verified,
-            avatar=self.avatar,
-            banner=self.banner,
+            tweets=self.tweets,
+            scrape_date=self.scrape_date,
+            report_count=len(self.reporters),
             score=self.score,
         )
         return response

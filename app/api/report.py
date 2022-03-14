@@ -4,53 +4,34 @@ These are endpoints to handle
 - Operator viewing reports
 """
 import secrets
-from random import randint
-from typing import Optional
+from typing import List, Optional
 
-from fastapi import APIRouter, Cookie, Depends, HTTPException
+from fastapi import APIRouter, Cookie, Depends
 
 from app import schemas
 from app.services.auth import OperatorAuthHandler, UserAuthHandler
+from app.services.report import ReportService
 
 router = APIRouter()
+report_service = ReportService()
 user_auth_handler = UserAuthHandler()
 operator_auth_handler = OperatorAuthHandler()
 
-# Note: Operator only
-
 
 @router.get(
-    "/view-reports", response_model=schemas.AccountReport, name="operator:view-report"
+    "/view-reports",
+    response_model=List[schemas.ReportResponse],
+    name="operator:view-report",
 )
 def view_reports(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
-    """
-    TODO:
-    - Take report from DB
-    - Show needed information
-    """
-    return [{"name": "report 1"}, {"name": "report 2"}]
+    report_list = report_service.get_report_list()
+    return report_list
 
 
 # NOTE: User only
 @router.post("/send-report/{twitter_user_id}", name="user:send-report")
 def send_report(twitter_user_id: str, session_id: Optional[str] = Cookie(None)):
-    """
-    TODO:
-    1. If first report:
-        - Fetch account info from database or scrape
-        - Copy all needed into DB (Report table)
-        - Include a timestamp for the report
-        - Set report count as 1
-    2. Else:
-        - Increase report count
-    """
     if session_id is None:
         session_id = secrets.token_hex()
-    # NOTE: remove this fake check when implemented
-    user_already_reported = randint(0, 1) == 0
-    if user_already_reported:
-        raise HTTPException(
-            status_code=420,
-            detail="User already reported this Twitter Account Recently!",
-        )
-    return {"status": "success", "account": "twitter_account_1"}
+
+    report_service.add_report(twitter_user_id, reporter_id=session_id)
