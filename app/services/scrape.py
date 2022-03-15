@@ -81,14 +81,7 @@ class TwitterScraper:
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_id"))
     def get_user_by_id(self, twitter_id: str) -> TwitterUser:
-        """
-        Get details of Twitter user's information from given username.
-
-        Args:
-            username (string): The username of Twitter user got from input url.
-        Return:
-            myitems (schemas.TwitterUser): TwitterUser informations.
-        """
+        """Get Twitter user information from given ID."""
         user_db = TwitterUser.objects(twitter_id=twitter_id).first()
 
         if user_db is None:
