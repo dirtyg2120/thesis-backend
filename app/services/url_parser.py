@@ -2,7 +2,7 @@ from typing import Literal, Tuple
 from urllib.parse import urlparse
 
 
-def parse_url(url: str) -> Tuple[Literal["user", "tweet"], str]:
+def parse_twitter_url(url: str) -> Tuple[Literal["user", "tweet"], str]:
     parsed = urlparse(url)
 
     if parsed.netloc != "twitter.com":
