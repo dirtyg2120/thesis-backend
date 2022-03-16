@@ -8,7 +8,6 @@ from cachetools.keys import hashkey
 from fastapi import HTTPException
 
 from app.core.config import settings
-from app.models import Tweet, TwitterUser
 from app.schemas.tweet import TimeSeries
 
 
@@ -31,7 +30,7 @@ class TwitterScraper:
         self._cache: TTLCache = TTLCache(maxsize=1024, ttl=settings.TWEEPY_CACHE_TTL)
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_username"))
-    def get_user_by_username(self, username) -> TwitterUser:
+    def get_user_by_username(self, username) -> tweepy.User:
         """
         Get details of Twitter user's information from given username.
 
@@ -53,7 +52,7 @@ class TwitterScraper:
             )
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_id"))
-    def get_user_by_id(self, twitter_id: str) -> TwitterUser:
+    def get_user_by_id(self, twitter_id: str) -> tweepy.User:
         """Get Twitter user information from given ID."""
         try:
             return self.api.get_user(user_id=twitter_id)
@@ -102,7 +101,7 @@ class TwitterScraper:
         return followings
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_tweet_info"))
-    def get_tweet_info(self, user_id: str, tweets_num: int) -> List[Tweet]:
+    def get_tweet_info(self, user_id: str, tweets_num: int) -> List[tweepy.Tweet]:
         """
         Get list of a user's tweet (no replies, retweets)
         from given user's id and desired number of tweets.
@@ -123,12 +122,7 @@ class TwitterScraper:
                 max_results=min(tweets_num, 100),
             ).flatten(limit=tweets_num)
         )
-
-        tweets_model = [
-            Tweet(tweet_id=str(tweet.id), text=tweet.text, created_at=tweet.created_at)
-            for tweet in tweets
-        ]
-        return tweets_model
+        return tweets
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_frequency"))
     def get_frequency(self, user_id: str) -> Tuple[TimeSeries, TimeSeries]:

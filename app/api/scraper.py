@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app import schemas
 from app.core.config import settings
-from app.models import TwitterUser
+from app.models import Tweet, TwitterUser
 from app.services.ml import ML
 from app.services.scrape import TwitterScraper
 
@@ -30,7 +30,10 @@ def user_info_check(
     if user_db is None:
         _logger.info("This account is not exist in DB")
         user = scraper.get_user_by_username(username)
-        recent_tweets = scraper.get_tweet_info(user.id_str, settings.TWEETS_NUMBER)
+        recent_tweets = [
+            Tweet(tweet_id=str(tweet.id), text=tweet.text, created_at=tweet.created_at)
+            for tweet in scraper.get_tweet_info(user.id_str, settings.TWEETS_NUMBER)
+        ]
         user_db = TwitterUser(
             twitter_id=user.id_str,
             name=user.name,
