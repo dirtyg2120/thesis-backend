@@ -10,9 +10,6 @@ from fastapi import HTTPException
 from app.core.config import settings
 from app.models import Tweet, TwitterUser
 from app.schemas.tweet import TimeSeries
-from app.services.ml import ML
-
-ml_service = ML()
 
 
 def _make_key(method_name: str):
@@ -43,80 +40,32 @@ class TwitterScraper:
         Return:
             myitems (schemas.TwitterUser): TwitterUser informations.
         """
-        user_db = TwitterUser.objects(username=username).first()
-
-        if user_db is None:
-            print("This account is not exist in DB")
-            try:
-                user = self.api.get_user(screen_name=username)
-            except tweepy.NotFound:
-                raise HTTPException(
-                    status_code=404, detail=f"User account @{username} not found"
-                )
-            except tweepy.Forbidden:
-                raise HTTPException(
-                    status_code=403,
-                    detail=f"User account @{username} has been suspended",
-                )
-            else:
-                recent_tweets = self.get_tweet_info(user.id_str, settings.TWEETS_NUMBER)
-
-                user_db = TwitterUser(
-                    twitter_id=user.id_str,
-                    name=user.name,
-                    username=user.screen_name,
-                    created_at=user.created_at,
-                    followers_count=user.followers_count,
-                    followings_count=user.friends_count,
-                    verified=user.verified,
-                    avatar=user.profile_image_url,
-                    banner=getattr(user, "profile_banner_url", None),
-                    tweets=recent_tweets,
-                    score=ml_service.get_analysis_result(user.screen_name),
-                )
-
-                user_db.save()
-
-        return user_db
+        try:
+            return self.api.get_user(screen_name=username)
+        except tweepy.NotFound:
+            raise HTTPException(
+                status_code=404, detail=f"User account @{username} not found"
+            )
+        except tweepy.Forbidden:
+            raise HTTPException(
+                status_code=403,
+                detail=f"User account @{username} has been suspended",
+            )
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_id"))
     def get_user_by_id(self, twitter_id: str) -> TwitterUser:
         """Get Twitter user information from given ID."""
-        user_db = TwitterUser.objects(twitter_id=twitter_id).first()
-
-        if user_db is None:
-            print("This account is not exist in DB")
-            try:
-                user = self.api.get_user(user_id=twitter_id)
-            except tweepy.NotFound:
-                raise HTTPException(
-                    status_code=404, detail=f"User with ID {twitter_id} not found"
-                )
-            except tweepy.Forbidden:
-                raise HTTPException(
-                    status_code=403,
-                    detail=f"User with ID {twitter_id} has been suspended",
-                )
-            else:
-                recent_tweets = self.get_tweet_info(user.id_str, settings.TWEETS_NUMBER)
-
-                user_db = TwitterUser(
-                    twitter_id=user.id_str,
-                    name=user.name,
-                    username=user.screen_name,
-                    created_at=user.created_at,
-                    followers_count=user.followers_count,
-                    followings_count=user.friends_count,
-                    verified=user.verified,
-                    avatar=user.profile_image_url,
-                    banner=getattr(user, "profile_banner_url", None),
-                    tweets=recent_tweets,
-                    score=ml_service.get_analysis_result(user.screen_name),
-                )
-
-                user_db.save()
-
-        return user_db
+        try:
+            return self.api.get_user(user_id=twitter_id)
+        except tweepy.NotFound:
+            raise HTTPException(
+                status_code=404, detail=f"User with ID {twitter_id} not found"
+            )
+        except tweepy.Forbidden:
+            raise HTTPException(
+                status_code=403,
+                detail=f"User with ID {twitter_id} has been suspended",
+            )
 
     def get_followers(self, followers_numbs):
         """
