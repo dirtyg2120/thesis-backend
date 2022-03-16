@@ -30,9 +30,8 @@ class TwitterScraper:
         self._cache: TTLCache = TTLCache(maxsize=1024, ttl=settings.TWEEPY_CACHE_TTL)
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_username"))
-    def get_user_by_username(self, username) -> tweepy.User:
-        """
-        Get details of Twitter user's information from given username.
+    def get_user_by_username(self, username: str) -> tweepy.User:
+        """Get details of Twitter user's information from given username.
 
         Args:
             username (string): The username of Twitter user got from input url.
@@ -67,8 +66,7 @@ class TwitterScraper:
             )
 
     def get_followers(self, followers_numbs):
-        """
-        Get list of Twitter user's followers.
+        """Get list of Twitter user's followers.
 
         Args:
             followers_numbs (int): Number of followers to get.
@@ -84,8 +82,7 @@ class TwitterScraper:
         return followers
 
     def get_followings(self, followings_numbs):
-        """
-        Get list of Twitter user's followings.
+        """Get list of Twitter user's followings.
 
         Args:
             followings_numbs (int): Number of followings to get.
