@@ -2,7 +2,7 @@ from operator import attrgetter
 from typing import List, Tuple
 
 import pandas as pd
-import tweepy  # type: ignore
+import tweepy
 from cachetools import TTLCache, cachedmethod
 from cachetools.keys import hashkey
 from fastapi import HTTPException
