@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import Depends, HTTPException
 
-from app.models import Report
+from app.models import Report, TwitterUser
 from app.schemas.report import ReportResponse
 
 from .scrape import TwitterScraper
@@ -29,7 +29,10 @@ class ReportService:
         """
         report_db = Report.objects(twitter_id=twitter_id).first()
         if report_db is None:
-            user = self.twitter_scraper.get_user_by_id(twitter_id)
+            user = TwitterUser.objects(twitter_id=twitter_id).first()
+
+            if user is None:
+                raise HTTPException(404, "Twitter account not in database")
 
             report_db = Report(
                 twitter_id=user.twitter_id,
