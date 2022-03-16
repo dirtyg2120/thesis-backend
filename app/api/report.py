@@ -3,17 +3,17 @@ These are endpoints to handle
 - User reporting wrong prediction result
 - Operator viewing reports
 """
-from typing import List
+import secrets
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Cookie, Depends, Response
 
 from app import schemas
-from app.services.auth import OperatorAuthHandler, UserAuthHandler
+from app.core.config import settings
+from app.services.auth import OperatorAuthHandler
 from app.services.report import ReportService
 
 router = APIRouter()
-report_service = ReportService()
-user_auth_handler = UserAuthHandler()
 operator_auth_handler = OperatorAuthHandler()
 
 
@@ -22,12 +22,33 @@ operator_auth_handler = OperatorAuthHandler()
     response_model=List[schemas.ReportResponse],
     name="operator:view-report",
 )
-def view_reports(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
+def view_reports(
+    user_identifier=Depends(operator_auth_handler.auth_wrapper),
+    report_service: ReportService = Depends(),
+):
     report_list = report_service.get_report_list()
     return report_list
 
 
-@router.post("/send-report", name="user:send-report")
-def send_report(username: str, user_identifier=Depends(user_auth_handler.auth_wrapper)):
-    report_service.add_report(username, reporter_id=user_identifier["user_id"])
-    return None
+# NOTE: User only
+@router.post("/send-report/{twitter_user_id}", name="user:send-report")
+def send_report(
+    twitter_user_id: str,
+    session_id: Optional[str] = Cookie(None),
+    report_service: ReportService = Depends(),
+):
+    init_session = False
+    if session_id is None:
+        session_id = secrets.token_hex()
+        init_session = True
+
+    report_service.add_report(twitter_user_id, reporter_id=session_id)
+
+    if init_session:
+        resp = Response()
+        resp.set_cookie(
+            "session_id",
+            session_id,
+            max_age=settings.TOKEN_EXPIRATION_TIME * 60,
+        )
+        return resp
