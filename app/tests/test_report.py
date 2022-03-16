@@ -6,22 +6,15 @@ TWITTER_ID = "250831586"
 
 
 def test_user_report_twitter_account():
-    auth_response = client.get(
-        "/auth/session-id", headers={"accept": "application/json"}
-    )
-    assert auth_response.status_code == 200
-    cookie = cookies.SimpleCookie(auth_response.headers["set-cookie"])
-    session_id = cookie["session_id"].value
+    client.get("/api/check", params={"url": "https://twitter.com/TheRock"})
 
     report_response = client.post(
         f"/api/send-report/{TWITTER_ID}",
-        headers={"accept": "application/json", "Cookie": f"session_id={session_id}"},
     )
     assert report_response.status_code == 200
 
     re_report_response = client.post(
         f"/api/send-report/{TWITTER_ID}",
-        headers={"accept": "application/json", "Cookie": f"session_id={session_id}"},
     )
     assert re_report_response.status_code == 420
 
