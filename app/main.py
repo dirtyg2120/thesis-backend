@@ -47,7 +47,14 @@ if __name__ == "__main__":
     import uvicorn  # type: ignore
 
     log_config = uvicorn.config.LOGGING_CONFIG
-    log_config["loggers"]["app"] = {"level": "INFO", "handlers": ["default"]}
+    log_config["handlers"]["database"] = {
+        "class": "app.services.log_db_handler.LogDBHandler"
+    }
+    log_config["loggers"]["app"] = {
+        "level": "INFO",
+        "handlers": ["default", "database"],
+    }
+    log_config["loggers"]["uvicorn.access"]["handlers"].append("database")
 
     uvicorn.run(
         "app.main:app",
