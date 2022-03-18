@@ -9,16 +9,11 @@ router = APIRouter()
 
 @router.get("/check", response_model=schemas.CheckResponse, name="user:get-data")
 def user_info_check(url: str, scraper: TwitterScraper = Depends()):
-    try:
-        twitter_entity, twitter_id = parse_twitter_url(url)
-    except ValueError:
-        raise HTTPException(status_code=400, detail="'url' argument is invalid!")
-
-    if twitter_entity == "tweet":
-        tweet = scraper.api_v2.get_tweet(twitter_id, tweet_fields=["author_id"])
-        user_db = scraper.get_user_by_id(tweet.data.author_id)
+    if "/" not in url:
+        username = url
     else:
-        user_db = scraper.get_user_by_username(twitter_id)
+        username = parse_twitter_url(url)
+    user_db = scraper.get_user_by_username(username)
 
     response = schemas.CheckResponse(
         score=user_db.score, user_info=user_db.to_response()
