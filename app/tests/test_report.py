@@ -2,7 +2,7 @@ from http import cookies
 
 from . import client
 
-USERNAME = "JohnCena"
+TWITTER_ID = "250831586"
 
 
 def test_user_report_twitter_account():
@@ -14,13 +14,13 @@ def test_user_report_twitter_account():
     session_id = cookie["session_id"].value
 
     report_response = client.post(
-        f"/api/send-report?username={USERNAME}",
+        f"/api/send-report/{TWITTER_ID}",
         headers={"accept": "application/json", "Cookie": f"session_id={session_id}"},
     )
     assert report_response.status_code == 200
 
     re_report_response = client.post(
-        f"/api/send-report?username={USERNAME}",
+        f"/api/send-report/{TWITTER_ID}",
         headers={"accept": "application/json", "Cookie": f"session_id={session_id}"},
     )
     assert re_report_response.status_code == 420
@@ -45,4 +45,4 @@ def test_operator_view_reports(create_operator):
             "Cookie": f"access_token={access_token}",
         },
     )
-    assert view_report_response.json()[0]["username"] == USERNAME
+    assert view_report_response.json()[0]["id"] == TWITTER_ID
