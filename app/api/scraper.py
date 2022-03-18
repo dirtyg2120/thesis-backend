@@ -1,11 +1,8 @@
-import logging
-
 from fastapi import APIRouter, Depends, HTTPException
 
 from app import schemas
 from app.services.scrape import TwitterScraper
 
-_logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
