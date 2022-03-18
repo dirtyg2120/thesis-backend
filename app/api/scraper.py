@@ -9,6 +9,9 @@ router = APIRouter()
 
 @router.get("/check", response_model=schemas.CheckResponse, name="user:get-data")
 def user_info_check(url: str, scraper: TwitterScraper = Depends()):
+    if url == "":
+        raise HTTPException(400, "'url' argument is invalid!")
+
     if "/" not in url:
         username = url
     else:
