@@ -1,3 +1,4 @@
+import logging
 from operator import attrgetter
 from typing import List, Tuple
 
@@ -8,7 +9,11 @@ from cachetools.keys import hashkey
 from fastapi import HTTPException
 
 from app.core.config import settings
+from app.models import Tweet, TwitterUser
 from app.schemas.tweet import TimeSeries
+from app.services.ml import ML
+
+_logger = logging.getLogger(__name__)
 
 
 def _make_key(method_name: str):
@@ -28,27 +33,53 @@ class TwitterScraper:
             bearer_token=auth._bearer_token, wait_on_rate_limit=True
         )
         self._cache: TTLCache = TTLCache(maxsize=1024, ttl=settings.TWEEPY_CACHE_TTL)
+        self._ml_service = ML()
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_username"))
-    def get_user_by_username(self, username: str) -> tweepy.User:
-        """Get details of Twitter user's information from given username.
+    def get_user_by_username(self, username) -> TwitterUser:
+        """
+        Get details of Twitter user's information from given username.
 
         Args:
             username (string): The username of Twitter user got from input url.
         Return:
             myitems (schemas.TwitterUser): TwitterUser informations.
         """
-        try:
-            return self.api.get_user(screen_name=username)
-        except tweepy.NotFound:
-            raise HTTPException(
-                status_code=404, detail=f"User account @{username} not found"
-            )
-        except tweepy.Forbidden:
-            raise HTTPException(
-                status_code=403,
-                detail=f"User account @{username} has been suspended",
-            )
+        user_db = TwitterUser.objects(username=username).first()
+
+        if user_db is None:
+            _logger.info(f"Account @{username} not in DB, fetch it from Twitter API")
+            try:
+                user = self.api.get_user(screen_name=username)
+            except tweepy.NotFound:
+                raise HTTPException(
+                    status_code=404, detail=f"User account @{username} not found"
+                )
+            except tweepy.Forbidden:
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"User account @{username} has been suspended",
+                )
+            else:
+                recent_tweets = self.get_tweet_info(user.id_str, settings.TWEETS_NUMBER)
+
+                user_db = TwitterUser(
+                    twitter_id=user.id_str,
+                    name=user.name,
+                    username=user.screen_name,
+                    created_at=user.created_at,
+                    followers_count=user.followers_count,
+                    followings_count=user.friends_count,
+                    verified=user.verified,
+                    avatar=user.profile_image_url,
+                    banner=getattr(user, "profile_banner_url", None),
+                    tweets=recent_tweets,
+                    score=self._ml_service.get_analysis_result(user.screen_name),
+                )
+
+                user_db.save()
+
+        return user_db
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_id"))
     def get_user_by_id(self, twitter_id: str) -> tweepy.User:
@@ -98,7 +129,7 @@ class TwitterScraper:
         return followings
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_tweet_info"))
-    def get_tweet_info(self, user_id: str, tweets_num: int) -> List[tweepy.Tweet]:
+    def get_tweet_info(self, user_id: str, tweets_num: int) -> List[Tweet]:
         """
         Get list of a user's tweet (no replies, retweets)
         from given user's id and desired number of tweets.
@@ -119,7 +150,12 @@ class TwitterScraper:
                 max_results=min(tweets_num, 100),
             ).flatten(limit=tweets_num)
         )
-        return tweets
+
+        tweets_model = [
+            Tweet(tweet_id=str(tweet.id), text=tweet.text, created_at=tweet.created_at)
+            for tweet in tweets
+        ]
+        return tweets_model
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_frequency"))
     def get_frequency(self, user_id: str) -> Tuple[TimeSeries, TimeSeries]:
