@@ -23,3 +23,9 @@ def test_twitter_user_found():
     response = client.get("/api/check?url=https://twitter.com/TranQuo48955621")
     assert response.status_code == 200
     assert response.json()["user_info"]["name"] == "Tran Quoc Anh"
+
+
+def test_tweet_as_url_input():
+    tweet_url = "https://twitter.com/fasterthanlime/status/1504573289435484160"
+    response = client.get("/api/check?url=" + tweet_url)
+    assert response.status_code == 200

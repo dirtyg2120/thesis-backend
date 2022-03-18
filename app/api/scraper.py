@@ -16,7 +16,7 @@ def user_info_check(url: str, scraper: TwitterScraper = Depends()):
 
     if twitter_entity == "tweet":
         tweet = scraper.api_v2.get_tweet(twitter_id, tweet_fields=["author_id"])
-        user_db = scraper.get_user_by_id(tweet.author_id)
+        user_db = scraper.get_user_by_id(tweet.data.author_id)
     else:
         user_db = scraper.get_user_by_username(twitter_id)
 
