@@ -5,6 +5,7 @@ from app.models import Operator, TwitterUser
 from app.services.auth import OperatorAuthHandler
 
 from . import client
+from .helpers import *  # noqa: F403, F401
 
 DB_NAME = "mongoenginetest"
 OP_UNAME = "test"
