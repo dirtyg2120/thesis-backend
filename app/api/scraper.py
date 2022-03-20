@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app import schemas
 from app.services.scrape import TwitterScraper
-from app.services.url_parser import parse_twitter_url
+from app.services.url_parser import get_twitter_username
 
 router = APIRouter()
 
@@ -12,10 +12,7 @@ def user_info_check(url: str, scraper: TwitterScraper = Depends()):
     if url == "":
         raise HTTPException(400, "'url' argument is invalid!")
 
-    if "/" not in url:
-        username = url
-    else:
-        username = parse_twitter_url(url)
+    username = get_twitter_username(url)
     user_db = scraper.get_user_by_username(username)
 
     response = schemas.CheckResponse(
@@ -29,10 +26,7 @@ def user_detail_check(url: str, scraper: TwitterScraper = Depends()):
     if url == "":
         raise HTTPException(400, "'url' argument is invalid!")
 
-    if "/" not in url:
-        username = url
-    else:
-        username = parse_twitter_url(url)
+    username = get_twitter_username(url)
 
     user_db = scraper.get_user_by_username(username)
 
