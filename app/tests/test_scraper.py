@@ -5,6 +5,7 @@ import pytest
 from app.models import TwitterUser
 
 from . import client
+from .helpers.mock_models import MockData
 
 PATHS = ["check", "detail"]
 
@@ -50,40 +51,43 @@ class TestScrapper:
             }
             assert TwitterUser.objects().count() == 0
 
+    @pytest.mark.usefixtures("mock_user_found")
     class TestUserFound:
+        username = MockData.user_info()["username"]
+
         def assert_check_success(self, username, response):
             assert response.status_code == 200
             assert response.json()["user_info"]["username"] == username
             assert TwitterUser.objects().count() == 1
 
-        def test_input_https_url(self, path, mock_user_found):
+        def test_input_https_url(self, path):
             assert TwitterUser.objects().count() == 0
-            username = mock_user_found
+            username = self.username
             url = f"/api/{path}?url=https://twitter.com/{username}"
             response = client.get(url)
             self.assert_check_success(username, response)
 
-        def test_input_half_url(self, path, mock_user_found):
-            username = mock_user_found
+        def test_input_half_url(self, path):
+            username = self.username
             url = f"/api/{path}?url=twitter.com/{username}"
             response = client.get(url)
             self.assert_check_success(username, response)
 
-        def test_input_username_only(self, path, mock_user_found):
-            username = mock_user_found
+        def test_input_username_only(self, path):
+            username = self.username
             url = f"/api/{path}?url={username}"
             response = client.get(url)
             self.assert_check_success(username, response)
 
         @pytest.mark.parametrize("username", ["   ", "twitter.com", "(.)(.)"])
-        def test_input_weird_usernames(self, username, path, mock_user_found):
+        def test_input_weird_usernames(self, username, path):
             assert TwitterUser.objects().count() == 0
             response = client.get(f"/api/check?url={username}")
             assert response.status_code == 200
             assert TwitterUser.objects().count() == 1
 
-        def test_check_then_detail(self, path, mock_user_found):
-            username = mock_user_found
+        def test_check_then_detail(self, path):
+            username = self.username
             check_response = client.get(f"/api/check?url={username}")
             self.assert_check_success(username, check_response)
             detail_response = client.get(f"/api/detail?url={username}")

@@ -24,4 +24,4 @@ def mock_user_suspended():
 def mock_user_found():
     with (patch("tweepy.API") as mock_api,):
         mock_api().get_user.return_value = MockData.user_info()
-        yield MockData.user_info()["username"]
+        yield
