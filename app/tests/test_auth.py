@@ -1,5 +1,3 @@
-from http import cookies
-
 import pytest
 
 from . import client
@@ -44,16 +42,3 @@ def test_logout_success(create_operator):
         "/auth/logout",
     )
     assert logout_response.status_code == 200
-
-
-def test_get_user_session_token():
-    issued_ids = []
-    for _ in range(20):
-        response = client.get(
-            "/auth/session-id", headers={"accept": "application/json"}
-        )
-        assert response.status_code == 200
-        cookie = cookies.SimpleCookie(response.headers["set-cookie"])
-        session_id = cookie["session_id"].value
-        assert session_id not in issued_ids
-        issued_ids.append(session_id)

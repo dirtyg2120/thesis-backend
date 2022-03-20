@@ -41,13 +41,3 @@ def logout(user_identifier=Depends(operator_auth_handler.auth_wrapper)):
     resp = Response()
     resp.delete_cookie("access_token")
     return resp
-
-
-# NOTE: for normal user to get their session token
-@router.get("/session-id", name="user:login")
-def get_user_session_id():
-    session_id = user_auth_handler.encode_token()
-    resp = Response()
-    # NOTE: age is 1 year cause we don't wanna user to keep changing ID
-    resp.set_cookie("session_id", session_id, max_age=31556952)
-    return resp
