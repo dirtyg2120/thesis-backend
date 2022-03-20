@@ -1,8 +1,9 @@
+import logging
 from operator import attrgetter
 from typing import List, Tuple
 
 import pandas as pd
-import tweepy  # type: ignore
+import tweepy
 from cachetools import TTLCache, cachedmethod
 from cachetools.keys import hashkey
 from fastapi import HTTPException
@@ -12,7 +13,7 @@ from app.models import Tweet, TwitterUser
 from app.schemas.tweet import TimeSeries
 from app.services.ml import ML
 
-ml_service = ML()
+_logger = logging.getLogger(__name__)
 
 
 def _make_key(method_name: str):
@@ -32,6 +33,7 @@ class TwitterScraper:
             bearer_token=auth._bearer_token, wait_on_rate_limit=True
         )
         self._cache: TTLCache = TTLCache(maxsize=1024, ttl=settings.TWEEPY_CACHE_TTL)
+        self._ml_service = ML()
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_username"))
     def get_user_by_username(self, username) -> TwitterUser:
@@ -46,7 +48,7 @@ class TwitterScraper:
         user_db = TwitterUser.objects(username=username).first()
 
         if user_db is None:
-            print("This account is not exist in DB")
+            _logger.info(f"Account @{username} not in DB, fetch it from Twitter API")
             try:
                 user = self.api.get_user(screen_name=username)
             except tweepy.NotFound:
@@ -72,7 +74,7 @@ class TwitterScraper:
                     avatar=user.profile_image_url,
                     banner=getattr(user, "profile_banner_url", None),
                     tweets=recent_tweets,
-                    score=ml_service.get_analysis_result(user.screen_name),
+                    score=self._ml_service.get_analysis_result(user.screen_name),
                 )
 
                 user_db.save()
@@ -111,7 +113,7 @@ class TwitterScraper:
                     avatar=user.profile_image_url,
                     banner=getattr(user, "profile_banner_url", None),
                     tweets=recent_tweets,
-                    score=ml_service.get_analysis_result(user.screen_name),
+                    score=self._ml_service.get_analysis_result(user.screen_name),
                 )
 
                 user_db.save()
@@ -119,8 +121,7 @@ class TwitterScraper:
         return user_db
 
     def get_followers(self, followers_numbs):
-        """
-        Get list of Twitter user's followers.
+        """Get list of Twitter user's followers.
 
         Args:
             followers_numbs (int): Number of followers to get.
@@ -136,8 +137,7 @@ class TwitterScraper:
         return followers
 
     def get_followings(self, followings_numbs):
-        """
-        Get list of Twitter user's followings.
+        """Get list of Twitter user's followings.
 
         Args:
             followings_numbs (int): Number of followings to get.

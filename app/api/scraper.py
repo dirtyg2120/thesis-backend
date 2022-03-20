@@ -7,7 +7,9 @@ router = APIRouter()
 
 
 @router.get("/check", response_model=schemas.CheckResponse, name="user:get-data")
-def user_info_check(url: str, scraper: TwitterScraper = Depends()):
+def user_info_check(
+    url: str, scraper: TwitterScraper = Depends()
+) -> schemas.CheckResponse:
     # Validate input url
     if url[:20] == "https://twitter.com/":
         username = url.split("/")[3]
