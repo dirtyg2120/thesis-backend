@@ -8,7 +8,6 @@ from app.models import Operator, TwitterUser
 from app.services.auth import OperatorAuthHandler
 
 from . import client
-from .helpers import *  # noqa: F403, F401
 from .helpers.mock_models import MockPaginator
 
 DB_NAME = "mongoenginetest"
