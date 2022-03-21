@@ -2,24 +2,17 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app import schemas
 from app.services.scrape import TwitterScraper
+from app.services.url_parser import get_twitter_username
 
 router = APIRouter()
 
 
 @router.get("/check", response_model=schemas.CheckResponse, name="user:get-data")
-def user_info_check(
-    url: str, scraper: TwitterScraper = Depends()
-) -> schemas.CheckResponse:
-    # Validate input url
-    if url[:20] == "https://twitter.com/":
-        username = url.split("/")[3]
-    elif url[:12] == "twitter.com/":
-        username = url.split("/")[1]
-    elif url != "" and "/" not in url:
-        username = url
-    else:
-        raise HTTPException(status_code=400, detail="'url' argument is invalid!")
+def user_info_check(url: str, scraper: TwitterScraper = Depends()):
+    if url == "":
+        raise HTTPException(400, "'url' argument is invalid!")
 
+    username = get_twitter_username(url)
     user_db = scraper.get_user_by_username(username)
 
     response = schemas.CheckResponse(
@@ -30,15 +23,10 @@ def user_info_check(
 
 @router.get("/detail", response_model=schemas.DetailResponse, name="user:get-detail")
 def user_detail_check(url: str, scraper: TwitterScraper = Depends()):
-    # Validate input url
-    if url[:20] == "https://twitter.com/":
-        username = url.split("/")[3]
-    elif url[:12] == "twitter.com/":
-        username = url.split("/")[1]
-    elif url != "" and "/" not in url:
-        username = url
-    else:
-        raise HTTPException(status_code=400, detail="'url' argument is invalid!")
+    if url == "":
+        raise HTTPException(400, "'url' argument is invalid!")
+
+    username = get_twitter_username(url)
 
     user_db = scraper.get_user_by_username(username)
 
