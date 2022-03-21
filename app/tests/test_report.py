@@ -50,6 +50,7 @@ class TestUserReport:
                 },
             )
             assert response.status_code == 200
+            pytest.skip("Will be fixed")
 
     class TestTwitterAccountNotChecked:
         def test_report_un_checked_account(self):
@@ -106,6 +107,7 @@ class TestOperatorReport:
             - Current: 420 Error User blocked since already report account
         """
         assert response.status_code == 420
+        pytest.skip("Will be fixed")
         # check_account()
         # report_account()
         # assert Report.objects().count() == 2
