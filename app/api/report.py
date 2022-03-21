@@ -6,7 +6,7 @@ These are endpoints to handle
 import secrets
 from typing import List, Optional
 
-from fastapi import APIRouter, Cookie, Depends, HttpException, Response
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 
 from app import schemas
 from app.core.config import settings
@@ -45,7 +45,7 @@ def send_report(
     else:
         session = AnonymousSession.objects(session_id=session_id).first()
         if session is None:
-            raise HttpException(401, "Invalid session ID")
+            raise HTTPException(401, "Invalid session ID")
         init_session = False
 
     report_service.add_report(twitter_user_id, reporter_id=session_id)
