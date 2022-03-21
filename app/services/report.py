@@ -32,7 +32,7 @@ class ReportService:
             user = TwitterUser.objects(twitter_id=twitter_id).first()
 
             if user is None:
-                raise HTTPException(404, "Twitter account does not exist")
+                raise HTTPException(404, "Twitter account has not been checked")
 
             report_db = Report(
                 twitter_id=user.twitter_id,

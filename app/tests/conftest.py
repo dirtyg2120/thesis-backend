@@ -1,3 +1,6 @@
+from unittest.mock import patch
+
+import pytest
 from mongoengine import connect, disconnect
 from pytest import fixture
 
@@ -5,10 +8,21 @@ from app.models import Operator, TwitterUser
 from app.services.auth import OperatorAuthHandler
 
 from . import client
+from .helpers.mock_models import MockPaginator
 
 DB_NAME = "mongoenginetest"
 OP_UNAME = "test"
 OP_PASS = "test"
+
+
+@pytest.fixture(autouse=True, scope="session")
+def mock_tweepy_global():
+    with (
+        patch("tweepy.AppAuthHandler"),
+        patch("tweepy.Client"),
+        patch("tweepy.Paginator", wraps=MockPaginator),
+    ):
+        yield
 
 
 @fixture(autouse=True, scope="function")
