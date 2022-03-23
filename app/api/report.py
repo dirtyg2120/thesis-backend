@@ -6,10 +6,11 @@ These are endpoints to handle
 import secrets
 from typing import List, Optional
 
-from fastapi import APIRouter, Cookie, Depends, Response
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 
 from app import schemas
 from app.core.config import settings
+from app.models import AnonymousSession
 from app.services.auth import OperatorAuthHandler
 from app.services.report import ReportService
 
@@ -37,10 +38,15 @@ def send_report(
     session_id: Optional[str] = Cookie(None),
     report_service: ReportService = Depends(),
 ):
-    init_session = False
     if session_id is None:
         session_id = secrets.token_hex()
+        AnonymousSession(session_id=session_id).save()
         init_session = True
+    else:
+        session = AnonymousSession.objects(session_id=session_id).first()
+        if session is None:
+            raise HTTPException(401, "Invalid session ID")
+        init_session = False
 
     report_service.add_report(twitter_user_id, reporter_id=session_id)
 
