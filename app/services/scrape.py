@@ -51,6 +51,7 @@ class TwitterScraper:
             _logger.info(f"Account @{username} not in DB, fetch it from Twitter API")
             try:
                 user = self.api.get_user(screen_name=username)
+                print(dir(user))
             except tweepy.NotFound:
                 raise HTTPException(
                     status_code=404, detail=f"User account @{username} not found"
@@ -65,11 +66,17 @@ class TwitterScraper:
 
                 user_db = TwitterUser(
                     twitter_id=user.id_str,
+                    tweets_count=user.statuses_count,
                     name=user.name,
                     username=user.screen_name,
                     created_at=user.created_at,
                     followers_count=user.followers_count,
                     followings_count=user.friends_count,
+                    favourites_count=user.favourites_count,
+                    listed_count=user.listed_count,
+                    default_profile=user.default_profile,
+                    default_profile_image=user.default_profile_image,
+                    protected=user.protected,
                     verified=user.verified,
                     avatar=user.profile_image_url,
                     banner=getattr(user, "profile_banner_url", None),
