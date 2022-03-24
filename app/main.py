@@ -23,7 +23,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-limiter = Limiter(key_func=get_remote_address, default_limits=[settings.RATE_LIMIT])
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=[settings.RATE_LIMIT],
+    enabled=settings.PYTHON_ENV == "production",
+)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
@@ -33,11 +37,13 @@ app.include_router(api_router)
 
 @app.on_event("startup")
 def connect_db():
+    is_mock = settings.PYTHON_ENV == "test"
     connect(
         settings.MONGO_DB,
         host=settings.MONGO_HOST,
         port=settings.MONGO_PORT,
         tz_aware=True,
+        is_mock=is_mock,
     )
 
 
