@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     MONGO_DB: str = "test"
     # Number of days before analysis result get cleared
     RESULT_MAX_AGE: int
+    RATE_LIMIT: str = str(5 * 60) + "/minute"
 
     class Config:
         env_file = ".env"
