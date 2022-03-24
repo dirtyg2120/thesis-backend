@@ -120,38 +120,6 @@ class TwitterScraper:
 
         return user_db
 
-    def get_followers(self, followers_numbs):
-        """Get list of Twitter user's followers.
-
-        Args:
-            followers_numbs (int): Number of followers to get.
-        Return:
-            followers (list<string>): List of followers' id.
-        """
-        followers = []
-        for follower in tweepy.Cursor(
-            self.api.get_follower_ids, screen_name=self.username
-        ).items(followers_numbs):
-            followers.append(follower)
-
-        return followers
-
-    def get_followings(self, followings_numbs):
-        """Get list of Twitter user's followings.
-
-        Args:
-            followings_numbs (int): Number of followings to get.
-        Return:
-            followings (list<string>): List of followings' id.
-        """
-        followings = []
-        for following in tweepy.Cursor(
-            self.api.get_friend_ids, screen_name=self.username
-        ).items(followings_numbs):
-            followings.append(following)
-
-        return followings
-
     @cachedmethod(cache=_cache_func, key=_make_key("get_tweet_info"))
     def get_tweet_info(self, user_id: str, tweets_num: int) -> List[Tweet]:
         """
