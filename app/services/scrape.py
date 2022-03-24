@@ -138,7 +138,6 @@ class TwitterScraper:
                 self.api_v2.get_users_tweets,
                 id=user_id,
                 tweet_fields=tweet_fields,
-                exclude=["replies", "retweets"],
                 max_results=min(tweets_num, 100),
             ).flatten(limit=tweets_num)
         )
