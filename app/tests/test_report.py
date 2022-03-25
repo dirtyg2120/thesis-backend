@@ -39,19 +39,6 @@ class TestUserReport:
             assert Report.objects().count() == 1
             assert len(Report.objects()[0].reporters) == report_count
 
-        @pytest.mark.parametrize("session_id", ["", "    ", "wrong-session-id"])
-        def test_any_session_id(self, session_id):
-            # NOTE: this means that session_id can be self-set! :))
-            response = client.post(
-                f"/api/send-report/{TWITTER_ID}",
-                headers={
-                    "accept": "application/json",
-                    "Cookie": f"session_id={session_id}",
-                },
-            )
-            assert response.status_code == 200
-            pytest.skip("Will be fixed")
-
     class TestTwitterAccountNotChecked:
         def test_report_un_checked_account(self):
             response = client.post(
