@@ -4,7 +4,6 @@ import pytz  # type: ignore
 
 from app.core.config import settings
 from app.models import TwitterUser
-from app.schemas import tweet
 from app.services.clean_database import clean_database
 
 MAX_AGE = timedelta(days=settings.RESULT_MAX_AGE)
