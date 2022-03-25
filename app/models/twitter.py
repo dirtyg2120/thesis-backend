@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
+import tweepy
 from mongoengine import (
     BooleanField,
     DateTimeField,
@@ -9,6 +10,7 @@ from mongoengine import (
     EmbeddedDocumentListField,
     FloatField,
     IntField,
+    ListField,
     StringField,
 )
 
@@ -19,6 +21,7 @@ class Tweet(EmbeddedDocument):
     tweet_id = StringField(primary_key=True)
     text: str = StringField(required=True)
     created_at: datetime = DateTimeField(required=True)
+    referenced_tweets: tweepy.ReferencedTweet = ListField()
 
     def to_response(self) -> TweetResponse:
         response = TweetResponse(

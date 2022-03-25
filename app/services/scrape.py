@@ -45,13 +45,13 @@ class TwitterScraper:
         Return:
             myitems (schemas.TwitterUser): TwitterUser informations.
         """
+
         user_db = TwitterUser.objects(username=username).first()
 
         if user_db is None:
             _logger.info(f"Account @{username} not in DB, fetch it from Twitter API")
             try:
                 user = self.api.get_user(screen_name=username)
-                print(dir(user))
             except tweepy.NotFound:
                 raise HTTPException(
                     status_code=404, detail=f"User account @{username} not found"
@@ -139,7 +139,7 @@ class TwitterScraper:
         Return:
             tweets (list<tweepy.Tweet>): List of user's tweets.
         """
-        tweet_fields = ["created_at"]
+        tweet_fields = ["created_at", "referenced_tweets"]
         tweets = list(
             tweepy.Paginator(
                 self.api_v2.get_users_tweets,
@@ -150,7 +150,12 @@ class TwitterScraper:
         )
 
         tweets_model = [
-            Tweet(tweet_id=str(tweet.id), text=tweet.text, created_at=tweet.created_at)
+            Tweet(
+                tweet_id=str(tweet.id),
+                text=tweet.text,
+                created_at=tweet.created_at,
+                referenced_tweets=tweet.referenced_tweets,
+            )
             for tweet in tweets
         ]
         return tweets_model
