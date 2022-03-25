@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-import pytest
 import pytz  # type: ignore
 
 from app.core.config import settings
