@@ -73,6 +73,14 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v3
 
+      - name: Cache pytest
+        uses: actions/cache@v2
+        with:
+          path: .pytest_cache
+          key: pytest-${{ hashFiles('requirements.txt', 'app') }}
+          restore-keys: |
+            pytest-
+
       - name: Set up Python 3
         uses: actions/setup-python@v3
         with:
@@ -85,10 +93,4 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run functional tests with pytest
-        env:
-          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
-          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
-          AUTH_PRIVATE_KEY: ${{ secrets.AUTH_PRIVATE_KEY }}
-          FRONTEND_URL: http://0.0.0.0
-          RESULT_MAX_AGE: 3
         run: pytest

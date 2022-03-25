@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-import pytest
+import pytz  # type: ignore
 
 from app.core.config import settings
 from app.models import TwitterUser
@@ -26,7 +26,6 @@ def create_twitter_user(id, timestamp):
     user_db.save()
 
 
-@pytest.fixture(autouse=False, scope="function")
 def create_fake_twitter_user_collection():
     up_to_date_ts = [
         MAX_AGE - timedelta(seconds=1),
@@ -46,12 +45,12 @@ def create_fake_twitter_user_collection():
     return len(up_to_date_ts), len(expired_ts)
 
 
-def test_clean_database(create_fake_twitter_user_collection):
-    num_new, num_old = create_fake_twitter_user_collection
+def test_clean_database(client):
+    num_new, num_old = create_fake_twitter_user_collection()
     assert TwitterUser.objects().count() == num_old + num_new
     clean_database(timedelta(days=settings.RESULT_MAX_AGE))
 
     users = TwitterUser.objects()
     assert users.count() == num_new
     for user in users:
-        assert datetime.utcnow() - user.timestamp < MAX_AGE
+        assert datetime.now(pytz.UTC) - user.timestamp < MAX_AGE
