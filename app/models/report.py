@@ -41,6 +41,7 @@ class Report(Document):
 
     def to_response(self) -> ReportResponse:
         response = ReportResponse(
+            id=self.twitter_id,
             avatar=self.avatar,
             username=self.username,
             created_at=self.created_at,

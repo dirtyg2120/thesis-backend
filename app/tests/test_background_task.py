@@ -4,6 +4,7 @@ import pytz  # type: ignore
 
 from app.core.config import settings
 from app.models import TwitterUser
+from app.schemas import tweet
 from app.services.clean_database import clean_database
 
 MAX_AGE = timedelta(days=settings.RESULT_MAX_AGE)
@@ -12,12 +13,18 @@ MAX_AGE = timedelta(days=settings.RESULT_MAX_AGE)
 def create_twitter_user(id, timestamp):
     user_db = TwitterUser(
         twitter_id=id,
+        tweets_count=0,
         name="user.name",
         username="user.screen_name",
         created_at=timestamp,
         timestamp=timestamp,
         followers_count=0,
         followings_count=0,
+        favourites_count=0,
+        listed_count=0,
+        default_profile=True,
+        default_profile_image=True,
+        protected=True,
         verified=True,
         avatar="user.profile_image_url",
         tweets=[],
