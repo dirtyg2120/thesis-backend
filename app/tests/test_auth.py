@@ -1,12 +1,10 @@
 import pytest
 
-from . import client
-
 
 @pytest.mark.parametrize(
     "username,password", [("test", "wrong"), ("wrong", "test"), ("wrong", "wrong")]
 )
-def test_login_invalid_credentials(create_operator, username, password):
+def test_login_invalid_credentials(client, create_operator, username, password):
     response = client.post(
         "/auth/login",
         headers={"accept": "application/json", "Content-Type": "application/json"},
@@ -16,7 +14,7 @@ def test_login_invalid_credentials(create_operator, username, password):
     assert response.json() == {"detail": "Invalid username and/or password"}
 
 
-def test_login_success(create_operator):
+def test_login_success(client, create_operator):
     response = client.post(
         "/auth/login",
         headers={"accept": "application/json", "Content-Type": "application/json"},
@@ -25,13 +23,13 @@ def test_login_success(create_operator):
     assert response.status_code == 200
 
 
-def test_logout_not_logged_in(create_operator):
+def test_logout_not_logged_in(client, create_operator):
     response = client.post("/auth/logout", headers={"accept": "application/json"})
     assert response.status_code == 401
     assert response.json() == {"detail": "Invalid token"}
 
 
-def test_logout_success(create_operator, login_operator):
+def test_logout_success(client, create_operator, login_operator):
     logout_response = client.post(
         "/auth/logout",
     )
@@ -47,7 +45,7 @@ class TestUnauthorizedOperatorEndpoints:
     @pytest.mark.parametrize(
         "cookie", [cookie("fake-token"), cookie(""), cookie("    "), ""]
     )
-    def test_wrong_token(self, cookie, url):
+    def test_wrong_token(self, client, cookie, url):
         response = client.get(
             url,
             headers={"accept": "application/json", "Cookie": cookie},
@@ -55,7 +53,7 @@ class TestUnauthorizedOperatorEndpoints:
         assert response.status_code == 401
         assert response.json() == {"detail": "Invalid token"}
 
-    def test_edited_token(self, url, create_operator, login_operator):
+    def test_edited_token(self, client, url, create_operator, login_operator):
         access_token = login_operator
         # edit token
         access_token += ","

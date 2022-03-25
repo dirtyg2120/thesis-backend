@@ -1,16 +1,15 @@
 from unittest.mock import patch
 
 import pytest
-from mongoengine import connect, disconnect
+from fastapi.testclient import TestClient
 from pytest import fixture
 
+from app.main import app
 from app.models import Operator, TwitterUser
 from app.services.auth import OperatorAuthHandler
 
-from . import client
 from .helpers.mock_models import MockPaginator
 
-DB_NAME = "mongoenginetest"
 OP_UNAME = "test"
 OP_PASS = "test"
 
@@ -25,19 +24,14 @@ def mock_tweepy_global():
         yield
 
 
-@fixture(autouse=True, scope="function")
-def setup_teardown():
-    print()
-    print("Setup")
-    connect(DB_NAME, host="mongomock://localhost")
-    yield
-    print("Teardown")
-    disconnect()
-    client.cookies.clear()
+@fixture
+def client():
+    with TestClient(app) as c:
+        yield c
 
 
 @fixture(autouse=True, scope="function")
-def print_db_status(setup_teardown):
+def print_db_status(client):
     print("--before test--")
     print("Current twitter user count: ", TwitterUser.objects().count())
     print("Current operator count: ", Operator.objects().count())

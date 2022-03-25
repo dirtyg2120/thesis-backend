@@ -4,7 +4,6 @@ import pytest
 
 from app.models import TwitterUser
 
-from . import client
 from .helpers.mock_models import MockData
 
 PATHS = ["check", "detail"]
@@ -13,7 +12,7 @@ PATHS = ["check", "detail"]
 @pytest.mark.parametrize("path", PATHS)
 class TestScrapper:
     class TestInvalidInput:
-        def assert_invalid(self, url):
+        def assert_invalid(self, client, url):
             response = client.get(url)
             assert response.status_code == 400
             assert response.json() == {"detail": "'url' argument is invalid!"}
@@ -31,7 +30,7 @@ class TestScrapper:
     class TestScrapingError:
         username = "unknown"
 
-        def test_twitter_user_not_found(self, path, mock_user_notfound):
+        def test_twitter_user_not_found(self, client, path, mock_user_notfound):
             response = client.get(
                 f"/api/{path}?url=https://twitter.com/{self.username}"
             )
@@ -41,7 +40,7 @@ class TestScrapper:
             }
             assert TwitterUser.objects().count() == 0
 
-        def test_twitter_user_suspended(self, path, mock_user_suspended):
+        def test_twitter_user_suspended(self, client, path, mock_user_suspended):
             response = client.get(
                 f"/api/{path}?url=https://twitter.com/{self.username}"
             )
@@ -55,19 +54,19 @@ class TestScrapper:
     class TestUserFound:
         username = MockData.user_info()["username"]
 
-        def assert_check_success(self, username, response):
+        def assert_check_success(self, client, username, response):
             assert response.status_code == 200
             assert response.json()["user_info"]["username"] == username
             assert TwitterUser.objects().count() == 1
 
-        def test_input_https_url(self, path):
+        def test_input_https_url(self, client, path):
             assert TwitterUser.objects().count() == 0
             username = self.username
             url = f"/api/{path}?url=https://twitter.com/{username}"
             response = client.get(url)
             self.assert_check_success(username, response)
 
-        def test_input_half_url(self, path):
+        def test_input_half_url(self, client, path):
             username = self.username
             url = f"/api/{path}?url=twitter.com/{username}"
             response = client.get(url)
@@ -80,26 +79,26 @@ class TestScrapper:
             pytest.skip("Will be fixed")
             # self.assert_check_success(username, response)
 
-        def test_input_username_only(self, path):
+        def test_input_username_only(self, client, path):
             username = self.username
             url = f"/api/{path}?url={username}"
             response = client.get(url)
             self.assert_check_success(username, response)
 
-        def test_tweet_as_url_input(self, path):
+        def test_tweet_as_url_input(self, client, path):
             username = self.username
             tweet_url = f"https://twitter.com/{username}/status/1504573289435484160"
             response = client.get(f"/api/{path}?url={tweet_url}")
             self.assert_check_success(username, response)
 
         @pytest.mark.parametrize("username", ["   ", "twitter.com", "(.)(.)"])
-        def test_input_weird_usernames(self, username, path):
+        def test_input_weird_usernames(self, client, username, path):
             assert TwitterUser.objects().count() == 0
             response = client.get(f"/api/check?url={username}")
             assert response.status_code == 200
             assert TwitterUser.objects().count() == 1
 
-        def test_check_then_detail(self, path):
+        def test_check_then_detail(self, client, path):
             username = self.username
             check_response = client.get(f"/api/check?url={username}")
             self.assert_check_success(username, check_response)

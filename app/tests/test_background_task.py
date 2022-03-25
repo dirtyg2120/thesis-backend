@@ -27,7 +27,7 @@ def create_twitter_user(id, timestamp):
 
 
 @pytest.fixture(autouse=False, scope="function")
-def create_fake_twitter_user_collection():
+def create_fake_twitter_user_collection(client):
     up_to_date_ts = [
         MAX_AGE - timedelta(seconds=1),
         MAX_AGE - timedelta(seconds=10000),
