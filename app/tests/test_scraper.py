@@ -18,14 +18,14 @@ class TestScrapper:
             assert response.json() == {"detail": "'url' argument is invalid!"}
             assert TwitterUser.objects().count() == 0
 
-        def test_no_input_url(self, path):
+        def test_no_input_url(self, client, path):
             url = f"/api/{path}?url="
-            self.assert_invalid(url)
+            self.assert_invalid(client, url)
 
         @pytest.mark.parametrize("username", ["####.()32##", "/", "test/123"])
-        def test_wrong_format_url(self, username, path):
+        def test_wrong_format_url(self, client, username, path):
             url = f"/api/{path}?url={username}"
-            self.assert_invalid(url)
+            self.assert_invalid(client, url)
 
     class TestScrapingError:
         username = "unknown"
@@ -64,7 +64,7 @@ class TestScrapper:
             username = self.username
             url = f"/api/{path}?url=https://twitter.com/{username}"
             response = client.get(url)
-            self.assert_check_success(username, response)
+            self.assert_check_success(client, username, response)
 
         def test_input_half_url(self, client, path):
             username = self.username
@@ -77,19 +77,19 @@ class TestScrapper:
             """
             assert response.status_code == 400
             pytest.skip("Will be fixed")
-            # self.assert_check_success(username, response)
+            # self.assert_check_success(client, username, response)
 
         def test_input_username_only(self, client, path):
             username = self.username
             url = f"/api/{path}?url={username}"
             response = client.get(url)
-            self.assert_check_success(username, response)
+            self.assert_check_success(client, username, response)
 
         def test_tweet_as_url_input(self, client, path):
             username = self.username
             tweet_url = f"https://twitter.com/{username}/status/1504573289435484160"
             response = client.get(f"/api/{path}?url={tweet_url}")
-            self.assert_check_success(username, response)
+            self.assert_check_success(client, username, response)
 
         @pytest.mark.parametrize("username", ["   ", "twitter.com", "(.)(.)"])
         def test_input_weird_usernames(self, client, username, path):
@@ -101,10 +101,10 @@ class TestScrapper:
         def test_check_then_detail(self, client, path):
             username = self.username
             check_response = client.get(f"/api/check?url={username}")
-            self.assert_check_success(username, check_response)
+            self.assert_check_success(client, username, check_response)
             detail_response = client.get(f"/api/detail?url={username}")
             # make sure database not changed
-            self.assert_check_success(username, detail_response)
+            self.assert_check_success(client, username, detail_response)
             # make sure twitterAPI is not re-called
             with patch("app.services.scrape.TwitterScraper") as mock_scraper:
                 mock_scraper.api.get_user.assert_not_called()

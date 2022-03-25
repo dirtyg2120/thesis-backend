@@ -8,7 +8,6 @@ from app.models import Report, TwitterUser
 from app.services.clean_database import clean_database
 
 from .helpers.mock_models import MockData
-from .helpers.report_helpers import check_account, report_account
 
 TWITTER_ID = MockData.user_info()["id_str"]
 
@@ -76,9 +75,9 @@ class TestOperatorReport:
         reports = view_report_response.json()
         assert len(reports) == 0
 
-    def test_two_reports_same_account(self, client, mock_user_found):
-        check_account()
-        report_account()
+    def test_two_reports_same_account(
+        self, client, checked_twitter_account, reported_twitter_account
+    ):
         assert Report.objects().count() == 1
         clean_database(timedelta(days=0))
         assert TwitterUser.objects().count() == 0

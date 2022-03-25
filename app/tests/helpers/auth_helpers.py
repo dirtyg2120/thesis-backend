@@ -2,11 +2,9 @@ from http import cookies
 
 import pytest
 
-from .. import client
-
 
 @pytest.fixture(autouse=False, scope="function")
-def login_operator():
+def login_operator(client):
     op_response = client.post(
         "/auth/login",
         headers={"accept": "application/json", "Content-Type": "application/json"},

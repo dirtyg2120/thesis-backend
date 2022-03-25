@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import pytest
+import pytz  # type: ignore
 
 from app.core.config import settings
 from app.models import TwitterUser
@@ -54,4 +55,4 @@ def test_clean_database(create_fake_twitter_user_collection):
     users = TwitterUser.objects()
     assert users.count() == num_new
     for user in users:
-        assert datetime.utcnow() - user.timestamp < MAX_AGE
+        assert datetime.now(pytz.UTC) - user.timestamp < MAX_AGE
