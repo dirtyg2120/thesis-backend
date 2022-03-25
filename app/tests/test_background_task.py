@@ -27,8 +27,7 @@ def create_twitter_user(id, timestamp):
     user_db.save()
 
 
-@pytest.fixture(autouse=False, scope="function")
-def create_fake_twitter_user_collection(client):
+def create_fake_twitter_user_collection():
     up_to_date_ts = [
         MAX_AGE - timedelta(seconds=1),
         MAX_AGE - timedelta(seconds=10000),
@@ -47,8 +46,8 @@ def create_fake_twitter_user_collection(client):
     return len(up_to_date_ts), len(expired_ts)
 
 
-def test_clean_database(create_fake_twitter_user_collection):
-    num_new, num_old = create_fake_twitter_user_collection
+def test_clean_database(client):
+    num_new, num_old = create_fake_twitter_user_collection()
     assert TwitterUser.objects().count() == num_old + num_new
     clean_database(timedelta(days=settings.RESULT_MAX_AGE))
 

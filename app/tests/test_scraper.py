@@ -1,12 +1,23 @@
 from unittest.mock import patch
 
 import pytest
+import tweepy
 
 from app.models import TwitterUser
 
-from .helpers.mock_models import MockData
+from .helpers.mock_models import MockData, MockResponse
 
 PATHS = ["check", "detail"]
+
+
+@pytest.fixture
+def mock_user_notfound(mock_tweepy_api):
+    mock_tweepy_api().get_user.side_effect = tweepy.NotFound(response=MockResponse())
+
+
+@pytest.fixture
+def mock_user_suspended(mock_tweepy_api):
+    mock_tweepy_api().get_user.side_effect = tweepy.Forbidden(response=MockResponse())
 
 
 @pytest.mark.parametrize("path", PATHS)
