@@ -77,19 +77,6 @@ class TestScrapper:
             response = client.get(url)
             self.assert_check_success(client, username, response)
 
-        def test_input_half_url(self, client, path):
-            username = self.username
-            url = f"/api/{path}?url=twitter.com/{username}"
-            response = client.get(url)
-            """
-                NOTE:
-                Previous behavior: allow missing https://
-                Current behavior: now allowing url without https://
-            """
-            assert response.status_code == 400
-            pytest.skip("Will be fixed")
-            # self.assert_check_success(client, username, response)
-
         def test_input_username_only(self, client, path):
             username = self.username
             url = f"/api/{path}?url={username}"
