@@ -11,7 +11,7 @@ api = tweepy.API(auth, wait_on_rate_limit=True)
 api_v2 = tweepy.Client(bearer_token=auth._bearer_token, wait_on_rate_limit=True)
 
 if len(sys.argv) != 3:
-    sys.exit("python -m app.tests.script.<current-file> <username> <tweet_num>")
+    sys.exit("python -m app.tests.scripts.<current-file> <username> <tweet_num>")
 
 username = sys.argv[1]
 tweets_num = int(sys.argv[2])
@@ -24,7 +24,7 @@ tweets = list(
             tweepy.Paginator(
                 api_v2.get_users_tweets,
                 id=user.id_str,
-                tweet_fields=["created_at"],
+                tweet_fields=["created_at", "referenced_tweets"],
                 exclude=["replies", "retweets"],
                 max_results=min(tweets_num, 100),
             ).flatten(limit=tweets_num)
