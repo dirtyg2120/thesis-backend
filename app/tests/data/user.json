@@ -21,9 +21,9 @@
         }
     },
     "protected": false,
-    "followers_count": 224760,
+    "followers_count": 225632,
     "friends_count": 84,
-    "listed_count": 690,
+    "listed_count": 693,
     "created_at": "2009-07-02T20:53:12.000000Z",
     "favourites_count": 195,
     "utc_offset": null,
@@ -61,7 +61,7 @@
         "contributors": null,
         "is_quote_status": false,
         "retweet_count": 155,
-        "favorite_count": 2396,
+        "favorite_count": 2405,
         "favorited": false,
         "retweeted": false,
         "possibly_sensitive": false,
@@ -92,204 +92,312 @@
     "withheld_in_countries": [],
     "username": "Deadpool",
     "tweets": [{
+        "text": "brb causing chaos in Tokyo https://t.co/XaTwOXcB4Z",
         "created_at": "2022-02-17T00:30:01.000Z",
-        "id": "1494106825691734022",
-        "text": "brb causing chaos in Tokyo https://t.co/XaTwOXcB4Z"
+        "id": "1494106825691734022"
     }, {
+        "text": "https://t.co/3kYJLM1wuC",
         "created_at": "2022-02-14T19:19:22.000Z",
         "id": "1493303873469100036",
-        "text": "https://t.co/3kYJLM1wuC"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1493303869077704712"
+        }]
     }, {
+        "text": "https://t.co/MDVcS38RQv",
         "created_at": "2022-02-14T19:19:21.000Z",
         "id": "1493303869077704712",
-        "text": "https://t.co/MDVcS38RQv"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1493303864157687809"
+        }]
     }, {
+        "text": "https://t.co/sryh1SphUV",
         "created_at": "2022-02-14T19:19:20.000Z",
         "id": "1493303864157687809",
-        "text": "https://t.co/sryh1SphUV"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1493303859590180873"
+        }]
     }, {
+        "text": "https://t.co/upSKbKn7ms",
         "created_at": "2022-02-14T19:19:19.000Z",
-        "id": "1493303859590180873",
-        "text": "https://t.co/upSKbKn7ms"
+        "id": "1493303859590180873"
     }, {
+        "text": "\ud83d\udca5 Snag 'Deadpool: Bad Blood' #1 and #2 when they hit stands in April: https://t.co/g968divtO3",
         "created_at": "2022-01-19T21:30:04.000Z",
         "id": "1483914679718191113",
-        "text": "\ud83d\udca5 Snag 'Deadpool: Bad Blood' #1 and #2 when they hit stands in April: https://t.co/g968divtO3"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1483914676685651968"
+        }]
     }, {
+        "text": "baby now we got bad blood. https://t.co/bm8ElU0KBu",
         "created_at": "2022-01-19T21:30:03.000Z",
-        "id": "1483914676685651968",
-        "text": "baby now we got bad blood. https://t.co/bm8ElU0KBu"
+        "id": "1483914676685651968"
     }, {
+        "text": "treat yourself to the greatest gift of all, moi \ud83c\udf81 https://t.co/9eUrNMdsO5",
         "created_at": "2022-01-14T20:05:22.000Z",
-        "id": "1482081425495056389",
-        "text": "treat yourself to the greatest gift of all, moi \ud83c\udf81 https://t.co/9eUrNMdsO5"
+        "id": "1482081425495056389"
     }, {
+        "text": "put me under your tree https://t.co/KRKXZHOWC3",
         "created_at": "2021-12-18T15:37:54.000Z",
         "id": "1472229642291621899",
-        "text": "put me under your tree https://t.co/KRKXZHOWC3"
+        "referenced_tweets": [{
+            "type": "quoted",
+            "id": "1472227661682515981"
+        }]
     }, {
+        "text": "JEFF https://t.co/OI6gAooRo4",
         "created_at": "2021-11-25T15:23:06.000Z",
         "id": "1463890997759381511",
-        "text": "JEFF https://t.co/OI6gAooRo4"
+        "referenced_tweets": [{
+            "type": "quoted",
+            "id": "1463886448348831748"
+        }]
     }, {
+        "text": "find out whose beautiful fist that is when I make my grand return to #MarvelUnlimited Infinity Comics in X-Men Unlimited #13 on 12/6! https://t.co/h2K2GgRq49",
         "created_at": "2021-11-15T21:42:00.000Z",
         "id": "1460362471399559170",
-        "text": "find out whose beautiful fist that is when I make my grand return to #MarvelUnlimited Infinity Comics in X-Men Unlimited #13 on 12/6! https://t.co/h2K2GgRq49"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1460362465825509377"
+        }]
     }, {
+        "text": "IN THE FACE https://t.co/eu31kcIrpq",
         "created_at": "2021-11-15T21:41:58.000Z",
         "id": "1460362465825509377",
-        "text": "IN THE FACE https://t.co/eu31kcIrpq"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1460362461090037762"
+        }]
     }, {
+        "text": "GETTING PUNCHED https://t.co/JvLREBbpQN",
         "created_at": "2021-11-15T21:41:57.000Z",
         "id": "1460362461090037762",
-        "text": "GETTING PUNCHED https://t.co/JvLREBbpQN"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1460362455775862788"
+        }]
     }, {
+        "text": "AND I\u2019M https://t.co/6Y08M9BjvJ",
         "created_at": "2021-11-15T21:41:56.000Z",
         "id": "1460362455775862788",
-        "text": "AND I\u2019M https://t.co/6Y08M9BjvJ"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1460362450369490947"
+        }]
     }, {
+        "text": "I\u2019M BACK BABY! https://t.co/qbTvUPhUgH",
         "created_at": "2021-11-15T21:41:55.000Z",
-        "id": "1460362450369490947",
-        "text": "I\u2019M BACK BABY! https://t.co/qbTvUPhUgH"
+        "id": "1460362450369490947"
     }, {
+        "text": "get vertical with me on #marvelunlimited \ud83d\ude1c https://t.co/VFHSooSV5Y",
         "created_at": "2021-09-30T19:30:29.000Z",
         "id": "1443659535323996162",
-        "text": "get vertical with me on #marvelunlimited \ud83d\ude1c https://t.co/VFHSooSV5Y"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1443659533289676811"
+        }]
     }, {
+        "text": "\u2b07\ufe0f https://t.co/oHs4wFtvJ7",
         "created_at": "2021-09-30T19:30:29.000Z",
         "id": "1443659533289676811",
-        "text": "\u2b07\ufe0f https://t.co/oHs4wFtvJ7"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1443659528218857479"
+        }]
     }, {
+        "text": "\u2b07\ufe0f https://t.co/TZflR206Gs",
         "created_at": "2021-09-30T19:30:28.000Z",
         "id": "1443659528218857479",
-        "text": "\u2b07\ufe0f https://t.co/TZflR206Gs"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1443659523500265472"
+        }]
     }, {
+        "text": "\u2b07\ufe0f https://t.co/LNw2n5rZgS",
         "created_at": "2021-09-30T19:30:26.000Z",
         "id": "1443659523500265472",
-        "text": "\u2b07\ufe0f https://t.co/LNw2n5rZgS"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1443659517250752514"
+        }]
     }, {
+        "text": "\u2b07\ufe0f https://t.co/hg6aQaIg7f",
         "created_at": "2021-09-30T19:30:25.000Z",
         "id": "1443659517250752514",
-        "text": "\u2b07\ufe0f https://t.co/hg6aQaIg7f"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1443659511550648320"
+        }]
     }, {
+        "text": "\u2b07\ufe0f https://t.co/7b9rs98n5V",
         "created_at": "2021-09-30T19:30:24.000Z",
-        "id": "1443659511550648320",
-        "text": "\u2b07\ufe0f https://t.co/7b9rs98n5V"
+        "id": "1443659511550648320"
     }, {
+        "text": "THAT\u2019S MY SON \ud83d\ude2d https://t.co/e79C9gNxMM",
         "created_at": "2021-09-10T18:13:14.000Z",
         "id": "1436392337572171776",
-        "text": "THAT\u2019S MY SON \ud83d\ude2d https://t.co/e79C9gNxMM"
+        "referenced_tweets": [{
+            "type": "quoted",
+            "id": "1436389014433525763"
+        }]
     }, {
+        "text": "follow me...OR ELSE! #MarvelUnlimited https://t.co/nquIusBsNB https://t.co/9wTwTvv3fF",
         "created_at": "2021-09-09T20:22:08.000Z",
-        "id": "1436062388751671302",
-        "text": "follow me...OR ELSE! #MarvelUnlimited https://t.co/nquIusBsNB https://t.co/9wTwTvv3fF"
+        "id": "1436062388751671302"
     }, {
+        "text": "i luv when im the star of the show https://t.co/leJq86Dtdp",
         "created_at": "2021-08-13T19:58:08.000Z",
-        "id": "1426271876792340482",
-        "text": "i luv when im the star of the show https://t.co/leJq86Dtdp"
+        "id": "1426271876792340482"
     }, {
+        "text": "red really is my color https://t.co/n3CaXh1dWM",
         "created_at": "2021-07-09T15:43:38.000Z",
-        "id": "1413524253002108931",
-        "text": "red really is my color https://t.co/n3CaXh1dWM"
+        "id": "1413524253002108931"
     }, {
+        "text": "\ud83e\udd72\u2764\ufe0f a chimichanga for you, for you, and for you, and... https://t.co/Ziu6tfXpwG",
         "created_at": "2021-04-14T21:03:39.000Z",
         "id": "1382439431815143424",
-        "text": "\ud83e\udd72\u2764\ufe0f a chimichanga for you, for you, and for you, and... https://t.co/Ziu6tfXpwG"
+        "referenced_tweets": [{
+            "type": "quoted",
+            "id": "1382435830619250690"
+        }]
     }, {
+        "text": "celebrate my bday with a piece of me \ud83d\ude1c\ud83c\udf89 #DeadpoolNerdy30 https://t.co/Rfuog2n24G",
         "created_at": "2021-04-01T16:22:38.000Z",
-        "id": "1377657669008429057",
-        "text": "celebrate my bday with a piece of me \ud83d\ude1c\ud83c\udf89 #DeadpoolNerdy30 https://t.co/Rfuog2n24G"
+        "id": "1377657669008429057"
     }, {
+        "text": "another day, another reason to celebrate me \ud83c\udf89 #deadpoolnerdy30 https://t.co/zuixcAbsYF",
         "created_at": "2021-04-01T00:59:55.000Z",
-        "id": "1377425461173620738",
-        "text": "another day, another reason to celebrate me \ud83c\udf89 #deadpoolnerdy30 https://t.co/zuixcAbsYF"
+        "id": "1377425461173620738"
     }, {
+        "text": "\ud83d\udc51\ud83d\udca9 https://t.co/ogSeDKCDsE",
         "created_at": "2021-03-29T19:00:01.000Z",
-        "id": "1376610110571651074",
-        "text": "\ud83d\udc51\ud83d\udca9 https://t.co/ogSeDKCDsE"
+        "id": "1376610110571651074"
     }, {
+        "text": "look at me, i have a new book for my #deadpoolnerdy30 \ud83e\udd73 https://t.co/NYGnZ5a5ue",
         "created_at": "2021-02-26T16:00:00.000Z",
         "id": "1365330785616744453",
-        "text": "look at me, i have a new book for my #deadpoolnerdy30 \ud83e\udd73 https://t.co/NYGnZ5a5ue"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1365330782919745538"
+        }]
     }, {
+        "text": "i look hot in black and white. the blood is just for fun https://t.co/lgyBS8iWxQ",
         "created_at": "2021-02-26T15:59:59.000Z",
-        "id": "1365330782919745538",
-        "text": "i look hot in black and white. the blood is just for fun https://t.co/lgyBS8iWxQ"
+        "id": "1365330782919745538"
     }, {
+        "text": "\ud83e\udd73 having a party, nerds. got a hashtag and everything. #deadpoolnerdy30\n\nfind out how u can get ur tix here: https://t.co/AlIhU2iiow",
         "created_at": "2021-02-10T18:17:20.000Z",
-        "id": "1359567142618869765",
-        "text": "\ud83e\udd73 having a party, nerds. got a hashtag and everything. #deadpoolnerdy30\n\nfind out how u can get ur tix here: https://t.co/AlIhU2iiow"
+        "id": "1359567142618869765"
     }, {
+        "text": "L is for the way your partner will Leave you if you don't get them a deadpool themed gift for valentines day https://t.co/9x2O2jXWRh",
         "created_at": "2021-02-08T21:59:56.000Z",
-        "id": "1358898383537246208",
-        "text": "L is for the way your partner will Leave you if you don't get them a deadpool themed gift for valentines day https://t.co/9x2O2jXWRh"
+        "id": "1358898383537246208"
     }, {
+        "text": "they told me DIRTY 30 was too polarizing \ud83e\udd73https://t.co/NGukgIrW4D",
         "created_at": "2021-02-05T20:21:42.000Z",
-        "id": "1357786499153018883",
-        "text": "they told me DIRTY 30 was too polarizing \ud83e\udd73https://t.co/NGukgIrW4D"
+        "id": "1357786499153018883"
     }, {
+        "text": "smh let me on the island",
         "created_at": "2021-01-27T22:03:27.000Z",
         "id": "1354550615976898560",
-        "text": "smh let me on the island"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1354550614022369282"
+        }]
     }, {
+        "text": "civic doodie https://t.co/VV4zySZUIl",
         "created_at": "2021-01-27T22:03:27.000Z",
         "id": "1354550614022369282",
-        "text": "civic doodie https://t.co/VV4zySZUIl"
+        "referenced_tweets": [{
+            "type": "quoted",
+            "id": "1354294725784776705"
+        }]
     }, {
+        "text": "i'm a gift https://t.co/tHkSfy4KUR",
         "created_at": "2020-12-05T04:14:42.000Z",
-        "id": "1335075097321861120",
-        "text": "i'm a gift https://t.co/tHkSfy4KUR"
+        "id": "1335075097321861120"
     }, {
+        "text": "stabby meat sticks https://t.co/bsx2VjLQ1l",
         "created_at": "2020-11-20T20:00:00.000Z",
-        "id": "1329877173566640130",
-        "text": "stabby meat sticks https://t.co/bsx2VjLQ1l"
+        "id": "1329877173566640130"
     }, {
+        "text": "ok @marvelunlimited i did what you asked can you unblock me now https://t.co/sgFr5PjBII",
         "created_at": "2020-10-20T14:15:21.000Z",
         "id": "1318556414403543040",
-        "text": "ok @marvelunlimited i did what you asked can you unblock me now https://t.co/sgFr5PjBII"
+        "referenced_tweets": [{
+            "type": "quoted",
+            "id": "1318280765566844930"
+        }]
     }, {
+        "text": "Want to start reading Deadpool? Here's your guide to Merc with a Mouth comics on @MarvelUnlimited: https://t.co/5AGTDkN4o2",
         "created_at": "2020-10-19T20:00:01.000Z",
-        "id": "1318280765566844930",
-        "text": "Want to start reading Deadpool? Here's your guide to Merc with a Mouth comics on @MarvelUnlimited: https://t.co/5AGTDkN4o2"
+        "id": "1318280765566844930"
     }, {
+        "text": "https://t.co/bFLal8UAmu",
         "created_at": "2020-07-29T22:13:36.000Z",
         "id": "1288598577443348480",
-        "text": "https://t.co/bFLal8UAmu"
+        "referenced_tweets": [{
+            "type": "replied_to",
+            "id": "1288598572514996224"
+        }]
     }, {
+        "text": "pin me https://t.co/qG2FCfPYAG",
         "created_at": "2020-07-29T22:13:35.000Z",
-        "id": "1288598572514996224",
-        "text": "pin me https://t.co/qG2FCfPYAG"
+        "id": "1288598572514996224"
     }, {
+        "text": "more things of me to add to your \u0336s\u0335h\u0335r\u0335i\u0335n\u0335e\u0335 collection https://t.co/vLZPvp9gjp",
         "created_at": "2020-06-25T02:55:23.000Z",
-        "id": "1275985913584029698",
-        "text": "more things of me to add to your \u0336s\u0335h\u0335r\u0335i\u0335n\u0335e\u0335 collection https://t.co/vLZPvp9gjp"
+        "id": "1275985913584029698"
     }, {
+        "text": "i can't keep losing my head like this \ud83d\ude43 https://t.co/MzldM37FDf",
         "created_at": "2020-06-24T19:02:51.000Z",
         "id": "1275866996941271040",
-        "text": "i can't keep losing my head like this \ud83d\ude43 https://t.co/MzldM37FDf"
+        "referenced_tweets": [{
+            "type": "quoted",
+            "id": "1275866280264757248"
+        }]
     }, {
+        "text": "it me https://t.co/QctQozMQUs",
         "created_at": "2020-06-20T21:32:11.000Z",
         "id": "1274455028699283457",
-        "text": "it me https://t.co/QctQozMQUs"
+        "referenced_tweets": [{
+            "type": "quoted",
+            "id": "1274454477274255360"
+        }]
     }, {
+        "text": "on your knees, peasants \ud83d\udc51 https://t.co/I2sMyyTujn",
         "created_at": "2020-05-26T21:46:41.000Z",
-        "id": "1265398981028220928",
-        "text": "on your knees, peasants \ud83d\udc51 https://t.co/I2sMyyTujn"
+        "id": "1265398981028220928"
     }, {
+        "text": "i know this worked https://t.co/e0BCVzKvou",
         "created_at": "2020-04-29T17:23:20.000Z",
-        "id": "1255548233171873792",
-        "text": "i know this worked https://t.co/e0BCVzKvou"
+        "id": "1255548233171873792"
     }, {
+        "text": "there are SO many \"stains\" on this suit. https://t.co/j9GaIC4AZ0",
         "created_at": "2020-04-17T16:28:07.000Z",
         "id": "1251185681642262528",
-        "text": "there are SO many \"stains\" on this suit. https://t.co/j9GaIC4AZ0"
+        "referenced_tweets": [{
+            "type": "quoted",
+            "id": "1251178611236728833"
+        }]
     }, {
+        "text": "for the record, i didn't ask for backup. i just didn't give maximum effort. \ud83d\ude44 TEAMWORK! https://t.co/YgpX7iOo24",
         "created_at": "2020-04-17T14:07:20.000Z",
         "id": "1251150254684008448",
-        "text": "for the record, i didn't ask for backup. i just didn't give maximum effort. \ud83d\ude44 TEAMWORK! https://t.co/YgpX7iOo24"
+        "referenced_tweets": [{
+            "type": "quoted",
+            "id": "1251148410582970368"
+        }]
     }, {
+        "text": "alright kids, the most important thing to remember when drawing me is that you better make my butt look good. https://t.co/XwE8u3o8Ah",
         "created_at": "2020-04-14T19:25:55.000Z",
         "id": "1250143266613444612",
-        "text": "alright kids, the most important thing to remember when drawing me is that you better make my butt look good. https://t.co/XwE8u3o8Ah"
+        "referenced_tweets": [{
+            "type": "quoted",
+            "id": "1250136989229334530"
+        }]
     }]
 }

@@ -45,6 +45,7 @@ class TwitterScraper:
         Return:
             myitems (schemas.TwitterUser): TwitterUser informations.
         """
+
         user_db = TwitterUser.objects(username=username).first()
 
         if user_db is None:
@@ -65,11 +66,17 @@ class TwitterScraper:
 
                 user_db = TwitterUser(
                     twitter_id=user.id_str,
+                    tweets_count=user.statuses_count,
                     name=user.name,
                     username=user.screen_name,
                     created_at=user.created_at,
                     followers_count=user.followers_count,
                     followings_count=user.friends_count,
+                    favourites_count=user.favourites_count,
+                    listed_count=user.listed_count,
+                    default_profile=user.default_profile,
+                    default_profile_image=user.default_profile_image,
+                    protected=user.protected,
                     verified=user.verified,
                     avatar=user.profile_image_url,
                     banner=getattr(user, "profile_banner_url", None),
@@ -104,11 +111,17 @@ class TwitterScraper:
 
                 user_db = TwitterUser(
                     twitter_id=user.id_str,
+                    tweets_count=user.statuses_count,
                     name=user.name,
                     username=user.screen_name,
                     created_at=user.created_at,
                     followers_count=user.followers_count,
                     followings_count=user.friends_count,
+                    favourites_count=user.favourites_count,
+                    listed_count=user.listed_count,
+                    default_profile=user.default_profile,
+                    default_profile_image=user.default_profile_image,
+                    protected=user.protected,
                     verified=user.verified,
                     avatar=user.profile_image_url,
                     banner=getattr(user, "profile_banner_url", None),
@@ -119,38 +132,6 @@ class TwitterScraper:
                 user_db.save()
 
         return user_db
-
-    def get_followers(self, followers_numbs):
-        """Get list of Twitter user's followers.
-
-        Args:
-            followers_numbs (int): Number of followers to get.
-        Return:
-            followers (list<string>): List of followers' id.
-        """
-        followers = []
-        for follower in tweepy.Cursor(
-            self.api.get_follower_ids, screen_name=self.username
-        ).items(followers_numbs):
-            followers.append(follower)
-
-        return followers
-
-    def get_followings(self, followings_numbs):
-        """Get list of Twitter user's followings.
-
-        Args:
-            followings_numbs (int): Number of followings to get.
-        Return:
-            followings (list<string>): List of followings' id.
-        """
-        followings = []
-        for following in tweepy.Cursor(
-            self.api.get_friend_ids, screen_name=self.username
-        ).items(followings_numbs):
-            followings.append(following)
-
-        return followings
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_tweet_info"))
     def get_tweet_info(self, user_id: str, tweets_num: int) -> List[Tweet]:
@@ -164,19 +145,23 @@ class TwitterScraper:
         Return:
             tweets (list<tweepy.Tweet>): List of user's tweets.
         """
-        tweet_fields = ["created_at"]
+        tweet_fields = ["created_at", "referenced_tweets"]
         tweets = list(
             tweepy.Paginator(
                 self.api_v2.get_users_tweets,
                 id=user_id,
                 tweet_fields=tweet_fields,
-                exclude=["replies", "retweets"],
                 max_results=min(tweets_num, 100),
             ).flatten(limit=tweets_num)
         )
 
         tweets_model = [
-            Tweet(tweet_id=str(tweet.id), text=tweet.text, created_at=tweet.created_at)
+            Tweet(
+                tweet_id=str(tweet.id),
+                text=tweet.text,
+                created_at=tweet.created_at,
+                referenced_tweets=tweet.referenced_tweets,
+            )
             for tweet in tweets
         ]
         return tweets_model

@@ -36,11 +36,18 @@ class ReportService:
 
             report_db = Report(
                 twitter_id=user.twitter_id,
+                tweets_count=user.tweets_count,
                 name=user.name,
                 username=user.username,
                 created_at=user.created_at,
                 followers_count=user.followers_count,
                 followings_count=user.followings_count,
+                favourites_count=user.favourites_count,
+                listed_count=user.listed_count,
+                default_profile=user.default_profile,
+                default_profile_image=user.default_profile_image,
+                protected=user.protected,
+                avatar=user.avatar,
                 verified=user.verified,
                 tweets=user.tweets,
                 scrape_date=user.timestamp,

@@ -5,12 +5,9 @@ from pydantic import BaseModel
 
 class ReportResponse(BaseModel):
     id: str
-    name: str
+    avatar: str
     username: str
     created_at: datetime
-    followers_count: int
-    followings_count: int
-    verified: bool
     scrape_date: datetime
     report_count: int
     score: float
