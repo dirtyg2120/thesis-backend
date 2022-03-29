@@ -1,6 +1,7 @@
 import logging
+from datetime import datetime, timedelta
 from operator import attrgetter
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import pandas as pd
 import tweepy
@@ -21,6 +22,22 @@ def _make_key(method_name: str):
         return hashkey(method_name, *args, **kwargs)
 
     return method_key
+
+
+def _find_replies_in_conversation(tweet_id: int, conversation: List[tweepy.Tweet]):
+    replies = []
+    for tweet in conversation:
+        for reference_tweet in tweet.referenced_tweets:
+            if reference_tweet.type == "replied_to" and reference_tweet.id == tweet_id:
+                replies.append(
+                    {
+                        "id": tweet.id,
+                        "text": tweet.text,
+                        "parent_id": tweet_id,
+                    }
+                )
+                break
+    return replies
 
 
 class TwitterScraper:
@@ -218,3 +235,62 @@ class TwitterScraper:
             value=hour_of_day.tolist(),
         )
         return dow_resp, hod_resp
+
+    def get_ml_user(self, username: str):
+        user_fields = [
+            "created_at",
+            "default_profile",
+            "default_profile_image",
+            "description",
+            "favourites_count",
+            "followers_count",
+            "friends_count",
+            "listed_count",
+            "name",
+            "protected",
+            "screen_name",
+            "statuses_count",
+            "verified",
+        ]
+        user_api = self.api.get_user(screen_name=username)
+        user = {"crawled_at": datetime.utcnow()}
+        for field in user_fields:
+            user[field] = getattr(user_api, field)
+        return user
+
+    def _get_conversation(self, conversation_id: int):
+        return list(
+            tweepy.Paginator(
+                self.api_v2.search_recent_tweets,
+                query=f"conversation_id:{conversation_id}",
+                tweet_fields="referenced_tweets",
+            ).flatten()
+        )
+
+    def _get_retweets(self, tweet_id: int):
+        retweets = self.api.get_retweets(tweet_id, trim_user=True)
+        return [
+            {"id": tweet.id, "text": tweet.text, "parent_id": tweet_id}
+            for tweet in retweets
+        ]
+
+    def get_ml_tweets(self, user_id: Union[int, str]):
+        tweets = []
+        duration = timedelta(days=7)
+        last_week = datetime.utcnow() - duration
+        for tweet in tweepy.Paginator(
+            self.api_v2.get_users_tweets,
+            id=user_id,
+            tweet_fields="conversation_id",
+            start_time=last_week.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            max_results=100,
+        ).flatten():
+            tweets.append({"id": tweet.id, "text": tweet.text, "parent_id": 0})
+
+            if not tweet.text.startswith("RT @"):
+                # Not a retweet
+                conversation = self._get_conversation(tweet.conversation_id)
+                tweets.extend(_find_replies_in_conversation(tweet.id, conversation))
+                tweets.extend(self._get_retweets(tweet.id))
+
+        return pd.DataFrame.from_records(tweets)
