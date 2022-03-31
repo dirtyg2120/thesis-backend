@@ -253,7 +253,7 @@ class TwitterScraper:
             "verified",
         ]
         user_api = self.api.get_user(screen_name=username)
-        user = {"crawled_at": datetime.utcnow()}
+        user = {"updated": datetime.utcnow()}
         for field in user_fields:
             user[field] = getattr(user_api, field)
         return user

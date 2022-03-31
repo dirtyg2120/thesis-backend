@@ -75,6 +75,7 @@ class Inference:
         user_df["name_length"] = user_df["name"].str.len()
         user_df["num_digits_in_name"] = user_df["name"].str.count(r"\d")
         user_df["description_length"] = user_df["description"].str.len()
+        user_df.replace({False: 0, True: 1}, inplace=True)
         user_df = user_df.select_dtypes("number").fillna(0.0)
         return (user_df - user_mean) / user_std
 
