@@ -8,6 +8,8 @@ import torch
 
 from .SOBOG import SOBOG
 
+_URL_PATTERN = r"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)"  # noqa: E501
+
 
 class Inference:
     def __init__(self):
@@ -69,15 +71,14 @@ class Inference:
             user_df["friends_count"], 1
         )
         user_df["screen_name_length"] = user_df["screen_name"].str.len()
-        user_df["num_digits_in_screen_name"] = user_df["screen_name"].str.count("\d")
+        user_df["num_digits_in_screen_name"] = user_df["screen_name"].str.count(r"\d")
         user_df["name_length"] = user_df["name"].str.len()
-        user_df["num_digits_in_name"] = user_df["name"].str.count("\d")
+        user_df["num_digits_in_name"] = user_df["name"].str.count(r"\d")
         user_df["description_length"] = user_df["description"].str.len()
         user_df = user_df.select_dtypes("number").fillna(0.0)
         return (user_df - user_mean) / user_std
 
     def preprocessing_tweet(self, row):
-        URL_PATTERN = r"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)"
         rowlist = str(row).split()
         rowlist = [word.strip() for word in rowlist]
         rowlist = [
@@ -88,7 +89,7 @@ class Inference:
             word if not word.strip().startswith("@") else "usertag" for word in rowlist
         ]
         rowlist = [word.lower() for word in rowlist]
-        rowlist = [re.sub(URL_PATTERN, "urltag", word) for word in rowlist]
+        rowlist = [re.sub(_URL_PATTERN, "urltag", word) for word in rowlist]
         return " ".join(rowlist)
 
     def vectorizing_tweet(self, tweets):
