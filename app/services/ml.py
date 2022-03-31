@@ -8,4 +8,4 @@ class ML:
 
     def get_analysis_result(self, username: str):
         # TODO: maybe ML model here
-        return round(random.uniform(0.0, 10.0), 2)
+        return round(random.uniform(0.0, 1.0), 2)
