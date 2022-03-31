@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from .SOBOG import SOBOG
+from .sobog import SOBOG
 
 _URL_PATTERN = r"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)"  # noqa: E501
 
