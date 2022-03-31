@@ -93,7 +93,6 @@ class Inference:
         return " ".join(rowlist)
 
     def vectorizing_tweet(self, tweets):
-        # print(tweets)
         v = self.vectorizer.transform(tweets)
         return v.A[np.newaxis, :]
 
@@ -123,7 +122,6 @@ class Inference:
         tweet = torch.Tensor(tweet)
         adj = torch.Tensor(adj)
         up = torch.Tensor(up)
-        # print(user.shape, tweet.shape, adj.shape, up.shape)
         user_pred, tweet_pred = self.model.forward(user, tweet, adj, up)
         return user_pred
 
