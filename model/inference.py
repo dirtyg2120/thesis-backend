@@ -136,7 +136,7 @@ class Inference:
         adj = self.generate_adj_matrix(tweet_df)
         up = self.generate_user_post_matrix(tweet_df)
         user_pred = self.inference(user, tweet, adj, up)
-        return user_pred
+        return user_pred.item()
 
 
 if __name__ == "__main__":
