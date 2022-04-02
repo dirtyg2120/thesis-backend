@@ -30,13 +30,12 @@ def user_detail_check(
         raise HTTPException(400, "'url' argument is invalid!")
 
     username = get_twitter_username(url)
-
-    user_db = scraper.get_user_by_username(username)
+    user_db = bot_checker.check_account(username)
 
     recent_tweets = scraper.get_tweet_info(user_db.twitter_id, 50)
     recent_tweets_response = [
         schemas.TweetResponse(
-            id=tweet.id_str, text=tweet.text, created_at=tweet.created_at
+            id=str(tweet.id), text=tweet.text, created_at=tweet.created_at
         )
         for tweet in recent_tweets
     ]

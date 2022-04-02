@@ -1,13 +1,13 @@
-import random
 from datetime import datetime, timedelta
-from typing import List, Tuple, Union
+from typing import List
 
 import pandas as pd
 import tweepy
+from fastapi import Depends
 
 from model.inference import Inference
 
-from .scrape import TwitterScraper
+from .scrape import TwitterID, TwitterScraper
 
 
 def _find_replies_in_conversation(tweet_id: int, conversation: List[tweepy.Tweet]):
@@ -27,26 +27,26 @@ def _find_replies_in_conversation(tweet_id: int, conversation: List[tweepy.Tweet
 
 
 class ML:
-    def __init__(self, scraper=TwitterScraper()):
-        self.scraper = scraper
-        self.inference = Inference()
+    def __init__(self, scraper: TwitterScraper = Depends()):
+        self._scraper = scraper
+        self._inference = Inference()
 
     def train(self):
         # TODO: for train / re-train purpose
         pass
 
-    def get_analysis_result(self, username: str):
-        user_api = self.scraper.get_user_by_username(username)
+    def get_analysis_result(self, username: str) -> float:
+        user_api = self._scraper.get_user_by_username(username)
         user = self._make_ml_user(user_api)
         tweets = self._get_ml_tweets(user_api.id)
-        return self.inference.predict(user, tweets)
+        return self._inference.predict(user, tweets)
 
-    def _get_ml_tweets(self, user_id: Union[int, str]):
+    def _get_ml_tweets(self, user_id: TwitterID):
         tweets = []
         duration = timedelta(days=1)
         last_week = datetime.utcnow() - duration
         for tweet in tweepy.Paginator(
-            self.scraper.api_v2.get_users_tweets,
+            self._scraper.api_v2.get_users_tweets,
             id=user_id,
             tweet_fields="conversation_id",
             exclude=["replies", "retweets"],
@@ -57,9 +57,9 @@ class ML:
 
             if not tweet.text.startswith("RT @"):
                 # Not a retweet
-                conversation = self.scraper.get_conversation(tweet.conversation_id)
+                conversation = self._scraper.get_conversation(tweet.conversation_id)
                 tweets.extend(_find_replies_in_conversation(tweet.id, conversation))
-                tweets.extend(self.scraper.get_retweets(tweet.id))
+                tweets.extend(self._get_retweets(tweet.id))
 
         return pd.DataFrame.from_records(tweets)
 
@@ -83,3 +83,10 @@ class ML:
         for field in user_fields:
             user[field] = getattr(user_api, field)
         return user
+
+    def _get_retweets(self, tweet_id: TwitterID):
+        retweets = self._scraper.api.get_retweets(tweet_id, trim_user=True)
+        return [
+            {"id": tweet.id, "text": tweet.text, "parent_id": tweet_id}
+            for tweet in retweets
+        ]

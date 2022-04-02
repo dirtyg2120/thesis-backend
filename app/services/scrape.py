@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime, timedelta
 from operator import attrgetter
 from typing import List, Tuple, Union
 
@@ -13,6 +12,7 @@ from app.core.config import settings
 from app.schemas.tweet import TimeSeries
 
 _logger = logging.getLogger(__name__)
+TwitterID = Union[int, str]
 
 
 def _make_key(method_name: str):
@@ -58,7 +58,7 @@ class TwitterScraper:
             return user
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_id"))
-    def get_user_by_id(self, twitter_id: str) -> tweepy.models.User:
+    def get_user_by_id(self, twitter_id: TwitterID) -> tweepy.models.User:
         """Get Twitter user information from given ID."""
         try:
             user = self.api.get_user(user_id=twitter_id)
@@ -75,7 +75,7 @@ class TwitterScraper:
             return user
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_tweet_info"))
-    def get_tweet_info(self, user_id: str, tweets_num: int) -> List[tweepy.Tweet]:
+    def get_tweet_info(self, user_id: TwitterID, tweets_num: int) -> List[tweepy.Tweet]:
         """
         Get list of a user's tweet (no replies, retweets)
         from given user's id and desired number of tweets.
@@ -97,7 +97,7 @@ class TwitterScraper:
         )
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_frequency"))
-    def get_frequency(self, user_id: str) -> Tuple[TimeSeries, TimeSeries]:
+    def get_frequency(self, user_id: TwitterID) -> Tuple[TimeSeries, TimeSeries]:
         """
         Get the frequency of user's tweets activity in 2 ways:
         Days of a week and Hours of a day.
@@ -149,7 +149,7 @@ class TwitterScraper:
         )
         return dow_resp, hod_resp
 
-    def get_conversation(self, conversation_id: int):
+    def get_conversation(self, conversation_id: TwitterID) -> List[tweepy.Tweet]:
         return list(
             tweepy.Paginator(
                 self.api_v2.search_recent_tweets,
@@ -157,10 +157,3 @@ class TwitterScraper:
                 tweet_fields="referenced_tweets",
             ).flatten()
         )
-
-    def get_retweets(self, tweet_id: int):
-        retweets = self.api.get_retweets(tweet_id, trim_user=True)
-        return [
-            {"id": tweet.id, "text": tweet.text, "parent_id": tweet_id}
-            for tweet in retweets
-        ]
