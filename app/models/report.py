@@ -36,6 +36,7 @@ class Report(Document):
     scrape_date: datetime = DateTimeField(required=True)
     reporters: List[str] = ListField(StringField(), required=True)
     score: float = FloatField(required=True)
+    expired: bool = BooleanField(required=True)
 
     meta = {"collection": "report_collection"}
 
