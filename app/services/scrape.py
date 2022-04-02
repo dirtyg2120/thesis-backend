@@ -10,9 +10,7 @@ from cachetools.keys import hashkey
 from fastapi import HTTPException
 
 from app.core.config import settings
-from app.models import Tweet, TwitterUser
 from app.schemas.tweet import TimeSeries
-from app.services.ml import ML
 
 _logger = logging.getLogger(__name__)
 
@@ -22,22 +20,6 @@ def _make_key(method_name: str):
         return hashkey(method_name, *args, **kwargs)
 
     return method_key
-
-
-def _find_replies_in_conversation(tweet_id: int, conversation: List[tweepy.Tweet]):
-    replies = []
-    for tweet in conversation:
-        for reference_tweet in tweet.referenced_tweets:
-            if reference_tweet.type == "replied_to" and reference_tweet.id == tweet_id:
-                replies.append(
-                    {
-                        "id": tweet.id,
-                        "text": tweet.text,
-                        "parent_id": tweet_id,
-                    }
-                )
-                break
-    return replies
 
 
 class TwitterScraper:
@@ -50,10 +32,9 @@ class TwitterScraper:
             bearer_token=auth._bearer_token, wait_on_rate_limit=True
         )
         self._cache: TTLCache = TTLCache(maxsize=1024, ttl=settings.TWEEPY_CACHE_TTL)
-        self._ml_service = ML()
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_username"))
-    def get_user_by_username(self, username) -> TwitterUser:
+    def get_user_by_username(self, username) -> tweepy.models.User:
         """
         Get details of Twitter user's information from given username.
 
@@ -62,96 +43,39 @@ class TwitterScraper:
         Return:
             myitems (schemas.TwitterUser): TwitterUser informations.
         """
-
-        user_db = TwitterUser.objects(username=username).first()
-
-        if user_db is None:
-            _logger.info(f"Account @{username} not in DB, fetch it from Twitter API")
-            try:
-                user = self.api.get_user(screen_name=username)
-            except tweepy.NotFound:
-                raise HTTPException(
-                    status_code=404, detail=f"User account @{username} not found"
-                )
-            except tweepy.Forbidden:
-                raise HTTPException(
-                    status_code=403,
-                    detail=f"User account @{username} has been suspended",
-                )
-            else:
-                recent_tweets = self.get_tweet_info(user.id_str, settings.TWEETS_NUMBER)
-
-                user_db = TwitterUser(
-                    twitter_id=user.id_str,
-                    tweets_count=user.statuses_count,
-                    name=user.name,
-                    username=user.screen_name,
-                    created_at=user.created_at,
-                    followers_count=user.followers_count,
-                    followings_count=user.friends_count,
-                    favourites_count=user.favourites_count,
-                    listed_count=user.listed_count,
-                    default_profile=user.default_profile,
-                    default_profile_image=user.default_profile_image,
-                    protected=user.protected,
-                    verified=user.verified,
-                    avatar=user.profile_image_url,
-                    banner=getattr(user, "profile_banner_url", None),
-                    tweets=recent_tweets,
-                    score=self._ml_service.get_analysis_result(user.screen_name),
-                )
-
-                user_db.save()
-
-        return user_db
+        try:
+            user = self.api.get_user(screen_name=username)
+        except tweepy.NotFound:
+            raise HTTPException(
+                status_code=404, detail=f"User account @{username} not found"
+            )
+        except tweepy.Forbidden:
+            raise HTTPException(
+                status_code=403,
+                detail=f"User account @{username} has been suspended",
+            )
+        else:
+            return user
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_id"))
-    def get_user_by_id(self, twitter_id: str) -> TwitterUser:
+    def get_user_by_id(self, twitter_id: str) -> tweepy.models.User:
         """Get Twitter user information from given ID."""
-        user_db = TwitterUser.objects(twitter_id=twitter_id).first()
-
-        if user_db is None:
-            print("This account is not exist in DB")
-            try:
-                user = self.api.get_user(user_id=twitter_id)
-            except tweepy.NotFound:
-                raise HTTPException(
-                    status_code=404, detail=f"User with ID {twitter_id} not found"
-                )
-            except tweepy.Forbidden:
-                raise HTTPException(
-                    status_code=403,
-                    detail=f"User with ID {twitter_id} has been suspended",
-                )
-            else:
-                recent_tweets = self.get_tweet_info(user.id_str, settings.TWEETS_NUMBER)
-
-                user_db = TwitterUser(
-                    twitter_id=user.id_str,
-                    tweets_count=user.statuses_count,
-                    name=user.name,
-                    username=user.screen_name,
-                    created_at=user.created_at,
-                    followers_count=user.followers_count,
-                    followings_count=user.friends_count,
-                    favourites_count=user.favourites_count,
-                    listed_count=user.listed_count,
-                    default_profile=user.default_profile,
-                    default_profile_image=user.default_profile_image,
-                    protected=user.protected,
-                    verified=user.verified,
-                    avatar=user.profile_image_url,
-                    banner=getattr(user, "profile_banner_url", None),
-                    tweets=recent_tweets,
-                    score=self._ml_service.get_analysis_result(user.screen_name),
-                )
-
-                user_db.save()
-
-        return user_db
+        try:
+            user = self.api.get_user(user_id=twitter_id)
+        except tweepy.NotFound:
+            raise HTTPException(
+                status_code=404, detail=f"User with ID {twitter_id} not found"
+            )
+        except tweepy.Forbidden:
+            raise HTTPException(
+                status_code=403,
+                detail=f"User with ID {twitter_id} has been suspended",
+            )
+        else:
+            return user
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_tweet_info"))
-    def get_tweet_info(self, user_id: str, tweets_num: int) -> List[Tweet]:
+    def get_tweet_info(self, user_id: str, tweets_num: int) -> List[tweepy.Tweet]:
         """
         Get list of a user's tweet (no replies, retweets)
         from given user's id and desired number of tweets.
@@ -162,8 +86,8 @@ class TwitterScraper:
         Return:
             tweets (list<tweepy.Tweet>): List of user's tweets.
         """
-        tweet_fields = ["created_at", "referenced_tweets"]
-        tweets = list(
+        tweet_fields = ["created_at"]
+        return list(
             tweepy.Paginator(
                 self.api_v2.get_users_tweets,
                 id=user_id,
@@ -171,17 +95,6 @@ class TwitterScraper:
                 max_results=min(tweets_num, 100),
             ).flatten(limit=tweets_num)
         )
-
-        tweets_model = [
-            Tweet(
-                tweet_id=str(tweet.id),
-                text=tweet.text,
-                created_at=tweet.created_at,
-                referenced_tweets=tweet.referenced_tweets,
-            )
-            for tweet in tweets
-        ]
-        return tweets_model
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_frequency"))
     def get_frequency(self, user_id: str) -> Tuple[TimeSeries, TimeSeries]:
@@ -236,29 +149,7 @@ class TwitterScraper:
         )
         return dow_resp, hod_resp
 
-    def get_ml_user(self, username: str):
-        user_fields = [
-            "created_at",
-            "default_profile",
-            "default_profile_image",
-            "description",
-            "favourites_count",
-            "followers_count",
-            "friends_count",
-            "listed_count",
-            "name",
-            "protected",
-            "screen_name",
-            "statuses_count",
-            "verified",
-        ]
-        user_api = self.api.get_user(screen_name=username)
-        user = {"updated": datetime.utcnow()}
-        for field in user_fields:
-            user[field] = getattr(user_api, field)
-        return user
-
-    def _get_conversation(self, conversation_id: int):
+    def get_conversation(self, conversation_id: int):
         return list(
             tweepy.Paginator(
                 self.api_v2.search_recent_tweets,
@@ -267,30 +158,9 @@ class TwitterScraper:
             ).flatten()
         )
 
-    def _get_retweets(self, tweet_id: int):
+    def get_retweets(self, tweet_id: int):
         retweets = self.api.get_retweets(tweet_id, trim_user=True)
         return [
             {"id": tweet.id, "text": tweet.text, "parent_id": tweet_id}
             for tweet in retweets
         ]
-
-    def get_ml_tweets(self, user_id: Union[int, str]):
-        tweets = []
-        duration = timedelta(days=7)
-        last_week = datetime.utcnow() - duration
-        for tweet in tweepy.Paginator(
-            self.api_v2.get_users_tweets,
-            id=user_id,
-            tweet_fields="conversation_id",
-            start_time=last_week.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            max_results=100,
-        ).flatten():
-            tweets.append({"id": tweet.id, "text": tweet.text, "parent_id": 0})
-
-            if not tweet.text.startswith("RT @"):
-                # Not a retweet
-                conversation = self._get_conversation(tweet.conversation_id)
-                tweets.extend(_find_replies_in_conversation(tweet.id, conversation))
-                tweets.extend(self._get_retweets(tweet.id))
-
-        return pd.DataFrame.from_records(tweets)

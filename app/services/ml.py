@@ -1,11 +1,85 @@
 import random
+from datetime import datetime, timedelta
+from typing import List, Tuple, Union
+
+import pandas as pd
+import tweepy
+
+from model.inference import Inference
+
+from .scrape import TwitterScraper
+
+
+def _find_replies_in_conversation(tweet_id: int, conversation: List[tweepy.Tweet]):
+    replies = []
+    for tweet in conversation:
+        for reference_tweet in tweet.referenced_tweets:
+            if reference_tweet.type == "replied_to" and reference_tweet.id == tweet_id:
+                replies.append(
+                    {
+                        "id": tweet.id,
+                        "text": tweet.text,
+                        "parent_id": tweet_id,
+                    }
+                )
+                break
+    return replies
 
 
 class ML:
+    def __init__(self, scraper=TwitterScraper()):
+        self.scraper = scraper
+        self.inference = Inference()
+
     def train(self):
         # TODO: for train / re-train purpose
         pass
 
     def get_analysis_result(self, username: str):
-        # TODO: maybe ML model here
-        return round(random.uniform(0.0, 10.0), 2)
+        user_api = self.scraper.get_user_by_username(username)
+        user = self._make_ml_user(user_api)
+        tweets = self._get_ml_tweets(user_api.id)
+        return self.inference.predict(user, tweets)
+
+    def _get_ml_tweets(self, user_id: Union[int, str]):
+        tweets = []
+        duration = timedelta(days=1)
+        last_week = datetime.utcnow() - duration
+        for tweet in tweepy.Paginator(
+            self.scraper.api_v2.get_users_tweets,
+            id=user_id,
+            tweet_fields="conversation_id",
+            exclude=["replies", "retweets"],
+            start_time=last_week.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            max_results=100,
+        ).flatten():
+            tweets.append({"id": tweet.id, "text": tweet.text, "parent_id": 0})
+
+            if not tweet.text.startswith("RT @"):
+                # Not a retweet
+                conversation = self.scraper.get_conversation(tweet.conversation_id)
+                tweets.extend(_find_replies_in_conversation(tweet.id, conversation))
+                tweets.extend(self.scraper.get_retweets(tweet.id))
+
+        return pd.DataFrame.from_records(tweets)
+
+    def _make_ml_user(self, user_api: tweepy.models.User):
+        user_fields = [
+            "created_at",
+            "default_profile",
+            "default_profile_image",
+            "description",
+            "favourites_count",
+            "followers_count",
+            "friends_count",
+            "listed_count",
+            "name",
+            "protected",
+            "screen_name",
+            "statuses_count",
+            "verified",
+        ]
+        user = {"updated": datetime.utcnow()}
+        for field in user_fields:
+            user[field] = getattr(user_api, field)
+        return user
