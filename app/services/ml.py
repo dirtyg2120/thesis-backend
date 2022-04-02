@@ -5,7 +5,7 @@ import pandas as pd
 import tweepy
 from fastapi import Depends
 
-from model.inference import Inference
+import model
 
 from .scrape import TwitterID, TwitterScraper
 
@@ -29,7 +29,7 @@ def _find_replies_in_conversation(tweet_id: int, conversation: List[tweepy.Tweet
 class ML:
     def __init__(self, scraper: TwitterScraper = Depends()):
         self._scraper = scraper
-        self._inference = Inference()
+        self._inference = model.Inference()
 
     def train(self):
         # TODO: for train / re-train purpose

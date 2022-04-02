@@ -14,12 +14,22 @@ OP_UNAME = "test"
 OP_PASS = "test"
 
 
+class MockInference:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def predict(self, user_object, tweet_df):
+        return 0
+
+
 @pytest.fixture(autouse=True, scope="session")
 def mock_tweepy_global():
+    print("ok")
     with (
         patch("tweepy.AppAuthHandler"),
         patch("tweepy.Client"),
         patch("tweepy.Paginator", wraps=MockPaginator),
+        patch("model.Inference", wraps=MockInference),
     ):
         yield
 
