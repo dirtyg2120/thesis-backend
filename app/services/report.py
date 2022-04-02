@@ -56,7 +56,7 @@ class ReportService:
                 scrape_date=user.timestamp,
                 reporters=[reporter_id],
                 score=user.score,
-                expired=True if user is None else False,
+                expired=user is None,
             )
         else:
             if reporter_id in report_db.reporters:
