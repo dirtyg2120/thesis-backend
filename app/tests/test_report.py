@@ -111,7 +111,7 @@ class TestOperatorReport:
                 if the report is outdated compared to the twitterUser
             - Current: 420 Error User blocked since already report account
         """
-        assert response.status_code == 420
+        assert response.status_code == 404
         pytest.skip("Will be fixed")
         # check_account()
         # report_account()

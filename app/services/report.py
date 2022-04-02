@@ -19,7 +19,6 @@ class ReportService:
         report_list = [report.to_response() for report in Report.objects]
         return report_list
 
-
     def add_report(self, twitter_id: str, reporter_id: str) -> Report:
         """
         Precondition: User must check_user before send report,
