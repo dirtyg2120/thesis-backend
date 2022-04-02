@@ -45,8 +45,8 @@ class Inference:
 
         self.model = self.load_model(model_path, model_dict)
         self.vectorizer = self.load_vectorizer(tfidf_path)
-        self.user_mean = pd.read_csv(user_mean_path).values.T
-        self.user_std = pd.read_csv(user_std_path).values.T
+        self.user_mean = pd.read_csv(user_mean_path)
+        self.user_std = pd.read_csv(user_std_path)
 
     def create_user_dataframe(self, user):
         return pd.DataFrame([user], columns=self.user_columns)
@@ -111,7 +111,7 @@ class Inference:
     def generate_adj_matrix(self, tweet_df):
         graph = nx.from_pandas_edgelist(tweet_df, "id", "parent_id")
         graph.remove_node(0)
-        adj = nx.adjacency_matrix(graph, nodelist=tweet_df["id"].values).A
+        adj = nx.adjacency_matrix(graph, nodelist=tweet_df["id"].unique()).A
         np.fill_diagonal(adj, 1.0)
         return adj[np.newaxis, :]
 
@@ -130,9 +130,10 @@ class Inference:
         user_df = self.create_user_dataframe(user_object)
         user_df = self.preprocessing_user(user_df, self.user_mean, self.user_std)
         user = user_df.values
-        tweet_df["text"] = tweet_df["text"].apply(self.preprocessing_tweet)
-        tweet = self.vectorizing_tweet(tweet_df["text"])
         adj = self.generate_adj_matrix(tweet_df)
+        tweet_df.drop_duplicates(subset="id", inplace=True)
+        tweets_text = tweet_df["text"].apply(self.preprocessing_tweet)
+        tweet = self.vectorizing_tweet(tweets_text)
         up = self.generate_user_post_matrix(tweet_df)
         user_pred = self.inference(user, tweet, adj, up)
         return user_pred.item()
