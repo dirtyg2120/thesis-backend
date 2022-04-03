@@ -24,7 +24,6 @@ class MockInference:
 
 @pytest.fixture(autouse=True, scope="session")
 def mock_tweepy_global():
-    print("ok")
     with (
         patch("tweepy.AppAuthHandler"),
         patch("tweepy.Client"),
