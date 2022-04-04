@@ -130,6 +130,7 @@ class Inference:
         user_df = self.create_user_dataframe(user_object)
         user_df = self.preprocessing_user(user_df, self.user_mean, self.user_std)
         user = user_df.values
+        tweet_df.sort_values(by=["id", "parent_id"], inplace=True)
         adj = self.generate_adj_matrix(tweet_df)
         tweet_df.drop_duplicates(subset="id", inplace=True)
         tweets_text = tweet_df["text"].apply(self.preprocessing_tweet)
