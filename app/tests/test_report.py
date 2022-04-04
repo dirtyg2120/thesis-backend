@@ -10,6 +10,7 @@ from app.services.clean_database import clean_database
 from .helpers.mock_models import MockData
 
 TWITTER_ID = MockData.user_info()["id_str"]
+USERNAME = MockData.user_info()["username"]
 
 
 @pytest.fixture
@@ -96,7 +97,12 @@ class TestOperatorReport:
         assert len(reports) == 0
 
     def test_two_reports_same_account(
-        self, client, checked_twitter_account, reported_twitter_account
+        self,
+        client,
+        checked_twitter_account,
+        reported_twitter_account,
+        create_operator,
+        login_operator,
     ):
         assert Report.objects().count() == 1
         clean_database(timedelta(days=0))
@@ -104,21 +110,21 @@ class TestOperatorReport:
         response = client.post(
             f"/api/send-report/{TWITTER_ID}",
         )
-
-        """
-            NOTE: Wrong behavior
-            - Expect: 404 Error User should not be able to report
-                if the report is outdated compared to the twitterUser
-            - Current: 420 Error User blocked since already report account
-        """
         assert response.status_code == 404
-        pytest.skip("Will be fixed")
-        # check_account()
-        # report_account()
-        # assert Report.objects().count() == 2
-        # view_report_response = client.get(
-        #     "/api/view-reports",
-        # )
-        # reports = view_report_response.json()
-        # assert len(reports) == 2
-        # assert reports[0].id == reports[1].id
+
+        recheck_response = client.get(f"/api/check?url={USERNAME}")
+        assert recheck_response.status_code == 200
+        assert TwitterUser.objects().count() == 1
+
+        rereport_response = client.post(
+            f"/api/send-report/{TWITTER_ID}",
+        )
+        assert rereport_response.status_code == 200
+        assert Report.objects().count() == 2
+
+        view_report_response = client.get(
+            "/api/view-reports",
+        )
+        reports = view_report_response.json()
+        assert len(reports) == 2
+        assert reports[0]["id"] == reports[1]["id"]
