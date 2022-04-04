@@ -3,6 +3,7 @@ from typing import List
 from fastapi import Depends, HTTPException
 
 from app.models import Report, TwitterUser
+from app.models.report import ReportKey
 from app.schemas.report import ReportResponse
 
 from .scrape import TwitterScraper
@@ -27,7 +28,9 @@ class ReportService:
         Check if report exist in DB, if yes -> +1 to report_count
                                      if no -> add report to DB
         """
-        report_db = Report.objects(twitter_id=twitter_id, expired=False).first()
+        report_db = Report.objects(
+            report_key__twitter_id=twitter_id, expired=False
+        ).first()
         user = TwitterUser.objects(twitter_id=twitter_id).first()
 
         if user is None:
@@ -38,7 +41,9 @@ class ReportService:
         if report_db is None:
 
             report_db = Report(
-                twitter_id=user.twitter_id,
+                report_key=ReportKey(
+                    twitter_id=user.twitter_id, scrape_date=user.timestamp
+                ),
                 tweets_count=user.tweets_count,
                 name=user.name,
                 username=user.username,
@@ -53,7 +58,6 @@ class ReportService:
                 avatar=user.avatar,
                 verified=user.verified,
                 tweets=user.tweets,
-                scrape_date=user.timestamp,
                 reporters=[reporter_id],
                 score=user.score,
                 expired=user is None,
