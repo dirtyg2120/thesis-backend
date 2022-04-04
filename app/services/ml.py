@@ -43,7 +43,7 @@ class ML:
 
     def _get_ml_tweets(self, user_id: TwitterID):
         tweets = []
-        duration = timedelta(days=1)
+        duration = timedelta(days=7)
         last_week = datetime.utcnow() - duration
         for tweet in tweepy.Paginator(
             self._scraper.api_v2.get_users_tweets,
