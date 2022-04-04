@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List
 
+import numpy as np
 import pandas as pd
 import tweepy
 from fastapi import Depends
@@ -65,7 +66,9 @@ class ML:
                 tweets.extend(replies)
                 tweets.extend(self._get_retweets(tweet.id))
 
-        return pd.DataFrame.from_records(tweets)
+        df = pd.DataFrame.from_records(tweets)
+        df = df.astype({"id": np.uint64, "parent_id": np.uint64})
+        return df
 
     def _make_ml_user(self, user_api: tweepy.models.User):
         user_fields = [
