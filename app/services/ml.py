@@ -58,7 +58,11 @@ class ML:
             if not tweet.text.startswith("RT @"):
                 # Not a retweet
                 conversation = self._scraper.get_conversation(tweet.conversation_id)
-                tweets.extend(_find_replies_in_conversation(tweet.id, conversation))
+                replies = _find_replies_in_conversation(tweet.id, conversation)
+                for reply in replies:
+                    tweets.extend(_find_replies_in_conversation(tweet.id, conversation))
+                    tweets.extend(self._get_retweets(tweet.id))
+                tweets.extend(replies)
                 tweets.extend(self._get_retweets(tweet.id))
 
         return pd.DataFrame.from_records(tweets)
