@@ -66,7 +66,7 @@ class ML:
                 tweets.extend(replies)
                 tweets.extend(self._get_retweets(tweet.id))
 
-        df = pd.DataFrame.from_records(tweets)
+        df = pd.DataFrame.from_records(tweets, columns=["id", "text", "parent_id"])
         df = df.astype({"id": np.uint64, "parent_id": np.uint64})
         return df
 
