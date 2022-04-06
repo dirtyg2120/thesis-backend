@@ -44,6 +44,8 @@ class ML:
 
     def _get_ml_tweets(self, user_id: TwitterID):
         tweets = []
+        # NOTE: Can only fetch tweets in a conversation in last 7 days
+        # without Academic Research access
         duration = timedelta(days=7)
         last_week = datetime.utcnow() - duration
         for tweet in tweepy.Paginator(
@@ -60,6 +62,7 @@ class ML:
                 # Not a retweet
                 conversation = self._scraper.get_conversation(tweet.conversation_id)
                 replies = _find_replies_in_conversation(tweet.id, conversation)
+                # Fetch 2nd level tweets
                 for reply in replies:
                     tweets.extend(_find_replies_in_conversation(tweet.id, conversation))
                     tweets.extend(self._get_retweets(tweet.id))
