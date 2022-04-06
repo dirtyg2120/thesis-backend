@@ -11,19 +11,27 @@ import model
 from .scrape import TwitterID, TwitterScraper
 
 
+def _is_reply(parent_tweet_id: int, tweet: tweepy.Tweet) -> bool:
+    for reference_tweet in tweet.referenced_tweets:
+        if (
+            reference_tweet.type == "replied_to"
+            and reference_tweet.id == parent_tweet_id
+        ):
+            return True
+    return False
+
+
 def _find_replies_in_conversation(tweet_id: int, conversation: List[tweepy.Tweet]):
     replies = []
     for tweet in conversation:
-        for reference_tweet in tweet.referenced_tweets:
-            if reference_tweet.type == "replied_to" and reference_tweet.id == tweet_id:
-                replies.append(
-                    {
-                        "id": tweet.id,
-                        "text": tweet.text,
-                        "parent_id": tweet_id,
-                    }
-                )
-                break
+        if _is_reply(tweet_id, tweet):
+            replies.append(
+                {
+                    "id": tweet.id,
+                    "text": tweet.text,
+                    "parent_id": tweet_id,
+                }
+            )
     return replies
 
 
