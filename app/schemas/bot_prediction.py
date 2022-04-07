@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class TwitterUser(BaseModel):
+class BotPrediction(BaseModel):
     id: str
     name: str
     username: str

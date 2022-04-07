@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.models import Report, TwitterUser
+from app.models import BotPrediction, Report
 from app.services.clean_database import clean_database
 
 from .helpers.mock_models import MockData
@@ -68,7 +68,7 @@ class TestUserReport:
             assert Report.objects().count() == 0
 
         def test_report_outdated_result(self, client, checked_twitter_account):
-            assert TwitterUser.objects().count() == 1
+            assert BotPrediction.objects().count() == 1
             clean_database(timedelta(days=0))
             response = client.post(
                 f"/api/send-report/{TWITTER_ID}",
@@ -106,7 +106,7 @@ class TestOperatorReport:
     ):
         assert Report.objects().count() == 1
         clean_database(timedelta(days=0))
-        assert TwitterUser.objects().count() == 0
+        assert BotPrediction.objects().count() == 0
         response = client.post(
             f"/api/send-report/{TWITTER_ID}",
         )
@@ -114,7 +114,7 @@ class TestOperatorReport:
 
         recheck_response = client.get(f"/api/check?url={USERNAME}")
         assert recheck_response.status_code == 200
-        assert TwitterUser.objects().count() == 1
+        assert BotPrediction.objects().count() == 1
 
         rereport_response = client.post(
             f"/api/send-report/{TWITTER_ID}",

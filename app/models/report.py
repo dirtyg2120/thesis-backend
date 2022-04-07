@@ -16,7 +16,7 @@ from mongoengine import (
 
 from app.schemas import ReportResponse
 
-from .twitter import Tweet
+from .tweet import Tweet
 
 
 class ReportKey(EmbeddedDocument):

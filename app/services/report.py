@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import Depends, HTTPException
 
-from app.models import Report, TwitterUser
+from app.models import BotPrediction, Report
 from app.models.report import ReportKey
 from app.schemas.report import ReportResponse
 
@@ -31,7 +31,7 @@ class ReportService:
         report_db = Report.objects(
             report_key__twitter_id=twitter_id, expired=False
         ).first()
-        user = TwitterUser.objects(twitter_id=twitter_id).first()
+        user = BotPrediction.objects(twitter_id=twitter_id).first()
 
         if user is None:
             if report_db:

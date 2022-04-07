@@ -1,36 +1,22 @@
 from datetime import datetime
 from typing import List, Optional
 
-import tweepy
 from mongoengine import (
     BooleanField,
     DateTimeField,
     Document,
-    EmbeddedDocument,
     EmbeddedDocumentListField,
     FloatField,
     IntField,
-    ListField,
     StringField,
 )
 
-from app.schemas import TweetResponse, TwitterUser
+from app.schemas import BotPrediction as BotPredictionSchema
+
+from .tweet import Tweet
 
 
-class Tweet(EmbeddedDocument):
-    tweet_id = StringField(primary_key=True)
-    text: str = StringField(required=True)
-    created_at: datetime = DateTimeField(required=True)
-    referenced_tweets: List[tweepy.ReferencedTweet] = ListField()
-
-    def to_response(self) -> TweetResponse:
-        response = TweetResponse(
-            id=self.tweet_id, text=self.text, created_at=self.created_at
-        )
-        return response
-
-
-class User(Document):
+class BotPrediction(Document):
     twitter_id = StringField(primary_key=True)
     tweets_count: int = IntField(required=True)
     name: str = StringField(required=True)
@@ -53,7 +39,7 @@ class User(Document):
     meta = {"collection": "twitter_user_collection"}
 
     def to_response(self):
-        response = TwitterUser(
+        response = BotPredictionSchema(
             id=self.twitter_id,
             name=self.name,
             username=self.username,

@@ -9,7 +9,7 @@ from cachetools.keys import hashkey
 from fastapi import HTTPException
 
 from app.core.config import settings
-from app.models import Tweet, TwitterUser
+from app.models import BotPrediction, Tweet
 from app.schemas.tweet import TimeSeries
 from app.services.ml import ML
 
@@ -36,7 +36,7 @@ class TwitterScraper:
         self._ml_service = ML()
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_username"))
-    def get_user_by_username(self, username) -> TwitterUser:
+    def get_user_by_username(self, username) -> BotPrediction:
         """
         Get details of Twitter user's information from given username.
 
@@ -46,7 +46,7 @@ class TwitterScraper:
             myitems (schemas.TwitterUser): TwitterUser informations.
         """
 
-        user_db = TwitterUser.objects(username=username).first()
+        user_db = BotPrediction.objects(username=username).first()
 
         if user_db is None:
             _logger.info(f"Account @{username} not in DB, fetch it from Twitter API")
@@ -64,7 +64,7 @@ class TwitterScraper:
             else:
                 recent_tweets = self.get_tweet_info(user.id_str, settings.TWEETS_NUMBER)
 
-                user_db = TwitterUser(
+                user_db = BotPrediction(
                     twitter_id=user.id_str,
                     tweets_count=user.statuses_count,
                     name=user.name,
@@ -89,9 +89,9 @@ class TwitterScraper:
         return user_db
 
     @cachedmethod(cache=_cache_func, key=_make_key("get_user_by_id"))
-    def get_user_by_id(self, twitter_id: str) -> TwitterUser:
+    def get_user_by_id(self, twitter_id: str) -> BotPrediction:
         """Get Twitter user information from given ID."""
-        user_db = TwitterUser.objects(twitter_id=twitter_id).first()
+        user_db = BotPrediction.objects(twitter_id=twitter_id).first()
 
         if user_db is None:
             print("This account is not exist in DB")
@@ -109,7 +109,7 @@ class TwitterScraper:
             else:
                 recent_tweets = self.get_tweet_info(user.id_str, settings.TWEETS_NUMBER)
 
-                user_db = TwitterUser(
+                user_db = BotPrediction(
                     twitter_id=user.id_str,
                     tweets_count=user.statuses_count,
                     name=user.name,
