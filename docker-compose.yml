@@ -1,0 +1,45 @@
+version: '3.9'
+
+services:
+  backend:
+    build: .
+    container_name: thesis-backend
+    ports: 
+      - ${BACKEND_HOST_PORT}:8000
+    volumes:
+    - type: bind
+      source: ./app
+      target: /backend/app
+    command: python -m app.main
+    depends_on: 
+      - database
+    environment:
+      MONGO_HOST: database
+    networks:
+      - db_network
+    env_file:
+      - .env
+
+  database:
+    image: mongo:5.0.6-focal
+    container_name: mongodb
+    expose: 
+      - 27017
+    ports:
+      - ${MONGO_HOST_PORT}:27017
+    networks:
+      - db_network
+    env_file: 
+      - .env
+
+    # TODO
+    # volumes:
+    #   # persistent data
+    #   - type: volume
+    #     target: /data/db
+
+networks:
+  db_network:
+    name: db_network
+  
+  # TODO: finish networking with frontend later
