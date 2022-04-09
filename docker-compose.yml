@@ -13,12 +13,22 @@ services:
     command: python -m app.main
     depends_on: 
       - database
-    environment:
-      MONGO_HOST: database
     networks:
       - db_network
     env_file:
-      - .env
+      - .env.production
+    environment:
+      # deployment related stuffs
+      PYTHON_ENV: 'production'    
+      MONGO_HOST: 'database'
+      MONGO_DB: 'bot_detector'
+      BACKEND_HOST_PORT: ${BACKEND_HOST_PORT} # backend port mapped to host
+
+      # other important stuffs
+      CONSUMER_KEY: ${CONSUMER_KEY}
+      CONSUMER_SECRET: ${CONSUMER_SECRET}
+      AUTH_PRIVATE_KEY: ${AUTH_PRIVATE_KEY}
+      FRONTEND_URL: ${FRONTEND_URL}
 
   database:
     image: mongo:5.0.6-focal
@@ -30,7 +40,9 @@ services:
     networks:
       - db_network
     env_file: 
-      - .env
+      - .env.production
+    environment:
+      MONGO_HOST_PORT: ${MONGO_HOST_PORT} # db port mapped to host
     volumes:
       # persistent data
       - ./data:/data/db
