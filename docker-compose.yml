@@ -31,12 +31,9 @@ services:
       - db_network
     env_file: 
       - .env
-
-    # TODO
-    # volumes:
-    #   # persistent data
-    #   - type: volume
-    #     target: /data/db
+    volumes:
+      # persistent data
+      - ./data:/data/db
 
 networks:
   db_network:
