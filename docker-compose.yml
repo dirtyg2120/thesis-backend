@@ -1,5 +1,8 @@
 version: '3.9'
 
+# NOTE: run docker-compose with "--env-file .env.production" option
+#   or just use the deploy.sh script i provided
+
 services:
   backend:
     build: .
@@ -15,11 +18,9 @@ services:
       - database
     networks:
       - db_network
-    env_file:
-      - .env.production
     environment:
       # deployment related stuffs
-      PYTHON_ENV: 'production'    
+      PYTHON_ENV: 'production'
       MONGO_HOST: 'database'
       MONGO_DB: 'bot_detector'
       BACKEND_HOST_PORT: ${BACKEND_HOST_PORT} # backend port mapped to host
@@ -39,8 +40,6 @@ services:
       - ${MONGO_HOST_PORT}:27017
     networks:
       - db_network
-    env_file: 
-      - .env.production
     environment:
       MONGO_HOST_PORT: ${MONGO_HOST_PORT} # db port mapped to host
     volumes:
