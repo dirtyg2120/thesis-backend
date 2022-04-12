@@ -31,9 +31,9 @@ class ReportService:
         report_db = Report.objects(
             report_key__twitter_id=twitter_id, expired=False
         ).first()
-        user = BotPrediction.objects(twitter_id=twitter_id).first()
+        prediction_db = BotPrediction.objects(user__twitter_id=twitter_id).first()
 
-        if user is None:
+        if prediction_db is None:
             if report_db:
                 report_db.update(expired=True)
             raise HTTPException(404, "Twitter account has not been checked")
@@ -42,25 +42,14 @@ class ReportService:
 
             report_db = Report(
                 report_key=ReportKey(
-                    twitter_id=user.twitter_id, scrape_date=user.timestamp
+                    twitter_id=prediction_db.user.twitter_id,
+                    scrape_date=prediction_db.timestamp,
                 ),
-                tweets_count=user.tweets_count,
-                name=user.name,
-                username=user.username,
-                created_at=user.created_at,
-                followers_count=user.followers_count,
-                followings_count=user.followings_count,
-                favourites_count=user.favourites_count,
-                listed_count=user.listed_count,
-                default_profile=user.default_profile,
-                default_profile_image=user.default_profile_image,
-                protected=user.protected,
-                avatar=user.avatar,
-                verified=user.verified,
-                tweets=user.tweets,
+                user=prediction_db.user,
+                tweets=prediction_db.tweets,
                 reporters=[reporter_id],
-                score=user.score,
-                expired=user is None,
+                score=prediction_db.score,
+                expired=prediction_db is None,
             )
         else:
             if reporter_id in report_db.reporters:

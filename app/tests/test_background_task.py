@@ -3,36 +3,38 @@ from datetime import datetime, timedelta
 import pytz  # type: ignore
 
 from app.core.config import settings
-from app.models import BotPrediction
+from app.models import BotPrediction, User
 from app.services.clean_database import clean_database
 
 MAX_AGE = timedelta(days=settings.RESULT_MAX_AGE)
 
 
-def create_twitter_user(id, timestamp):
-    user_db = BotPrediction(
-        twitter_id=id,
-        tweets_count=0,
-        name="user.name",
-        username="user.screen_name",
-        created_at=timestamp,
+def create_prediction(id, timestamp):
+    prediction_db = BotPrediction(
+        user=User(
+            twitter_id=id,
+            tweets_count=0,
+            name="user.name",
+            username="user.screen_name",
+            created_at=timestamp,
+            followers_count=0,
+            followings_count=0,
+            favourites_count=0,
+            listed_count=0,
+            default_profile=True,
+            default_profile_image=True,
+            protected=True,
+            verified=True,
+            avatar="user.profile_image_url",
+        ),
         timestamp=timestamp,
-        followers_count=0,
-        followings_count=0,
-        favourites_count=0,
-        listed_count=0,
-        default_profile=True,
-        default_profile_image=True,
-        protected=True,
-        verified=True,
-        avatar="user.profile_image_url",
         tweets=[],
         score=0,
     )
-    user_db.save()
+    prediction_db.save()
 
 
-def create_fake_twitter_user_collection():
+def create_fake_prediction_collection():
     up_to_date_ts = [
         MAX_AGE - timedelta(seconds=1),
         MAX_AGE - timedelta(seconds=10000),
@@ -46,13 +48,13 @@ def create_fake_twitter_user_collection():
         MAX_AGE * 3,
     ]
     for i, ts in enumerate(up_to_date_ts + expired_ts):
-        create_twitter_user(id=str(i), timestamp=datetime.utcnow() - ts)
+        create_prediction(id=str(i), timestamp=datetime.utcnow() - ts)
 
     return len(up_to_date_ts), len(expired_ts)
 
 
 def test_clean_database(client):
-    num_new, num_old = create_fake_twitter_user_collection()
+    num_new, num_old = create_fake_prediction_collection()
     assert BotPrediction.objects().count() == num_old + num_new
     clean_database(timedelta(days=settings.RESULT_MAX_AGE))
 
