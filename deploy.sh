@@ -1,15 +1,11 @@
-docker_command="docker-compose --env-file .env.production"
+#!/bin/sh
+set -e
 
-if [ $# -ne 1 ]
-  then
-    echo "Please supply one command for docker-compose"
-    echo "Usage: sh deploy.sh <command>"
-    echo "<command>: up/down/restart/build .."
-    exit
-fi
+remote=socialbot@103.176.178.107
 
-echo "Running: ''$docker_command $1''" 
-$docker_command $1
-
-# Why do we need this --env-file option?
-# https://stackoverflow.com/a/39548957/18616317
+# NOTE: Only deploy from current git HEAD
+git archive --format=tar.gz HEAD | ssh "$remote" 'cat >source.tar.gz'
+ssh "$remote" ./backend/bin/pip install --upgrade \
+	--disable-pip-version-check source.tar.gz
+ssh "$remote" rm source.tar.gz
+ssh "$remote" systemctl --user restart backend.service
