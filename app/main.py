@@ -60,10 +60,6 @@ def disconnect_db():
 
 if __name__ == "__main__":
     import uvicorn  # type: ignore
-    import json
-
-    print('Environment:')
-    print(json.dumps(settings.dict(), indent=4, sort_keys=True))
 
     log_config = uvicorn.config.LOGGING_CONFIG
     log_config["handlers"]["database"] = {
