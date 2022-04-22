@@ -1,10 +1,12 @@
 import pickle
+from importlib.resources import open_binary, open_text
 import re
 
 import networkx as nx
 import numpy as np
 import pandas as pd
 import torch
+import model_data
 
 from .sobog import SOBOG
 
@@ -13,10 +15,6 @@ _URL_PATTERN = r"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}
 
 class Inference:
     def __init__(self):
-        model_path = "model/model.pt"
-        tfidf_path = "vect/vectorizer.pk"
-        user_mean_path = "ckpts/mean.csv"
-        user_std_path = "ckpts/std.csv"
         self.user_columns = [
             "statuses_count",
             "followers_count",
@@ -33,20 +31,14 @@ class Inference:
             "screen_name",
             "description",
         ]
-        model_dict = {
-            "n_user_features": 20,
-            "d_user_embed": 20,
-            "n_post_features": 5000,
-            "d_post_embed": 64,
-            "n_gat_layers": 3,
-            "d_cls": 32,
-            "n_cls_layer": 2,
-        }
 
-        self.model = self.load_model(model_path, model_dict)
-        self.vectorizer = self.load_vectorizer(tfidf_path)
-        self.user_mean = pd.read_csv(user_mean_path)
-        self.user_std = pd.read_csv(user_std_path)
+        self.model = self.load_model()
+        with open_binary(model_data, 'vectorizer.pk') as f:
+            self.vectorizer = pickle.load(f)
+        with open_text(model_data, 'user_mean.csv') as f:
+            self.user_mean = pd.read_csv(f)
+        with open_text(model_data, 'user_std.csv') as f:
+            self.user_std = pd.read_csv(f)
 
     def create_user_dataframe(self, user):
         return pd.DataFrame([user], columns=self.user_columns)
@@ -97,16 +89,22 @@ class Inference:
         v = self.vectorizer.transform(tweets)
         return v.A[np.newaxis, :]
 
-    def load_model(self, path, model_dict):
+    def load_model(self):
+        model_dict = {
+            "n_user_features": 20,
+            "d_user_embed": 20,
+            "n_post_features": 5000,
+            "d_post_embed": 64,
+            "n_gat_layers": 3,
+            "d_cls": 32,
+            "n_cls_layer": 2,
+        }
         model = SOBOG(gpu=0, **model_dict)
-        model.load_state_dict(torch.load(path, map_location=torch.device("cpu")))
+        with open_binary(model_data, 'model.pt') as f:
+            state_dict = torch.load(f, map_location=torch.device("cpu"))
+        model.load_state_dict(state_dict)
         model.eval()
         return model
-
-    def load_vectorizer(self, path):
-        with open(path, "rb") as fin:
-            vect = pickle.load(fin)
-        return vect
 
     def generate_adj_matrix(self, tweet_df):
         graph = nx.from_pandas_edgelist(tweet_df, "id", "parent_id")
