@@ -1,0 +1,53 @@
+version: '3.9'
+
+# NOTE: run docker-compose with "--env-file .env.production" option
+#   or just use the deploy.sh script i provided
+
+services:
+  backend:
+    build: .
+    container_name: thesis-backend
+    ports: 
+      - ${BACKEND_HOST_PORT}:8000
+    volumes:
+    - type: bind
+      source: ./app
+      target: /backend/app
+    command: python -m app.main
+    depends_on: 
+      - database
+    networks:
+      - db_network
+    environment:
+      # deployment related stuffs
+      PYTHON_ENV: 'production'
+      MONGO_HOST: 'database'
+      MONGO_DB: 'bot_detector'
+      BACKEND_HOST_PORT: ${BACKEND_HOST_PORT} # backend port mapped to host
+
+      # other important stuffs
+      CONSUMER_KEY: ${CONSUMER_KEY}
+      CONSUMER_SECRET: ${CONSUMER_SECRET}
+      AUTH_PRIVATE_KEY: ${AUTH_PRIVATE_KEY}
+      FRONTEND_URL: ${FRONTEND_URL}
+
+  database:
+    image: mongo:5.0.6-focal
+    container_name: mongodb
+    expose: 
+      - 27017
+    ports:
+      - ${MONGO_HOST_PORT}:27017
+    networks:
+      - db_network
+    environment:
+      MONGO_HOST_PORT: ${MONGO_HOST_PORT} # db port mapped to host
+    volumes:
+      # persistent data
+      - ./data:/data/db
+
+networks:
+  db_network:
+    name: db_network
+  
+  # TODO: finish networking with frontend later
