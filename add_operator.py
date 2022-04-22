@@ -9,11 +9,6 @@ from mongoengine import connect
 from app.models import Operator
 from app.services.auth import OperatorAuthHandler
 
-"""
-    NOTE:
-    In production, run this from backend's container
-"""
-
 load_dotenv()
 
 if len(sys.argv) < 3:
