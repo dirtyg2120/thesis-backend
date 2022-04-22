@@ -2,7 +2,8 @@ from typing import List
 
 from fastapi import Depends, HTTPException
 
-from app.models import Report, TwitterUser
+from app.models import BotPrediction, Report
+from app.models.report import ReportKey
 from app.schemas.report import ReportResponse
 
 from .scrape import TwitterScraper
@@ -27,32 +28,28 @@ class ReportService:
         Check if report exist in DB, if yes -> +1 to report_count
                                      if no -> add report to DB
         """
-        report_db = Report.objects(twitter_id=twitter_id).first()
-        if report_db is None:
-            user = TwitterUser.objects(twitter_id=twitter_id).first()
+        report_db = Report.objects(
+            report_key__twitter_id=twitter_id, expired=False
+        ).first()
+        prediction_db = BotPrediction.objects(user__twitter_id=twitter_id).first()
 
-            if user is None:
-                raise HTTPException(404, "Twitter account has not been checked")
+        if prediction_db is None:
+            if report_db:
+                report_db.update(expired=True)
+            raise HTTPException(404, "Twitter account has not been checked")
+
+        if report_db is None:
 
             report_db = Report(
-                twitter_id=user.twitter_id,
-                tweets_count=user.tweets_count,
-                name=user.name,
-                username=user.username,
-                created_at=user.created_at,
-                followers_count=user.followers_count,
-                followings_count=user.followings_count,
-                favourites_count=user.favourites_count,
-                listed_count=user.listed_count,
-                default_profile=user.default_profile,
-                default_profile_image=user.default_profile_image,
-                protected=user.protected,
-                avatar=user.avatar,
-                verified=user.verified,
-                tweets=user.tweets,
-                scrape_date=user.timestamp,
+                report_key=ReportKey(
+                    twitter_id=prediction_db.user.twitter_id,
+                    scrape_date=prediction_db.timestamp,
+                ),
+                user=prediction_db.user,
+                tweets=prediction_db.tweets,
                 reporters=[reporter_id],
-                score=user.score,
+                score=prediction_db.score,
+                expired=prediction_db is None,
             )
         else:
             if reporter_id in report_db.reporters:
@@ -64,5 +61,4 @@ class ReportService:
             report_db.reporters.append(reporter_id)
 
         report_db.save()
-
         return report_db

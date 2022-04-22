@@ -9,7 +9,7 @@ from cachetools.keys import hashkey
 from fastapi import HTTPException
 
 from app.core.config import settings
-from app.schemas.tweet import TimeSeries
+from app.schemas.twitter import TimeSeries
 
 _logger = logging.getLogger(__name__)
 TwitterID = Union[int, str]
@@ -41,7 +41,7 @@ class TwitterScraper:
         Args:
             username (string): The username of Twitter user got from input url.
         Return:
-            myitems (schemas.TwitterUser): TwitterUser informations.
+            tweepy.models.User: twitter user informations.
         """
         try:
             user = self.api.get_user(screen_name=username)

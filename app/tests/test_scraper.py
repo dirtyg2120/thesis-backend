@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytest
 import tweepy
 
-from app.models import TwitterUser
+from app.models import BotPrediction
 
 from .helpers.mock_models import MockData, MockResponse
 
@@ -27,7 +27,7 @@ class TestScrapper:
             response = client.get(url)
             assert response.status_code == 400
             assert response.json() == {"detail": "'url' argument is invalid!"}
-            assert TwitterUser.objects().count() == 0
+            assert BotPrediction.objects().count() == 0
 
         def test_no_input_url(self, client, path):
             url = f"/api/{path}?url="
@@ -49,7 +49,7 @@ class TestScrapper:
             assert response.json() == {
                 "detail": f"User account @{self.username} not found"
             }
-            assert TwitterUser.objects().count() == 0
+            assert BotPrediction.objects().count() == 0
 
         def test_twitter_user_suspended(self, client, path, mock_user_suspended):
             response = client.get(
@@ -59,7 +59,7 @@ class TestScrapper:
             assert response.json() == {
                 "detail": f"User account @{self.username} has been suspended"
             }
-            assert TwitterUser.objects().count() == 0
+            assert BotPrediction.objects().count() == 0
 
     @pytest.mark.usefixtures("mock_user_found")
     class TestUserFound:
@@ -68,10 +68,10 @@ class TestScrapper:
         def assert_check_success(self, client, username, response):
             assert response.status_code == 200
             assert response.json()["user_info"]["username"] == username
-            assert TwitterUser.objects().count() == 1
+            assert BotPrediction.objects().count() == 1
 
         def test_input_https_url(self, client, path):
-            assert TwitterUser.objects().count() == 0
+            assert BotPrediction.objects().count() == 0
             username = self.username
             url = f"/api/{path}?url=https://twitter.com/{username}"
             response = client.get(url)
@@ -91,10 +91,10 @@ class TestScrapper:
 
         @pytest.mark.parametrize("username", ["   ", "twitter.com", "(.)(.)"])
         def test_input_weird_usernames(self, client, username, path):
-            assert TwitterUser.objects().count() == 0
+            assert BotPrediction.objects().count() == 0
             response = client.get(f"/api/check?url={username}")
             assert response.status_code == 200
-            assert TwitterUser.objects().count() == 1
+            assert BotPrediction.objects().count() == 1
 
         def test_check_then_detail(self, client, path):
             username = self.username

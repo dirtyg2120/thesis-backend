@@ -14,10 +14,11 @@ def user_info_check(url: str, bot_checker: BotChecker = Depends()):
         raise HTTPException(400, "'url' argument is invalid!")
 
     username = get_twitter_username(url)
-    user_db = bot_checker.check_account(username)
+    prediction = bot_checker.check_account(username)
 
     response = schemas.CheckResponse(
-        score=user_db.score, user_info=user_db.to_response()
+        user_info=prediction.user.to_user_info(),
+        score=prediction.score,
     )
     return response
 
@@ -30,9 +31,9 @@ def user_detail_check(
         raise HTTPException(400, "'url' argument is invalid!")
 
     username = get_twitter_username(url)
-    user_db = bot_checker.check_account(username)
+    prediction = bot_checker.check_account(username)
 
-    recent_tweets = scraper.get_tweet_info(user_db.twitter_id, 50)
+    recent_tweets = scraper.get_tweet_info(prediction.user.twitter_id, 50)
     recent_tweets_response = [
         schemas.TweetResponse(
             id=str(tweet.id), text=tweet.text, created_at=tweet.created_at
@@ -40,7 +41,7 @@ def user_detail_check(
         for tweet in recent_tweets
     ]
 
-    day_of_week, hour_of_day = scraper.get_frequency(user_db["twitter_id"])
+    day_of_week, hour_of_day = scraper.get_frequency(prediction.user.twitter_id)
     tweet_info = schemas.TweetInfo(
         day_of_week=day_of_week,
         hour_of_day=hour_of_day,
@@ -48,6 +49,8 @@ def user_detail_check(
     )
 
     response = schemas.DetailResponse(
-        user_info=user_db.to_response(), tweet_info=tweet_info, score=user_db.score
+        user_info=prediction.user.to_user_info(),
+        tweet_info=tweet_info,
+        score=prediction.score,
     )
     return response

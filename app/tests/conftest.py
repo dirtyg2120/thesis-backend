@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.models import Operator, TwitterUser
+from app.models import BotPrediction, Operator
 from app.services.auth import OperatorAuthHandler
 
 from .helpers.mock_models import MockData, MockPaginator
@@ -53,13 +53,13 @@ def client():
 @pytest.fixture(autouse=True, scope="function")
 def print_db_status(client):
     print("--before test--")
-    print("Current twitter user count: ", TwitterUser.objects().count())
+    print("Current twitter user count: ", BotPrediction.objects().count())
     print("Current operator count: ", Operator.objects().count())
 
     yield
 
     print("--after test--")
-    print("Current twitter user count: ", TwitterUser.objects().count())
+    print("Current twitter user count: ", BotPrediction.objects().count())
     print("Current operator count: ", Operator.objects().count())
 
 
