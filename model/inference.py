@@ -1,11 +1,12 @@
 import pickle
-from importlib.resources import open_binary, open_text
 import re
+from importlib.resources import open_binary, open_text
 
 import networkx as nx
 import numpy as np
 import pandas as pd
 import torch
+
 import model_data
 
 from .sobog import SOBOG
@@ -33,11 +34,11 @@ class Inference:
         ]
 
         self.model = self.load_model()
-        with open_binary(model_data, 'vectorizer.pk') as f:
+        with open_binary(model_data, "vectorizer.pk") as f:
             self.vectorizer = pickle.load(f)
-        with open_text(model_data, 'user_mean.csv') as f:
+        with open_text(model_data, "user_mean.csv") as f:
             self.user_mean = pd.read_csv(f)
-        with open_text(model_data, 'user_std.csv') as f:
+        with open_text(model_data, "user_std.csv") as f:
             self.user_std = pd.read_csv(f)
 
     def create_user_dataframe(self, user):
@@ -100,7 +101,7 @@ class Inference:
             "n_cls_layer": 2,
         }
         model = SOBOG(gpu=0, **model_dict)
-        with open_binary(model_data, 'model.pt') as f:
+        with open_binary(model_data, "model.pt") as f:
             state_dict = torch.load(f, map_location=torch.device("cpu"))
         model.load_state_dict(state_dict)
         model.eval()
