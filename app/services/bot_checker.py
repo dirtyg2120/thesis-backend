@@ -56,14 +56,3 @@ class BotChecker:
             prediction_db.save()
 
         return prediction_db
-
-    def get_full_detail(self, username):
-        user = self._scraper.get_user_by_username(username)
-        recent_tweets = [
-            Tweet(tweet_id=str(tweet.id), text=tweet.text, created_at=tweet.created_at)
-            for tweet in self._scraper.get_tweet_info(
-                user.id_str, settings.TWEETS_NUMBER
-            )
-        ]
-
-        return user

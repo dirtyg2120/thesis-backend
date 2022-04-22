@@ -157,3 +157,15 @@ class TwitterScraper:
                 tweet_fields="referenced_tweets",
             ).flatten()
         )
+
+    def get_full_detail(self, username, tweets_num):
+        user = self.get_user_by_username(username)
+        recent_tweets = self.api.user_timeline(
+            screen_name=username, count=tweets_num
+        )  # self.get_tweet_info(user.id_str, settings.TWEETS_NUMBER)
+        tweets_dict_list = []
+        for tweet in recent_tweets:
+            tweet._json.pop("user")
+            tweets_dict_list.append(tweet._json)
+        user._json["status"] = tweets_dict_list
+        return user

@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
@@ -63,24 +64,28 @@ def user_detail_check(
 
 @router.get("/export", name="user:export-detail")
 def export_profile(
-    url: str, bg_tasks: BackgroundTasks, bot_checker: BotChecker = Depends(), scraper: TwitterScraper = Depends()
+    url: str, bg_tasks: BackgroundTasks, scraper: TwitterScraper = Depends()
 ):
     if url == "":
         raise HTTPException(400, "'url' argument is invalid!")
 
     username = get_twitter_username(url)
-    full_details = bot_checker.get_full_detail(username)
+    full_details = scraper.get_full_detail(username, 3)
 
     file_path = f"{full_details.screen_name}.json"
     with open(file_path, "w") as f:
-        mydata = json.loads(
+        full_details_str = (
             str(full_details._json)
             .replace('"', '\\"')
             .replace("'", '"')
+            .replace(': \\"', ': "')
+            .replace('\\",', '",')
             .replace("None", "null")
             .replace("True", "true")
             .replace("False", "false")
         )
+        full_details_str = re.sub(r'(\w)"(\w)', r"\1'\2", full_details_str)
+        mydata = json.loads(full_details_str)
         f.write(json.dumps(mydata, indent=4))
 
     bg_tasks.add_task(remove_file, file_path)
@@ -89,8 +94,9 @@ def export_profile(
         return FileResponse(
             file_path,
             media_type="application/json",
-            filename=f"{full_details.screen_name}.json"
+            filename=f"{full_details.screen_name}.json",
         )
 
+
 def remove_file(path: str) -> None:
-    os.unlink(path)
+    os.remove(path)
