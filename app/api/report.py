@@ -61,5 +61,5 @@ def approve_report(
     user_identifier=Depends(operator_auth_handler.auth_wrapper),
     report_service: ReportService = Depends(),
 ):
-    report_service.process_report(twitter_user_id, report_process)
-    return None
+    report_service.process_report(twitter_user_id, report_process.method)
+    return "success"
