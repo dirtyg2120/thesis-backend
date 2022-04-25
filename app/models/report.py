@@ -52,6 +52,7 @@ class Report(Document):
 
 
 class ProcessedReport(Document):
+    twitter_id = StringField(primary_key=True)
     user: dict = DictField(required=True)
     label: int = IntField(required=True)
 

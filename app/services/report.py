@@ -62,7 +62,7 @@ class ReportService:
         report_db.save()
         return report_db
 
-    def process_report(self, twitter_id: str, report_process: str) -> Report:
+    def process_report(self, twitter_id: str, method: str):
         report_db = Report.objects(
             report_key__twitter_id=twitter_id, expired=False
         ).first()
@@ -70,9 +70,11 @@ class ReportService:
             twitter_id, tweets_num=2
         )
         label = int()
-        if report_process.method == "approve":
+        if method == "approve":
             label = 1 if report_db.score >= 0.5 else 0
-        elif report_process.method == "reject":
+        elif method == "reject":
             label = 0 if report_db.score >= 0.5 else 1
 
-        ProcessedReport(user=full_details._json, label=label).save()
+        ProcessedReport.objects(twitter_id=twitter_id).update_one(
+            user=full_details._json, label=label, upsert=True
+        )
