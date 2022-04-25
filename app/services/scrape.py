@@ -1,6 +1,6 @@
 import logging
 from operator import attrgetter
-from typing import List, Tuple, Union
+from typing import List, Literal, Tuple, Union
 
 import pandas as pd
 import tweepy
@@ -13,6 +13,7 @@ from app.schemas.twitter import TimeSeries
 
 _logger = logging.getLogger(__name__)
 TwitterID = Union[int, str]
+Label = Literal[0, 1]
 
 
 def _make_key(method_name: str):
@@ -158,11 +159,9 @@ class TwitterScraper:
             ).flatten()
         )
 
-    def get_full_detail(self, username, tweets_num):
-        user = self.get_user_by_username(username)
-        recent_tweets = self.api.user_timeline(
-            screen_name=username, count=tweets_num
-        )  # self.get_tweet_info(user.id_str, settings.TWEETS_NUMBER)
+    def get_full_details(self, user_id: TwitterID, tweets_num: int):
+        user = self.get_user_by_id(user_id)
+        recent_tweets = self.api.user_timeline(user_id=user_id, count=tweets_num)
         tweets_dict_list = []
         for tweet in recent_tweets:
             tweet._json.pop("user")

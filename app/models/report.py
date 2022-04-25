@@ -4,11 +4,13 @@ from typing import List
 from mongoengine import (
     BooleanField,
     DateTimeField,
+    DictField,
     Document,
     EmbeddedDocument,
     EmbeddedDocumentField,
     EmbeddedDocumentListField,
     FloatField,
+    IntField,
     ListField,
     StringField,
 )
@@ -47,3 +49,10 @@ class Report(Document):
             score=self.score,
         )
         return response
+
+
+class ProcessedReport(Document):
+    user: dict = DictField(required=True)
+    label: int = IntField(required=True)
+
+    meta = {"collection": "processed_report_collection"}

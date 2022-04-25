@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -11,3 +12,7 @@ class ReportResponse(BaseModel):
     scrape_date: datetime
     report_count: int
     score: float
+
+
+class ReportProcess(BaseModel):
+    method: Literal["approve", "reject"]

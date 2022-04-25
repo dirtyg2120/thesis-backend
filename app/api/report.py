@@ -52,3 +52,14 @@ def send_report(
             max_age=settings.TOKEN_EXPIRATION_TIME * 60,
         )
         return resp
+
+
+@router.post("/process-report/{twitter_user_id}", name="user:process-report")
+def approve_report(
+    twitter_user_id: str,
+    report_process: schemas.ReportProcess,
+    user_identifier=Depends(operator_auth_handler.auth_wrapper),
+    report_service: ReportService = Depends(),
+):
+    report_service.process_report(twitter_user_id, report_process)
+    return None

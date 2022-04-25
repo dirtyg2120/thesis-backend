@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import Depends, HTTPException
 
-from app.models import BotPrediction, Report
+from app.models import BotPrediction, ProcessedReport, Report
 from app.models.report import ReportKey
 from app.schemas.report import ReportResponse
 
@@ -39,7 +39,6 @@ class ReportService:
             raise HTTPException(404, "Twitter account has not been checked")
 
         if report_db is None:
-
             report_db = Report(
                 report_key=ReportKey(
                     twitter_id=prediction_db.user.twitter_id,
@@ -62,3 +61,18 @@ class ReportService:
 
         report_db.save()
         return report_db
+
+    def process_report(self, twitter_id: str, report_process: str) -> Report:
+        report_db = Report.objects(
+            report_key__twitter_id=twitter_id, expired=False
+        ).first()
+        full_details = full_details = self.twitter_scraper.get_full_details(
+            twitter_id, tweets_num=2
+        )
+        label = int()
+        if report_process.method == "approve":
+            label = 1 if report_db.score >= 0.5 else 0
+        elif report_process.method == "reject":
+            label = 0 if report_db.score >= 0.5 else 1
+
+        ProcessedReport(user=full_details._json, label=label).save()

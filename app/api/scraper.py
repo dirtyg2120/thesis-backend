@@ -70,7 +70,7 @@ def export_profile(
         raise HTTPException(400, "'url' argument is invalid!")
 
     username = get_twitter_username(url)
-    full_details = scraper.get_full_detail(username, 3)
+    full_details = scraper.get_full_details(username, 3)
 
     file_path = f"{full_details.screen_name}.json"
     with open(file_path, "w") as f:
