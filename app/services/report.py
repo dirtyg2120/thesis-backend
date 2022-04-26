@@ -73,7 +73,7 @@ class ReportService:
         if method == "approve":
             label = 0 if report_db.score >= 0.5 else 1
         elif method == "reject":
-            label = 1 if report_db.score >= 0.5 else 0
+            report_db.update(expired=True)
 
         ProcessedReport.objects(twitter_id=twitter_id).update_one(
             user=full_details._json, label=label, upsert=True
