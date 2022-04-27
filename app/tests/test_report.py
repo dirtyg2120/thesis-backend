@@ -126,5 +126,4 @@ class TestOperatorReport:
             "/api/view-reports",
         )
         reports = view_report_response.json()
-        assert len(reports) == 2
-        assert reports[0]["id"] == reports[1]["id"]
+        assert len(reports) == 1
