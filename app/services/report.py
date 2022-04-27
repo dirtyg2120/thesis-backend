@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException
 
 from app.models import BotPrediction, ProcessedReport, Report
 from app.models.report import ReportKey
-from app.schemas.report import ReportResponse
+from app.schemas.report import ProcessedReportResponse, ReportResponse
 
 from .scrape import TwitterScraper
 
@@ -17,7 +17,7 @@ class ReportService:
         """
         Get report list to display to Operator, but not display tweets
         """
-        report_list = [report.to_response() for report in Report.objects]
+        report_list = [report.to_response() for report in Report.objects(expired=False)]
         return report_list
 
     def add_report(self, twitter_id: str, reporter_id: str) -> Report:
@@ -69,12 +69,26 @@ class ReportService:
         full_details = full_details = self.twitter_scraper.get_full_details(
             twitter_id, tweets_num=2
         )
+
         label = int()
         if method == "approve":
             label = 0 if report_db.score >= 0.5 else 1
-        elif method == "reject":
-            report_db.update(expired=True)
+
+        report_db.update(expired=True)
 
         ProcessedReport.objects(twitter_id=twitter_id).update_one(
             user=full_details._json, label=label, upsert=True
         )
+
+    def export(self) -> List[ProcessedReportResponse]:
+        processed_report_list = []
+        for report in ProcessedReport.objects:
+            report_dict = report.to_mongo()
+            resp = ProcessedReportResponse(
+                id=report_dict["_id"],
+                user=report_dict["user"],
+                label=report_dict["label"],
+            )
+            processed_report_list.append(resp)
+        ProcessedReport.objects.delete()
+        return processed_report_list

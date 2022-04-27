@@ -63,3 +63,15 @@ def approve_report(
 ):
     report_service.process_report(twitter_user_id, report_process.method)
     return "success"
+
+
+@router.get(
+    "/export",
+    response_model=List[schemas.ProcessedReportResponse],
+    name="user:export-detail",
+)
+def export_profile(
+    user_identifier=Depends(operator_auth_handler.auth_wrapper),
+    report_service: ReportService = Depends(),
+):
+    return report_service.export()

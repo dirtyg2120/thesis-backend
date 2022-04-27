@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel
 
@@ -12,6 +12,12 @@ class ReportResponse(BaseModel):
     scrape_date: datetime
     report_count: int
     score: float
+
+
+class ProcessedReportResponse(BaseModel):
+    id: str
+    user: dict[str, Any]
+    label: int
 
 
 class ReportProcess(BaseModel):

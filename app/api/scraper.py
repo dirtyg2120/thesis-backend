@@ -1,10 +1,4 @@
-import json
-import os
-import re
-
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse
-from starlette.background import BackgroundTasks
 
 from app import schemas
 from app.services.bot_checker import BotChecker
@@ -60,43 +54,3 @@ def user_detail_check(
         score=prediction.score,
     )
     return response
-
-
-@router.get("/export", name="user:export-detail")
-def export_profile(
-    url: str, bg_tasks: BackgroundTasks, scraper: TwitterScraper = Depends()
-):
-    if url == "":
-        raise HTTPException(400, "'url' argument is invalid!")
-
-    username = get_twitter_username(url)
-    full_details = scraper.get_full_details(username, 3)
-
-    file_path = f"{full_details.screen_name}.json"
-    with open(file_path, "w") as f:
-        full_details_str = (
-            str(full_details._json)
-            .replace('"', '\\"')
-            .replace("'", '"')
-            .replace(': \\"', ': "')
-            .replace('\\",', '",')
-            .replace("None", "null")
-            .replace("True", "true")
-            .replace("False", "false")
-        )
-        full_details_str = re.sub(r'(\w)"(\w)', r"\1'\2", full_details_str)
-        mydata = json.loads(full_details_str)
-        f.write(json.dumps(mydata, indent=4))
-
-    bg_tasks.add_task(remove_file, file_path)
-
-    if os.path.exists(file_path):
-        return FileResponse(
-            file_path,
-            media_type="application/json",
-            filename=f"{full_details.screen_name}.json",
-        )
-
-
-def remove_file(path: str) -> None:
-    os.remove(path)

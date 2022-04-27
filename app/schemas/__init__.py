@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 from .auth import AccessToken, AuthDetails, TokenPayload, UserIdentifier
-from .report import ReportProcess, ReportResponse
+from .report import ProcessedReportResponse, ReportProcess, ReportResponse
 from .twitter import TweetInfo, TweetResponse, UserInfo
 
 
