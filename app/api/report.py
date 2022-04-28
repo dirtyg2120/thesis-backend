@@ -54,14 +54,23 @@ def send_report(
         return resp
 
 
-@router.post("/process-report/{twitter_user_id}", name="user:process-report")
+@router.post("/approve-report/{twitter_user_id}", name="user:approve-report")
 def approve_report(
     twitter_user_id: str,
-    report_process: schemas.ReportProcess,
     user_identifier=Depends(operator_auth_handler.auth_wrapper),
     report_service: ReportService = Depends(),
 ):
-    report_service.process_report(twitter_user_id, report_process.method)
+    report_service.approve_report(twitter_user_id)
+    return "success"
+
+
+@router.post("/reject-report/{twitter_user_id}", name="user:reject-report")
+def reject_report(
+    twitter_user_id: str,
+    user_identifier=Depends(operator_auth_handler.auth_wrapper),
+    report_service: ReportService = Depends(),
+):
+    report_service.reject_report(twitter_user_id)
     return "success"
 
 

@@ -62,22 +62,22 @@ class ReportService:
         report_db.save()
         return report_db
 
-    def process_report(self, twitter_id: str, method: str):
+    def approve_report(self, twitter_id: str):
         report_db = Report.objects(
             report_key__twitter_id=twitter_id, expired=False
         ).first()
-        full_details = full_details = self.twitter_scraper.get_full_details(
-            twitter_id, tweets_num=2
-        )
-
-        label = int()
-        if method == "approve":
-            label = 0 if report_db.score >= 0.5 else 1
+        full_details = self.twitter_scraper.get_full_details(twitter_id, tweets_num=2)
 
         report_db.update(expired=True)
 
+        label = 0 if report_db.score >= 0.5 else 1
         ProcessedReport.objects(twitter_id=twitter_id).update_one(
             user=full_details._json, label=label, upsert=True
+        )
+
+    def reject_report(self, twitter_id: str):
+        Report.objects(report_key__twitter_id=twitter_id, expired=False).first().update(
+            expired=True
         )
 
     def export(self) -> List[ProcessedReportResponse]:

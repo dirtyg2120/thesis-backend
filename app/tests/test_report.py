@@ -116,10 +116,10 @@ class TestOperatorReport:
         assert recheck_response.status_code == 200
         assert BotPrediction.objects().count() == 1
 
-        rereport_response = client.post(
+        re_report_response = client.post(
             f"/api/send-report/{TWITTER_ID}",
         )
-        assert rereport_response.status_code == 200
+        assert re_report_response.status_code == 200
         assert Report.objects().count() == 2
 
         view_report_response = client.get(
