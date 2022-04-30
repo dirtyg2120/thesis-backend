@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.models import BotPrediction, Operator
+from app.models import Operator
 from app.services.auth import OperatorAuthHandler
 
 from .helpers.mock_models import MockData, MockPaginator

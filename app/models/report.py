@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 
+import tweepy
 from mongoengine import (
     BooleanField,
     DateTimeField,
@@ -30,7 +31,6 @@ class Report(Document):
 
     # NOTE: User.banner is never used in report!
     user = EmbeddedDocumentField(User, required=True)
-
     tweets: List[Tweet] = EmbeddedDocumentListField(Tweet, default=[])
     reporters: List[str] = ListField(StringField(), required=True)
     score: float = FloatField(required=True)
@@ -53,7 +53,7 @@ class Report(Document):
 
 class ProcessedReport(Document):
     twitter_id = StringField(primary_key=True)
-    user: dict = DictField(required=True)
+    user: tweepy.User = DictField(required=True)
     label: int = IntField(required=True)
 
     meta = {"collection": "processed_report_collection"}

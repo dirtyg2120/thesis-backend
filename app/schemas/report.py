@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Literal
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -18,7 +18,3 @@ class ProcessedReportResponse(BaseModel):
     id: str
     user: dict[str, Any]
     label: int
-
-
-class ReportProcess(BaseModel):
-    method: Literal["approve", "reject"]

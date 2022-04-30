@@ -63,7 +63,7 @@ class TestScrapper:
 
     @pytest.mark.usefixtures("mock_user_found")
     class TestUserFound:
-        username = MockData.user_info()["username"]
+        username = MockData.user_info()._json["username"]
 
         def assert_check_success(self, client, username, response):
             assert response.status_code == 200

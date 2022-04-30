@@ -13,9 +13,12 @@ class MockData:
     @classmethod
     def user_info(cls):
         if cls.user is None:
-            cls.user = tweepy.User(
-                data={x: cls.data[x] for x in cls.data if x not in ["tweets"]}
-            )
+            cls.user = tweepy.models.User()
+            setattr(cls.user, "_json", cls.data)
+            # cls.user = tweepy.User(
+            #     data={x: cls.data[x] for x in cls.data if x not in ["tweets"]}
+            # )
+            # cls.user = User()._json
         return cls.user
 
     @classmethod
