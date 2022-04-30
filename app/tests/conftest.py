@@ -8,7 +8,7 @@ from app.main import app
 from app.models import BotPrediction, Operator
 from app.services.auth import OperatorAuthHandler
 
-from .helpers.mock_models import MockData, MockPaginator
+from .helpers.mock_models import MockPaginator, get_mock_user
 
 OP_UNAME = "test"
 OP_PASS = "test"
@@ -32,7 +32,7 @@ def mock_tweepy_api():
 
 @pytest.fixture
 def mock_user_found(mock_tweepy_api):
-    mock_tweepy_api().get_user.return_value = MockData.user_info()
+    mock_tweepy_api().get_user.return_value = get_mock_user()
 
 
 @pytest.fixture

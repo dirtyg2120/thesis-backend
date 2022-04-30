@@ -8,10 +8,10 @@ from app.models import BotPrediction, Report
 from app.models.report import ProcessedReport
 from app.services.clean_database import clean_database
 
-from .helpers.mock_models import MockData
+from .helpers.mock_models import get_mock_user
 
-TWITTER_ID = MockData.user_info()._json["id_str"]
-USERNAME = MockData.user_info()._json["username"]
+TWITTER_ID = get_mock_user().id_str
+USERNAME = get_mock_user().screen_name
 
 
 @pytest.fixture
