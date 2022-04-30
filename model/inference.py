@@ -107,10 +107,8 @@ class Inference:
         model.eval()
         return model
 
-    def generate_adj_matrix(self, tweet_df):
-        graph = nx.from_pandas_edgelist(tweet_df, "id", "parent_id")
-        graph.remove_node(0)
-        adj = nx.adjacency_matrix(graph, nodelist=tweet_df["id"].unique()).A
+    def generate_adj_matrix(self, graph):
+        adj = nx.adjacency_matrix(graph).A
         np.fill_diagonal(adj, 1.0)
         return adj[np.newaxis, :]
 
@@ -125,14 +123,18 @@ class Inference:
         user_pred, tweet_pred = self.model.forward(user, tweet, adj, up)
         return user_pred
 
-    def predict(self, user_object, tweet_df):
+    def predict(self, user_object, tweet_graph: nx.DiGraph) -> float:
         user_df = self.create_user_dataframe(user_object)
         user_df = self.preprocessing_user(user_df, self.user_mean, self.user_std)
         user = user_df.values
-        tweet_df.sort_values(by=["id", "parent_id"], inplace=True)
-        adj = self.generate_adj_matrix(tweet_df)
-        tweet_df.drop_duplicates(subset="id", inplace=True)
-        tweets_text = tweet_df["text"].apply(self.preprocessing_tweet)
+
+        adj = self.generate_adj_matrix(tweet_graph)
+        tweets_text = np.array(
+            [
+                self.preprocessing_tweet(text)
+                for _, text in tweet_graph.nodes(data="text", default="")
+            ]
+        )
         tweet = self.vectorizing_tweet(tweets_text)
         up = self.generate_user_post_matrix(tweet_df)
         user_pred = self.inference(user, tweet, adj, up)

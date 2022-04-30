@@ -1,38 +1,13 @@
 from datetime import datetime, timedelta
 from typing import List
 
-import numpy as np
-import pandas as pd
+import networkx as nx
 import tweepy
 from fastapi import Depends
 
 import model
 
 from .scrape import TwitterID, TwitterScraper
-
-
-def _is_reply(parent_tweet_id: int, tweet: tweepy.Tweet) -> bool:
-    for reference_tweet in tweet.referenced_tweets:
-        if (
-            reference_tweet.type == "replied_to"
-            and reference_tweet.id == parent_tweet_id
-        ):
-            return True
-    return False
-
-
-def _find_replies_in_conversation(tweet_id: int, conversation: List[tweepy.Tweet]):
-    replies = []
-    for tweet in conversation:
-        if _is_reply(tweet_id, tweet):
-            replies.append(
-                {
-                    "id": tweet.id,
-                    "text": tweet.text,
-                    "parent_id": tweet_id,
-                }
-            )
-    return replies
 
 
 class ML:
@@ -50,36 +25,58 @@ class ML:
         tweets = self._get_ml_tweets(user_api.id)
         return self._inference.predict(user, tweets)
 
-    def _get_ml_tweets(self, user_id: TwitterID):
-        tweets = []
+    def _create_retweet_node(
+        self, tweet_graph: nx.DiGraph, tweet: tweepy.Tweet
+    ) -> None:
+        """Create a fake tweet node representing all of tweet's retweets"""
+        if tweet.public_metrics["retweet_count"] > 0:
+            retweet_node = "RT" + str(tweet.id)
+            retweet_text = f"RT @usertag: {tweet.text}"
+            tweet_graph.add_node(retweet_node, text=retweet_text)
+            tweet_graph.add_edge(
+                tweet.id, retweet_node, weight=tweet.public_metrics["retweet_count"]
+            )
+
+    def _create_tweet_subgraph(self, tweet: tweepy.Tweet) -> nx.DiGraph:
+        """
+        Create a subgraph rooted at tweet that contains all its replies and retweets.
+        """
+        tweet_graph = nx.DiGraph()
+        tweet_graph.add_node(tweet.id, text=tweet.text)
+        self._create_retweet_node(tweet_graph, tweet)
+
+        conversation = self._scraper.get_conversation(tweet.conversation_id)
+        for descendant in conversation:
+            tweet_graph.add_node(descendant.id, text=descendant.text)
+            for referenced in descendant.referenced_tweets:
+                if referenced.type == "replied_to":
+                    tweet_graph.add_edge(referenced.id, descendant.id)
+            self._create_retweet_node(tweet_graph, descendant)
+
+        # Remove unreachable tweets, e.g., replies of deleted tweets
+        reachable_nodes = nx.descendants(tweet_graph, tweet.id) | {tweet.id}
+        unreachable_nodes = tweet_graph.nodes - reachable_nodes
+        tweet_graph.remove_nodes_from(unreachable_nodes)
+        return tweet_graph
+
+    def _get_ml_tweets(self, user_id: TwitterID) -> nx.DiGraph:
         # NOTE: Can only fetch tweets in a conversation in last 7 days
         # without Academic Research access
         duration = timedelta(days=7)
-        last_week = datetime.utcnow() - duration
-        for tweet in tweepy.Paginator(
-            self._scraper.api_v2.get_users_tweets,
-            id=user_id,
-            tweet_fields="conversation_id",
-            exclude=["replies", "retweets"],
-            start_time=last_week.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            max_results=100,
-        ).flatten():
-            tweets.append({"id": tweet.id, "text": tweet.text, "parent_id": 0})
-
-            if not tweet.text.startswith("RT @"):
-                # Not a retweet
-                conversation = self._scraper.get_conversation(tweet.conversation_id)
-                replies = _find_replies_in_conversation(tweet.id, conversation)
-                # Fetch 2nd level tweets
-                for reply in replies:
-                    tweets.extend(_find_replies_in_conversation(tweet.id, conversation))
-                    tweets.extend(self._get_retweets(tweet.id))
-                tweets.extend(replies)
-                tweets.extend(self._get_retweets(tweet.id))
-
-        df = pd.DataFrame.from_records(tweets, columns=["id", "text", "parent_id"])
-        df = df.astype({"id": np.uint64, "parent_id": np.uint64})
-        return df
+        now = datetime.utcnow()
+        last_week = now - duration
+        tweet_graphs = map(
+            self._create_tweet_subgraph,
+            tweepy.Paginator(
+                self._scraper.api_v2.get_users_tweets,
+                id=user_id,
+                tweet_fields=["conversation_id", "public_metrics"],
+                exclude=["replies", "retweets"],
+                start_time=last_week.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                max_results=100,
+            ).flatten(),
+        )
+        return nx.compose_all(tweet_graphs)
 
     def _make_ml_user(self, user_api: tweepy.models.User):
         user_fields = [
@@ -101,10 +98,3 @@ class ML:
         for field in user_fields:
             user[field] = getattr(user_api, field)
         return user
-
-    def _get_retweets(self, tweet_id: TwitterID):
-        retweets = self._scraper.api.get_retweets(tweet_id, trim_user=True)
-        return [
-            {"id": tweet.id, "text": tweet.text, "parent_id": tweet_id}
-            for tweet in retweets
-        ]
