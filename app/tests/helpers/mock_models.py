@@ -1,5 +1,5 @@
-from functools import lru_cache
 import json
+from functools import lru_cache
 from importlib.resources import open_text, read_text
 
 import tweepy
@@ -12,7 +12,7 @@ def get_mock_user():
     data = read_text(test_data, "user.json")
     parser = tweepy.parsers.ModelParser()
     api = tweepy.API()
-    return parser.parse(data, api=api, payload_type='user')
+    return parser.parse(data, api=api, payload_type="user")
 
 
 @lru_cache
