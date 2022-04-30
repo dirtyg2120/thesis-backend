@@ -127,32 +127,37 @@ class Inference:
 
 
 if __name__ == "__main__":
-    sample_user_object = [
-        23,
-        41,
-        39,
-        20,
-        55,
-        1.0,
-        0.0,
-        0.0,
-        0.0,
-        "2022/03/28 09:45:23.19485",
-        "2021/02/28 13:30:34.00023",
-        "Quoc Anh",
-        "dirtygay2020",
-        "Some description here",
+    from datetime import datetime
+
+    sample_user_object = {
+        "statuses_count": 23,
+        "followers_count": 41,
+        "friends_count": 39,
+        "favourites_count": 20,
+        "listed_count": 55,
+        "default_profile": 1,
+        "default_profile_image": 0,
+        "protected": 0,
+        "verified": 0,
+        "updated": datetime.fromisoformat("2022-03-28T09:45:23"),
+        "created_at": datetime.fromisoformat("2021-02-28T13:30:34"),
+        "name": "Quoc Anh",
+        "screen_name": "dirtygay2020",
+        "description": "Some description here",
+    }
+
+    sample_tweet_graph = nx.DiGraph()
+    nodes = [
+        (30492, {"text": "This tweet is written by TQA"}),
+        (31949, {"text": "That's right"}),
+        (31950, {"text": "Are you sure?"}),
+        (31958, {"text": "Definitely"}),
+        (32223, {"text": "This is my second tweet"}),
+        (32294, {"text": "Yes! Keep posting new ones!"}),
+        (34449, {"text": "Don't reply this"}),
     ]
-    sample_tweet_object = pd.DataFrame(
-        [
-            {"id": 30492, "text": "This tweet is written by TQA", "parent_id": 0},
-            {"id": 31949, "text": "That's right", "parent_id": 30492},
-            {"id": 31950, "text": "Are you sure?", "parent_id": 30492},
-            {"id": 31958, "text": "Definitely", "parent_id": 31950},
-            {"id": 32223, "text": "This is my second tweet", "parent_id": 0},
-            {"id": 32294, "text": "Yes! Keep posting new ones!", "parent_id": 32223},
-            {"id": 34449, "text": "Don't reply this", "parent_id": 0},
-        ]
-    )
+    edges = [(30492, 31949), (30492, 31950), (31950, 31958), (32223, 32294)]
+    sample_tweet_graph.update(nodes=nodes, edges=edges)
+
     inf = Inference()
-    print(inf.predict(sample_user_object, sample_tweet_object))
+    print(inf.predict(sample_user_object, sample_tweet_graph))
