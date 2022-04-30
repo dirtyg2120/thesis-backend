@@ -1,6 +1,6 @@
 import pickle
 import re
-from importlib.resources import open_binary, open_text
+from importlib.resources import open_binary
 
 import networkx as nx
 import numpy as np
@@ -15,36 +15,34 @@ _URL_PATTERN = r"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}
 
 
 class Inference:
-    def __init__(self):
-        self.user_columns = [
-            "statuses_count",
-            "followers_count",
-            "friends_count",
-            "favourites_count",
-            "listed_count",
-            "default_profile",
-            "default_profile_image",
-            "protected",
-            "verified",
-            "updated",
-            "created_at",
-            "name",
-            "screen_name",
-            "description",
-        ]
+    USER_COLUMNS = [
+        "statuses_count",
+        "followers_count",
+        "friends_count",
+        "favourites_count",
+        "listed_count",
+        "default_profile",
+        "default_profile_image",
+        "protected",
+        "verified",
+        "updated",
+        "created_at",
+        "name",
+        "screen_name",
+        "description",
+    ]
 
+    def __init__(self):
         self.model = self.load_model()
         with open_binary(model_data, "vectorizer.pk") as f:
             self.vectorizer = pickle.load(f)
-        with open_text(model_data, "user_mean.csv") as f:
-            self.user_mean = pd.read_csv(f)
-        with open_text(model_data, "user_std.csv") as f:
-            self.user_std = pd.read_csv(f)
+        with open_binary(model_data, "user_mean.pk") as f:
+            self.user_mean: pd.Series = pd.read_pickle(f)
+        with open_binary(model_data, "user_std.pk") as f:
+            self.user_std: pd.Series = pd.read_pickle(f)
 
-    def create_user_dataframe(self, user):
-        return pd.DataFrame([user], columns=self.user_columns)
-
-    def preprocessing_user(self, user_df, user_mean, user_std):
+    def preprocessing_user(self, user_dict, user_mean, user_std):
+        user_df = pd.DataFrame.from_records([user_dict], columns=self.USER_COLUMNS)
         if "updated" in user_df.columns:
             age = (
                 pd.to_datetime(user_df.loc[:, "updated"])
@@ -68,9 +66,8 @@ class Inference:
         user_df["name_length"] = user_df["name"].str.len()
         user_df["num_digits_in_name"] = user_df["name"].str.count(r"\d")
         user_df["description_length"] = user_df["description"].str.len()
-        user_df.replace({False: 0, True: 1}, inplace=True)
-        user_df = user_df.select_dtypes("number").fillna(0.0)
-        return (user_df - user_mean) / user_std
+        normalized_user_df = (user_df[user_mean.index] - user_mean) / user_std
+        return normalized_user_df.iloc[0]
 
     def preprocessing_tweet(self, row):
         rowlist = str(row).split()
@@ -85,10 +82,6 @@ class Inference:
         rowlist = [word.lower() for word in rowlist]
         rowlist = [re.sub(_URL_PATTERN, "urltag", word) for word in rowlist]
         return " ".join(rowlist)
-
-    def vectorizing_tweet(self, tweets):
-        v = self.vectorizer.transform(tweets)
-        return v.A[np.newaxis, :]
 
     def load_model(self):
         model_dict = {
@@ -107,37 +100,29 @@ class Inference:
         model.eval()
         return model
 
-    def generate_adj_matrix(self, graph):
-        adj = nx.adjacency_matrix(graph).A
-        np.fill_diagonal(adj, 1.0)
-        return adj[np.newaxis, :]
-
-    def generate_user_post_matrix(self, tweet_df):
-        return (tweet_df["parent_id"] == 0).astype("int").values[np.newaxis, :]
-
     def inference(self, user, tweet, adj, up):
-        user = torch.Tensor(user)
-        tweet = torch.Tensor(tweet)
-        adj = torch.Tensor(adj)
-        up = torch.Tensor(up)
+        # First axis is batch size
+        user = torch.Tensor(user).unsqueeze(0)
+        tweet = torch.Tensor(tweet).unsqueeze(0)
+        adj = torch.Tensor(adj).unsqueeze(0)
+        up = torch.Tensor(up).unsqueeze(0)
         user_pred, tweet_pred = self.model.forward(user, tweet, adj, up)
         return user_pred
 
-    def predict(self, user_object, tweet_graph: nx.DiGraph) -> float:
-        user_df = self.create_user_dataframe(user_object)
-        user_df = self.preprocessing_user(user_df, self.user_mean, self.user_std)
-        user = user_df.values
+    def predict(self, user_dict, tweet_graph: nx.DiGraph) -> float:
+        user = self.preprocessing_user(user_dict, self.user_mean, self.user_std)
 
-        adj = self.generate_adj_matrix(tweet_graph)
-        tweets_text = np.array(
-            [
-                self.preprocessing_tweet(text)
-                for _, text in tweet_graph.nodes(data="text", default="")
-            ]
+        adj = nx.adjacency_matrix(tweet_graph).A
+        np.fill_diagonal(adj, 1.0)
+
+        tweets_text = (
+            self.preprocessing_tweet(text)
+            for _, text in tweet_graph.nodes(data="text", default="")
         )
-        tweet = self.vectorizing_tweet(tweets_text)
-        up = self.generate_user_post_matrix(tweet_df)
-        user_pred = self.inference(user, tweet, adj, up)
+        tweet = self.vectorizer.transform(tweets_text).A
+
+        # Not use user post matrix for now
+        user_pred = self.inference(user, tweet, adj, [])
         return user_pred.item()
 
 
