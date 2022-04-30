@@ -45,7 +45,6 @@ class ReportService:
                     scrape_date=prediction_db.timestamp,
                 ),
                 user=prediction_db.user,
-                tweets=prediction_db.tweets,
                 reporters=[reporter_id],
                 score=prediction_db.score,
                 expired=prediction_db is None,

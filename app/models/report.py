@@ -9,7 +9,6 @@ from mongoengine import (
     Document,
     EmbeddedDocument,
     EmbeddedDocumentField,
-    EmbeddedDocumentListField,
     FloatField,
     IntField,
     ListField,
@@ -18,7 +17,7 @@ from mongoengine import (
 
 from app.schemas import ReportResponse
 
-from .twitter import Tweet, User
+from .twitter import User
 
 
 class ReportKey(EmbeddedDocument):
@@ -31,7 +30,6 @@ class Report(Document):
 
     # NOTE: User.banner is never used in report!
     user = EmbeddedDocumentField(User, required=True)
-    tweets: List[Tweet] = EmbeddedDocumentListField(Tweet, default=[])
     reporters: List[str] = ListField(StringField(), required=True)
     score: float = FloatField(required=True)
     expired: bool = BooleanField(required=True)
