@@ -41,7 +41,7 @@ class Inference:
         with open_binary(model_data, "user_std.pk") as f:
             self.user_std: pd.Series = pd.read_pickle(f)
 
-    def preprocessing_user(self, user_dict, user_mean, user_std):
+    def preprocess_user(self, user_dict, user_mean, user_std):
         user_df = pd.DataFrame.from_records([user_dict], columns=self.USER_COLUMNS)
         if "updated" in user_df.columns:
             age = (
@@ -69,7 +69,7 @@ class Inference:
         normalized_user_df = (user_df[user_mean.index] - user_mean) / user_std
         return normalized_user_df.iloc[0]
 
-    def preprocessing_tweet(self, row):
+    def preprocess_tweet(self, row):
         rowlist = str(row).split()
         rowlist = [word.strip() for word in rowlist]
         rowlist = [
@@ -110,13 +110,13 @@ class Inference:
         return user_pred
 
     def predict(self, user_dict, tweet_graph: nx.DiGraph) -> float:
-        user = self.preprocessing_user(user_dict, self.user_mean, self.user_std)
+        user = self.preprocess_user(user_dict, self.user_mean, self.user_std)
 
         adj = nx.adjacency_matrix(tweet_graph).A
         np.fill_diagonal(adj, 1.0)
 
         tweets_text = (
-            self.preprocessing_tweet(text)
+            self.preprocess_tweet(text)
             for _, text in tweet_graph.nodes(data="text", default="")
         )
         tweet = self.vectorizer.transform(tweets_text).A
