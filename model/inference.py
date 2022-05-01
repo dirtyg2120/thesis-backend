@@ -112,6 +112,11 @@ class Inference:
     def predict(self, user_dict, tweet_graph: nx.DiGraph) -> float:
         user = self.preprocess_user(user_dict, self.user_mean, self.user_std)
 
+        if nx.is_empty(tweet_graph):
+            # Create a fake tweet node
+            tweet_graph = nx.DiGraph()
+            tweet_graph.add_node(0, text="")
+
         adj = nx.adjacency_matrix(tweet_graph).A
         np.fill_diagonal(adj, 1.0)
 

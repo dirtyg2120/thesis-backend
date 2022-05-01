@@ -65,7 +65,7 @@ class ML:
         duration = timedelta(days=7)
         now = datetime.utcnow()
         last_week = now - duration
-        tweet_graphs = map(
+        tweet_graphs = list(map(
             self._create_tweet_subgraph,
             tweepy.Paginator(
                 self._scraper.api_v2.get_users_tweets,
@@ -75,8 +75,11 @@ class ML:
                 start_time=last_week.strftime("%Y-%m-%dT%H:%M:%SZ"),
                 max_results=100,
             ).flatten(),
-        )
-        return nx.compose_all(tweet_graphs)
+        ))
+        if tweet_graphs:
+            return nx.compose_all(tweet_graphs)
+        else:
+            return nx.DiGraph()
 
     def _make_ml_user(self, user_api: tweepy.models.User):
         user_fields = [
