@@ -102,7 +102,7 @@ class ReportService:
             resp = ProcessedReportResponse(
                 user_id=report_dict["_id"],
                 user=report_dict["user"],
-                tweet_graph=report_dict['tweet_graph'],
+                tweet_graph=report_dict["tweet_graph"],
                 label=report_dict["label"],
             )
             processed_report_list.append(resp)
