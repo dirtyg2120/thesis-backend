@@ -100,7 +100,6 @@ class TestOperatorReport:
     def test_two_reports_same_account(
         self,
         client,
-        checked_twitter_account,
         reported_twitter_account,
         create_operator,
         login_operator,
@@ -132,7 +131,6 @@ class TestOperatorReport:
     def test_approve_report(
         self,
         client,
-        checked_twitter_account,
         reported_twitter_account,
         create_operator,
         login_operator,
@@ -154,7 +152,6 @@ class TestOperatorReport:
     def test_reject_report(
         self,
         client,
-        checked_twitter_account,
         reported_twitter_account,
         create_operator,
         login_operator,
@@ -176,7 +173,6 @@ class TestOperatorReport:
     def test_export_report(
         self,
         client,
-        checked_twitter_account,
         reported_twitter_account,
         create_operator,
         login_operator,
