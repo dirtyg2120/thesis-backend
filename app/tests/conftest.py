@@ -7,11 +7,22 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.models import BotPrediction, Operator
 from app.services.auth import OperatorAuthHandler
+from model import Inference
 
 from .helpers.mock_models import MockData, MockPaginator
 
 OP_UNAME = "test"
 OP_PASS = "test"
+
+
+class MockInference:
+    USER_COLUMNS = Inference.USER_COLUMNS
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def predict(self, user_object, tweet_df):
+        return 0
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -20,6 +31,7 @@ def mock_tweepy_global():
         patch("tweepy.AppAuthHandler"),
         patch("tweepy.Client"),
         patch("tweepy.Paginator", wraps=MockPaginator),
+        patch("model.Inference", wraps=MockInference),
     ):
         yield
 
