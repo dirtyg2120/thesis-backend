@@ -1,20 +1,10 @@
 from datetime import datetime
-from typing import List
 
-from mongoengine import (
-    DateTimeField,
-    Document,
-    EmbeddedDocumentField,
-    EmbeddedDocumentListField,
-    FloatField,
-)
-
-from .twitter import Tweet, User
+from mongoengine import DateTimeField, Document, FloatField, StringField
 
 
 class BotPrediction(Document):
-    user = EmbeddedDocumentField(User, required=True)
-    tweets: List[Tweet] = EmbeddedDocumentListField(Tweet, default=[])
+    user_id = StringField(required=True)
     score: float = FloatField(required=True)
     timestamp: datetime = DateTimeField(default=datetime.utcnow)
 
