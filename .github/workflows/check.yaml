@@ -62,7 +62,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Check type with mypy
-        run: mypy --package=app
+        run: mypy --package=app --package=model
 
   test:
     name: Run tests

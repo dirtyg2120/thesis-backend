@@ -150,12 +150,13 @@ class TwitterScraper:
         )
         return dow_resp, hod_resp
 
+    @cachedmethod(cache=_cache_func, key=_make_key("get_conversation"))
     def get_conversation(self, conversation_id: TwitterID) -> List[tweepy.Tweet]:
         return list(
             tweepy.Paginator(
                 self.api_v2.search_recent_tweets,
                 query=f"conversation_id:{conversation_id}",
-                tweet_fields="referenced_tweets",
+                tweet_fields=["referenced_tweets", "public_metrics"],
             ).flatten()
         )
 

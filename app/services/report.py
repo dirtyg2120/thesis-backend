@@ -11,14 +11,26 @@ from .scrape import TwitterScraper
 
 class ReportService:
     def __init__(self, twitter_scraper: TwitterScraper = Depends()):
-        self.twitter_scraper = twitter_scraper
+        self._scraper = twitter_scraper
+
+    def _make_response(self, report: Report) -> ReportResponse:
+        twitter_id = report.report_key.twitter_id
+        user = self._scraper.get_user_by_id(twitter_id)
+        return ReportResponse(
+            id=report.report_key.twitter_id,
+            avatar=user.profile_image_url,
+            username=user.screen_name,
+            created_at=user.created_at,
+            scrape_date=report.report_key.scrape_date,
+            report_count=len(report.reporters),
+            score=report.score,
+        )
 
     def get_report_list(self) -> List[ReportResponse]:
         """
         Get report list to display to Operator, but not display tweets
         """
-        report_list = [report.to_response() for report in Report.objects(expired=False)]
-        return report_list
+        return list(map(self._make_response, Report.objects(expired=False)))
 
     def add_report(self, twitter_id: str, reporter_id: str) -> Report:
         """
@@ -31,7 +43,7 @@ class ReportService:
         report_db = Report.objects(
             report_key__twitter_id=twitter_id, expired=False
         ).first()
-        prediction_db = BotPrediction.objects(user__twitter_id=twitter_id).first()
+        prediction_db = BotPrediction.objects(user_id=twitter_id).first()
 
         if prediction_db is None:
             if report_db:
@@ -41,13 +53,12 @@ class ReportService:
         if report_db is None:
             report_db = Report(
                 report_key=ReportKey(
-                    twitter_id=prediction_db.user.twitter_id,
+                    twitter_id=twitter_id,
                     scrape_date=prediction_db.timestamp,
                 ),
-                user=prediction_db.user,
                 reporters=[reporter_id],
                 score=prediction_db.score,
-                expired=prediction_db is None,
+                expired=False,
             )
         else:
             if reporter_id in report_db.reporters:
@@ -68,9 +79,7 @@ class ReportService:
         if report_db:
             report_db.update(expired=True)
 
-            full_details = self.twitter_scraper.get_full_details(
-                twitter_id, tweets_num=2
-            )
+            full_details = self._scraper.get_full_details(twitter_id, tweets_num=2)
             label = 0 if report_db.score >= 0.5 else 1
             ProcessedReport.objects(twitter_id=twitter_id).update_one(
                 user=full_details._json, label=label, upsert=True

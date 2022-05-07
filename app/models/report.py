@@ -15,10 +15,6 @@ from mongoengine import (
     StringField,
 )
 
-from app.schemas import ReportResponse
-
-from .twitter import User
-
 
 class ReportKey(EmbeddedDocument):
     twitter_id: str = StringField(required=True)
@@ -27,26 +23,11 @@ class ReportKey(EmbeddedDocument):
 
 class Report(Document):
     report_key = EmbeddedDocumentField(ReportKey, primary_key=True)
-
-    # NOTE: User.banner is never used in report!
-    user = EmbeddedDocumentField(User, required=True)
     reporters: List[str] = ListField(StringField(), required=True)
     score: float = FloatField(required=True)
     expired: bool = BooleanField(required=True)
 
     meta = {"collection": "report_collection"}
-
-    def to_response(self) -> ReportResponse:
-        response = ReportResponse(
-            id=self.report_key.twitter_id,
-            avatar=self.user.avatar,
-            username=self.user.username,
-            created_at=self.user.created_at,
-            scrape_date=self.report_key.scrape_date,
-            report_count=len(self.reporters),
-            score=self.score,
-        )
-        return response
 
 
 class ProcessedReport(Document):
