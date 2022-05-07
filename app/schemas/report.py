@@ -15,6 +15,7 @@ class ReportResponse(BaseModel):
 
 
 class ProcessedReportResponse(BaseModel):
-    id: str
-    user: dict[str, Any]
+    user_id: str
+    user: Any
+    tweet_graph: Any
     label: int

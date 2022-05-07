@@ -2,16 +2,18 @@ from typing import List
 
 from fastapi import Depends, HTTPException
 
-from app.models import BotPrediction, ProcessedReport, Report
-from app.models.report import ReportKey
+from app.models import BotPrediction, ProcessedReport
+from app.models.report import Report, ReportKey
 from app.schemas.report import ProcessedReportResponse, ReportResponse
 
+from .ml import ML
 from .scrape import TwitterScraper
 
 
 class ReportService:
-    def __init__(self, twitter_scraper: TwitterScraper = Depends()):
+    def __init__(self, twitter_scraper: TwitterScraper = Depends(), ml: ML = Depends()):
         self._scraper = twitter_scraper
+        self._ml = ml
 
     def _make_response(self, report: Report) -> ReportResponse:
         twitter_id = report.report_key.twitter_id
@@ -79,10 +81,13 @@ class ReportService:
         if report_db:
             report_db.update(expired=True)
 
-            full_details = self._scraper.get_full_details(twitter_id, tweets_num=2)
             label = 0 if report_db.score >= 0.5 else 1
-            ProcessedReport.objects(twitter_id=twitter_id).update_one(
-                user=full_details._json, label=label, upsert=True
+            user_api = self._scraper.get_user_by_id(twitter_id)
+            ProcessedReport.objects(user_id=twitter_id).update_one(
+                user=self._ml.make_ml_user(user_api),
+                tweet_graph=self._ml.get_ml_tweets(twitter_id),
+                label=label,
+                upsert=True,
             )
 
     def reject_report(self, twitter_id: str):
@@ -95,8 +100,9 @@ class ReportService:
         for report in ProcessedReport.objects:
             report_dict = report.to_mongo()
             resp = ProcessedReportResponse(
-                id=report_dict["_id"],
+                user_id=report_dict["_id"],
                 user=report_dict["user"],
+                tweet_graph=report_dict['tweet_graph'],
                 label=report_dict["label"],
             )
             processed_report_list.append(resp)

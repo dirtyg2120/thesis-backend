@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import List
 
-import tweepy
 from mongoengine import (
     BooleanField,
     DateTimeField,
@@ -31,8 +30,9 @@ class Report(Document):
 
 
 class ProcessedReport(Document):
-    twitter_id = StringField(primary_key=True)
-    user: tweepy.User = DictField(required=True)
+    user_id: str = StringField(primary_key=True)
+    user = DictField(required=True)
+    tweet_graph = DictField(required=True)
     label: int = IntField(required=True)
 
     meta = {"collection": "processed_report_collection"}
