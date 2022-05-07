@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import List
 
 import networkx as nx
 import tweepy
