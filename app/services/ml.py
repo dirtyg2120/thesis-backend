@@ -65,39 +65,26 @@ class ML:
         duration = timedelta(days=7)
         now = datetime.utcnow()
         last_week = now - duration
-        tweet_graphs = list(map(
-            self._create_tweet_subgraph,
-            tweepy.Paginator(
-                self._scraper.api_v2.get_users_tweets,
-                id=user_id,
-                tweet_fields=["conversation_id", "public_metrics"],
-                exclude=["replies", "retweets"],
-                start_time=last_week.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                max_results=100,
-            ).flatten(),
-        ))
+        tweet_graphs = list(
+            map(
+                self._create_tweet_subgraph,
+                tweepy.Paginator(
+                    self._scraper.api_v2.get_users_tweets,
+                    id=user_id,
+                    tweet_fields=["conversation_id", "public_metrics"],
+                    exclude=["replies", "retweets"],
+                    start_time=last_week.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    max_results=100,
+                ).flatten(),
+            )
+        )
         if tweet_graphs:
             return nx.compose_all(tweet_graphs)
         else:
             return nx.DiGraph()
 
     def _make_ml_user(self, user_api: tweepy.models.User):
-        user_fields = [
-            "created_at",
-            "default_profile",
-            "default_profile_image",
-            "description",
-            "favourites_count",
-            "followers_count",
-            "friends_count",
-            "listed_count",
-            "name",
-            "protected",
-            "screen_name",
-            "statuses_count",
-            "verified",
-        ]
         user = {"updated": datetime.utcnow()}
-        for field in user_fields:
+        for field in model.Inference.USER_COLUMNS - {"updated"}:
             user[field] = getattr(user_api, field)
         return user

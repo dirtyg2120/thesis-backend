@@ -15,22 +15,24 @@ _URL_PATTERN = r"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}
 
 
 class Inference:
-    USER_COLUMNS = [
-        "statuses_count",
-        "followers_count",
-        "friends_count",
-        "favourites_count",
-        "listed_count",
-        "default_profile",
-        "default_profile_image",
-        "protected",
-        "verified",
-        "updated",
-        "created_at",
-        "name",
-        "screen_name",
-        "description",
-    ]
+    USER_COLUMNS = frozenset(
+        [
+            "statuses_count",
+            "followers_count",
+            "friends_count",
+            "favourites_count",
+            "listed_count",
+            "default_profile",
+            "default_profile_image",
+            "protected",
+            "verified",
+            "updated",
+            "created_at",
+            "name",
+            "screen_name",
+            "description",
+        ]
+    )
 
     def __init__(self):
         self.model = self.load_model()
