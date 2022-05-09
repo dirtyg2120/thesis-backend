@@ -52,3 +52,35 @@ def send_report(
             max_age=settings.TOKEN_EXPIRATION_TIME * 60,
         )
         return resp
+
+
+@router.post("/approve-report/{twitter_user_id}", name="user:approve-report")
+def approve_report(
+    twitter_user_id: str,
+    user_identifier=Depends(operator_auth_handler.auth_wrapper),
+    report_service: ReportService = Depends(),
+):
+    report_service.approve_report(twitter_user_id)
+    return "success"
+
+
+@router.post("/reject-report/{twitter_user_id}", name="user:reject-report")
+def reject_report(
+    twitter_user_id: str,
+    user_identifier=Depends(operator_auth_handler.auth_wrapper),
+    report_service: ReportService = Depends(),
+):
+    report_service.reject_report(twitter_user_id)
+    return "success"
+
+
+@router.get(
+    "/export",
+    response_model=List[schemas.ProcessedReportResponse],
+    name="user:export-detail",
+)
+def export_profile(
+    user_identifier=Depends(operator_auth_handler.auth_wrapper),
+    report_service: ReportService = Depends(),
+):
+    return report_service.export()

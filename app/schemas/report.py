@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -11,3 +12,10 @@ class ReportResponse(BaseModel):
     scrape_date: datetime
     report_count: int
     score: float
+
+
+class ProcessedReportResponse(BaseModel):
+    user_id: str
+    user: Any
+    tweet_graph: Any
+    label: int

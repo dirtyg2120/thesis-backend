@@ -20,8 +20,8 @@ class ML:
 
     def get_analysis_result(self, username: str) -> float:
         user_api = self._scraper.get_user_by_username(username)
-        user = self._make_ml_user(user_api)
-        tweets = self._get_ml_tweets(user_api.id)
+        user = self.make_ml_user(user_api)
+        tweets = self.get_ml_tweets(user_api.id)
         return self._inference.predict(user, tweets)
 
     def _create_retweet_node(
@@ -58,7 +58,7 @@ class ML:
         tweet_graph.remove_nodes_from(unreachable_nodes)
         return tweet_graph
 
-    def _get_ml_tweets(self, user_id: TwitterID) -> nx.DiGraph:
+    def get_ml_tweets(self, user_id: TwitterID) -> nx.DiGraph:
         # NOTE: Can only fetch tweets in a conversation in last 7 days
         # without Academic Research access
         duration = timedelta(days=7)
@@ -82,7 +82,7 @@ class ML:
         else:
             return nx.DiGraph()
 
-    def _make_ml_user(self, user_api: tweepy.models.User):
+    def make_ml_user(self, user_api: tweepy.models.User):
         user = {"updated": datetime.utcnow()}
         for field in model.Inference.USER_COLUMNS - {"updated"}:
             user[field] = getattr(user_api, field)

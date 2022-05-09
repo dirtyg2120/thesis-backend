@@ -4,10 +4,12 @@ from typing import List
 from mongoengine import (
     BooleanField,
     DateTimeField,
+    DictField,
     Document,
     EmbeddedDocument,
     EmbeddedDocumentField,
     FloatField,
+    IntField,
     ListField,
     StringField,
 )
@@ -25,3 +27,12 @@ class Report(Document):
     expired: bool = BooleanField(required=True)
 
     meta = {"collection": "report_collection"}
+
+
+class ProcessedReport(Document):
+    user_id: str = StringField(primary_key=True)
+    user = DictField(required=True)
+    tweet_graph = DictField(required=True)
+    label: int = IntField(required=True)
+
+    meta = {"collection": "processed_report_collection"}

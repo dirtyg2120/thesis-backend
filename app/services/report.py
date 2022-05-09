@@ -2,16 +2,18 @@ from typing import List
 
 from fastapi import Depends, HTTPException
 
-from app.models import BotPrediction
+from app.models import BotPrediction, ProcessedReport
 from app.models.report import Report, ReportKey
-from app.schemas.report import ReportResponse
+from app.schemas.report import ProcessedReportResponse, ReportResponse
 
+from .ml import ML
 from .scrape import TwitterScraper
 
 
 class ReportService:
-    def __init__(self, twitter_scraper: TwitterScraper = Depends()):
+    def __init__(self, twitter_scraper: TwitterScraper = Depends(), ml: ML = Depends()):
         self._scraper = twitter_scraper
+        self._ml = ml
 
     def _make_response(self, report: Report) -> ReportResponse:
         twitter_id = report.report_key.twitter_id
@@ -30,7 +32,7 @@ class ReportService:
         """
         Get report list to display to Operator, but not display tweets
         """
-        return list(map(self._make_response, Report.objects))
+        return list(map(self._make_response, Report.objects(expired=False)))
 
     def add_report(self, twitter_id: str, reporter_id: str) -> Report:
         """
@@ -71,3 +73,38 @@ class ReportService:
 
         report_db.save()
         return report_db
+
+    def approve_report(self, twitter_id: str):
+        report_db = Report.objects(
+            report_key__twitter_id=twitter_id, expired=False
+        ).first()
+        if report_db:
+            report_db.update(expired=True)
+
+            label = 0 if report_db.score >= 0.5 else 1
+            user_api = self._scraper.get_user_by_id(twitter_id)
+            ProcessedReport.objects(user_id=twitter_id).update_one(
+                user=self._ml.make_ml_user(user_api),
+                tweet_graph=self._ml.get_ml_tweets(twitter_id),
+                label=label,
+                upsert=True,
+            )
+
+    def reject_report(self, twitter_id: str):
+        Report.objects(report_key__twitter_id=twitter_id, expired=False).first().update(
+            expired=True
+        )
+
+    def export(self) -> List[ProcessedReportResponse]:
+        processed_report_list = []
+        for report in ProcessedReport.objects:
+            report_dict = report.to_mongo()
+            resp = ProcessedReportResponse(
+                user_id=report_dict["_id"],
+                user=report_dict["user"],
+                tweet_graph=report_dict["tweet_graph"],
+                label=report_dict["label"],
+            )
+            processed_report_list.append(resp)
+        ProcessedReport.objects.delete()
+        return processed_report_list

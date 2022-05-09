@@ -1,6 +1,6 @@
 import logging
 from operator import attrgetter
-from typing import List, Tuple, Union
+from typing import List, Literal, Tuple, Union
 
 import pandas as pd
 import tweepy
@@ -13,6 +13,7 @@ from app.schemas.twitter import TimeSeries
 
 _logger = logging.getLogger(__name__)
 TwitterID = Union[int, str]
+Label = Literal[0, 1]
 
 
 def _make_key(method_name: str):

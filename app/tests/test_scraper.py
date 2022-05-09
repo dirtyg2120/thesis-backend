@@ -5,7 +5,7 @@ import tweepy
 
 from app.models import BotPrediction
 
-from .helpers.mock_models import MockData, MockResponse
+from .helpers.mock_models import MockResponse, get_mock_user
 
 PATHS = ["check", "detail"]
 
@@ -63,7 +63,7 @@ class TestScrapper:
 
     @pytest.mark.usefixtures("mock_user_found")
     class TestUserFound:
-        username = MockData.user_info()["username"]
+        username = get_mock_user().screen_name
 
         def assert_check_success(self, client, username, response):
             assert response.status_code == 200
