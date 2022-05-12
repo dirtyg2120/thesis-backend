@@ -131,5 +131,4 @@ class ReportService:
                 label=report_dict["label"],
             )
             processed_report_list.append(resp)
-        ProcessedReport.objects.delete()
         return processed_report_list
