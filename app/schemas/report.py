@@ -13,6 +13,7 @@ class CommonReport(BaseModel):
 
 class ApprovedReport(CommonReport):
     label: int
+    scrape_date: datetime
 
 
 class WaitingReport(CommonReport):

@@ -45,6 +45,7 @@ class ReportService:
             username=user.username,
             created_at=user.created_at,
             label=report.label,
+            scrape_date=report.user["updated"],
         )
 
     def get_report_list(self) -> ReportResponse:
