@@ -41,6 +41,7 @@ class BotChecker:
                     verified=user.verified,
                     avatar=user.profile_image_url,
                     banner=getattr(user, "profile_banner_url", None),
+                    description=user.description,
                 ),
                 tweets={"graph": tweet_graph["graph"], "nodes": tweet_graph["nodes"]},
                 score=score,

@@ -29,6 +29,7 @@ class User(EmbeddedDocument):
     protected: bool = BooleanField(required=True)
     verified: bool = BooleanField(required=True)
     description: str = StringField(required=True)
+    updated: datetime = DateTimeField(default=datetime.utcnow)
     avatar: str = StringField(required=True)
     banner: Optional[str] = StringField()
 

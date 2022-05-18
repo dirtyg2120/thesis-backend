@@ -14,6 +14,8 @@ from mongoengine import (
     StringField,
 )
 
+from .twitter import User
+
 
 class ReportKey(EmbeddedDocument):
     twitter_id: str = StringField(required=True)
@@ -21,6 +23,8 @@ class ReportKey(EmbeddedDocument):
 
 
 class Report(Document):
+    user = EmbeddedDocumentField(User, required=True)
+    tweets = DictField(required=True)
     report_key = EmbeddedDocumentField(ReportKey, primary_key=True)
     reporters: List[str] = ListField(StringField(), required=True)
     score: float = FloatField(required=True)
@@ -31,7 +35,7 @@ class Report(Document):
 
 class ProcessedReport(Document):
     user_id: str = StringField(primary_key=True)
-    user = DictField(required=True)
+    user = EmbeddedDocumentField(User, required=True)
     tweet_graph = DictField(required=True)
     label: int = IntField(required=True)
 

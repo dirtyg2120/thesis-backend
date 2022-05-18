@@ -21,14 +21,11 @@ class ReportService:
         self._ml = ml
 
     def _make_waiting_report(self, report: Report) -> WaitingReport:
-        twitter_id = report.report_key.twitter_id
-        user = self._scraper.api_v2.get_user(
-            id=twitter_id, user_fields=["created_at", "profile_image_url"]
-        ).data
+        user = report.user
         return WaitingReport(
             id=report.report_key.twitter_id,
-            avatar=user.profile_image_url,
-            username=user.username,
+            avatar=user.avatar,
+            username=user.screen_name,
             created_at=user.created_at,
             scrape_date=report.report_key.scrape_date,
             report_count=len(report.reporters),
@@ -36,13 +33,11 @@ class ReportService:
         )
 
     def _make_approved_report(self, report) -> ApprovedReport:
-        user = self._scraper.api_v2.get_user(
-            id=report.user_id, user_fields=["created_at", "profile_image_url"]
-        ).data
+        user = report.user
         return ApprovedReport(
             id=report.user_id,
-            avatar=user.profile_image_url,
-            username=user.username,
+            avatar=user.avatar,
+            username=user.screen_name,
             created_at=user.created_at,
             label=report.label,
             scrape_date=report.user["updated"],
@@ -87,6 +82,8 @@ class ReportService:
                 reporters=[reporter_id],
                 score=prediction_db.score,
                 expired=False,
+                user=prediction_db.user,
+                tweets=prediction_db.tweets,
             )
         else:
             if reporter_id in report_db.reporters:
@@ -97,8 +94,7 @@ class ReportService:
 
             report_db.reporters.append(reporter_id)
 
-        report_db.save()
-        return report_db
+        return report_db.save()
 
     def approve_report(self, twitter_id: str):
         report_db = Report.objects(
@@ -108,10 +104,9 @@ class ReportService:
             report_db.update(expired=True)
 
             label = 0 if report_db.score >= 0.5 else 1
-            user_api = self._scraper.get_user_by_id(twitter_id)
             ProcessedReport.objects(user_id=twitter_id).update_one(
-                user=self._ml.make_ml_user(user_api),
-                tweet_graph=self._ml.get_ml_tweets(twitter_id),
+                user=report_db.user,
+                tweet_graph=report_db.tweets,
                 label=label,
                 upsert=True,
             )
