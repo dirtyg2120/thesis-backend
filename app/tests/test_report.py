@@ -86,7 +86,7 @@ class TestOperatorReport:
         view_report_response = client.get(
             "/api/view-reports",
         )
-        reports = view_report_response.json()
+        reports = view_report_response.json()["waiting"]
         assert len(reports) == 1
         assert reports[0]["id"] == TWITTER_ID
 
@@ -94,7 +94,7 @@ class TestOperatorReport:
         view_report_response = client.get(
             "/api/view-reports",
         )
-        reports = view_report_response.json()
+        reports = view_report_response.json()["waiting"]
         assert len(reports) == 0
 
     def test_two_reports_same_account(
@@ -125,7 +125,7 @@ class TestOperatorReport:
         view_report_response = client.get(
             "/api/view-reports",
         )
-        reports = view_report_response.json()
+        reports = view_report_response.json()["waiting"]
         assert len(reports) == 1
 
     def test_approve_report(
@@ -146,7 +146,7 @@ class TestOperatorReport:
         view_report_response = client.get(
             "/api/view-reports",
         )
-        reports = view_report_response.json()
+        reports = view_report_response.json()["waiting"]
         assert len(reports) == 0
 
     def test_reject_report(
@@ -167,7 +167,7 @@ class TestOperatorReport:
         view_report_response = client.get(
             "/api/view-reports",
         )
-        reports = view_report_response.json()
+        reports = view_report_response.json()["waiting"]
         assert len(reports) == 0
 
     def test_export_report(
@@ -186,4 +186,4 @@ class TestOperatorReport:
 
         export_response = client.get("/api/export")
         assert export_response.status_code == 200
-        assert ProcessedReport.objects().count() == 0
+        assert ProcessedReport.objects().count() == 1
