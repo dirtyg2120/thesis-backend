@@ -28,15 +28,15 @@ class TweetInfo(TweetStatistics):
 
 
 class UserInfo(BaseModel):
-    id: str
+    twitter_id: str = Field(alias="id")
     name: str
     screen_name: str = Field(alias="username")
     created_at: datetime
     followers_count: int
     friends_count: int = Field(alias="followings_count")
     verified: bool
-    profile_image_url: str = Field(alias="avatar")
-    profile_banner_url: Optional[str] = Field(alias="banner")
+    avatar: str
+    banner: Optional[str]
 
     class Config:
         orm_mode = True
