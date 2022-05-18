@@ -15,7 +15,7 @@ def create_prediction(id, timestamp):
         timestamp=timestamp,
         score=0,
     )
-    prediction_db.save()
+    prediction_db.save(validate=False)
 
 
 def create_fake_prediction_collection():
