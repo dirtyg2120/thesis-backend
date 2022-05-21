@@ -18,11 +18,11 @@ class ML:
         # TODO: for train / re-train purpose
         pass
 
-    def get_analysis_result(self, username: str) -> float:
+    def get_analysis_result(self, username: str):
         user_api = self._scraper.get_user_by_username(username)
         user = self.make_ml_user(user_api)
         tweets = self.get_ml_tweets(user_api.id)
-        return self._inference.predict(user, tweets)
+        return self._inference.predict(user, tweets), user_api, tweets
 
     def _create_retweet_node(
         self, tweet_graph: nx.DiGraph, tweet: tweepy.Tweet

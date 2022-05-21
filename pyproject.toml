@@ -9,19 +9,7 @@ profile = "black"
 plugins = ["numpy.typing.mypy_plugin", "pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = "pandas"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "networkx"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "mongoengine"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "tweepy"
+module = ["pandas", "networkx.*", "mongoengine", "tweepy"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

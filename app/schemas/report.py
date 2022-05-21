@@ -1,17 +1,30 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, List
 
 from pydantic import BaseModel
 
 
-class ReportResponse(BaseModel):
+class CommonReport(BaseModel):
     id: str
     avatar: str
     username: str
     created_at: datetime
+
+
+class ApprovedReport(CommonReport):
+    label: int
+    scrape_date: datetime
+
+
+class WaitingReport(CommonReport):
+    score: float
     scrape_date: datetime
     report_count: int
-    score: float
+
+
+class ReportResponse(BaseModel):
+    waiting: List[WaitingReport]
+    approved: List[ApprovedReport]
 
 
 class ProcessedReportResponse(BaseModel):
