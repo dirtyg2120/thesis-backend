@@ -30,5 +30,6 @@ class ReportResponse(BaseModel):
 class ProcessedReportResponse(BaseModel):
     user_id: str
     user: Any
-    tweet_graph: Any
+    tweets: List
+    tweet_relation: List
     label: int
