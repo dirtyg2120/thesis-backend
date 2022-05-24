@@ -18,7 +18,7 @@ class BotChecker:
 
     def check_account(self, username):
         prediction_db: BotPrediction = BotPrediction.objects(
-            user__screen_name=username
+            user__screen_name=username.lower()
         ).first()
         if prediction_db is None:
             _logger.info("This account is not exist in DB")
@@ -28,7 +28,7 @@ class BotChecker:
                 user=User(
                     twitter_id=user.id_str,
                     name=user.name,
-                    screen_name=user.screen_name,
+                    screen_name=user.screen_name.lower(),
                     created_at=user.created_at,
                     statuses_count=user.statuses_count,
                     followers_count=user.followers_count,
