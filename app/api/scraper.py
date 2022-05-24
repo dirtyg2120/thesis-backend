@@ -19,7 +19,7 @@ def user_info_check(
     username = get_twitter_username(url)
     prediction = bot_checker.check_account(username)
 
-    response = schemas.CheckResponse(user_info=prediction.user, score=prediction.score)
+    response = schemas.CheckResponse(user_info=prediction.twitter_info.user, score=prediction.score)
     return response
 
 
@@ -43,7 +43,7 @@ def user_detail_check(
     )
 
     response = schemas.DetailResponse(
-        user_info=prediction.user,
+        user_info=prediction.twitter_info.user,
         tweet_info=tweet_info,
         score=prediction.score,
     )

@@ -6,16 +6,16 @@ from mongoengine import (
     Document,
     EmbeddedDocumentField,
     FloatField,
+    ReferenceField,
     StringField,
 )
 
-from .twitter import User
+from .twitter import TwitterInfo, User
 
 
 class BotPrediction(Document):
     user_id = StringField(primary_key=True)
-    user = EmbeddedDocumentField(User, required=True)
-    tweets = DictField(required=True)
+    twitter_info = ReferenceField(TwitterInfo, required=True)
     score: float = FloatField(required=True)
     timestamp: datetime = DateTimeField(default=datetime.utcnow)
 
