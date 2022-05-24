@@ -11,14 +11,12 @@ from app.schemas.report import (
     WaitingReport,
 )
 
-from .ml import ML
 from .scrape import TwitterScraper
 
 
 class ReportService:
-    def __init__(self, twitter_scraper: TwitterScraper = Depends(), ml: ML = Depends()):
+    def __init__(self, twitter_scraper: TwitterScraper = Depends()):
         self._scraper = twitter_scraper
-        self._ml = ml
 
     def _make_waiting_report(self, report: Report) -> WaitingReport:
         user = report.twitter_info.user
@@ -118,7 +116,6 @@ class ReportService:
         processed_report_list = []
         for report in ProcessedReport.objects:
             twitter_info = report.twitter_info
-            debug(twitter_info.tweets)
             resp = ProcessedReportResponse(
                 user_id=report.user_id,
                 user=twitter_info.user,

@@ -1,16 +1,8 @@
 from datetime import datetime
 
-from mongoengine import (
-    DateTimeField,
-    DictField,
-    Document,
-    EmbeddedDocumentField,
-    FloatField,
-    ReferenceField,
-    StringField,
-)
+from mongoengine import DateTimeField, Document, FloatField, ReferenceField, StringField
 
-from .twitter import TwitterInfo, User
+from .twitter import TwitterInfo
 
 
 class BotPrediction(Document):

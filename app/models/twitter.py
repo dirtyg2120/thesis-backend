@@ -5,9 +5,9 @@ import tweepy
 from mongoengine import (
     BooleanField,
     DateTimeField,
+    Document,
     EmbeddedDocument,
     EmbeddedDocumentField,
-    Document,
     IntField,
     ListField,
     StringField,

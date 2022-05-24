@@ -7,26 +7,25 @@ from app.services.scrape import TwitterScraper
 from app.services.url_parser import get_twitter_username
 
 router = APIRouter()
+bot_checker = BotChecker()
 
 
 @router.get("/check", response_model=schemas.CheckResponse, name="user:get-data")
-def user_info_check(
-    url: str, bot_checker: BotChecker = Depends(), scraper: TwitterScraper = Depends()
-):
+def user_info_check(url: str):
     if url == "":
         raise HTTPException(400, "'url' argument is invalid!")
 
     username = get_twitter_username(url)
     prediction = bot_checker.check_account(username)
 
-    response = schemas.CheckResponse(user_info=prediction.twitter_info.user, score=prediction.score)
+    response = schemas.CheckResponse(
+        user_info=prediction.twitter_info.user, score=prediction.score
+    )
     return response
 
 
 @router.get("/detail", response_model=schemas.DetailResponse, name="user:get-detail")
-def user_detail_check(
-    url: str, bot_checker: BotChecker = Depends(), scraper: TwitterScraper = Depends()
-):
+def user_detail_check(url: str, scraper: TwitterScraper = Depends()):
     if url == "":
         raise HTTPException(400, "'url' argument is invalid!")
 

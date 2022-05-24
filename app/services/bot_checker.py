@@ -1,6 +1,5 @@
 import logging
 
-from fastapi import Depends
 from networkx.readwrite import json_graph
 
 from app.models import BotPrediction
@@ -13,9 +12,9 @@ _logger = logging.getLogger(__name__)
 
 
 class BotChecker:
-    def __init__(self, ml: ML = Depends(), scraper: TwitterScraper = Depends()):
-        self._ml_service = ml
-        self._scraper = scraper
+    def __init__(self):
+        self._ml_service = ML()
+        self._scraper = TwitterScraper()
 
     def check_account(self, username):
         user = self._scraper.get_user_by_username(username)
@@ -24,6 +23,7 @@ class BotChecker:
         ).first()
         if prediction_db is None:
             _logger.info("This account is not exist in DB")
+            # self._ml_service = ML()
             score, user, tweet_graph = self._ml_service.get_analysis_result(username)
             tweet_graph = json_graph.node_link_data(tweet_graph)
             twitter_info = TwitterInfo(

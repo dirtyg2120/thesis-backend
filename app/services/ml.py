@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 import networkx as nx
 import tweepy
-from fastapi import Depends
 
 import model
 
@@ -10,8 +9,8 @@ from .scrape import TwitterID, TwitterScraper
 
 
 class ML:
-    def __init__(self, scraper: TwitterScraper = Depends()):
-        self._scraper = scraper
+    def __init__(self):
+        self._scraper = TwitterScraper()
         self._inference = model.Inference()
 
     def train(self):
