@@ -115,37 +115,33 @@ class TwitterScraper:
         timezone = "Asia/Ho_Chi_Minh"
         now = pd.Timestamp.now(tz=timezone)
         day_of_week = pd.Series(
-            index=pd.period_range(end=now, periods=7, freq="D"), dtype=int
+            index=pd.period_range(end=now, periods=7, freq="D").strftime("%a"),
+            dtype=int,
         )
-        start_day_of_week = day_of_week.index[0].start_time.tz_localize(timezone)
         hour_of_day = pd.Series(
-            index=pd.period_range(end=now, periods=24, freq="H"), dtype=int
+            index=pd.period_range(end=now, periods=24, freq="H").strftime("%H:%M"),
+            dtype=int,
         )
-        start_hour_of_day = hour_of_day.index[0].start_time.tz_localize(timezone)
 
+        start_time = now - pd.Timedelta(weeks=4)
         for tweet in tweepy.Paginator(
             self.api_v2.get_users_tweets,
             id=user_id,
             tweet_fields=tweet_fields,
             exclude=["replies", "retweets"],
-            start_time=start_day_of_week.astimezone("UTC").strftime(
-                "%Y-%m-%dT%H:%M:%SZ"
-            ),
+            start_time=start_time.astimezone("UTC").strftime("%Y-%m-%dT%H:%M:%SZ"),
             max_results=100,
         ).flatten():
             tweet_timestamp = pd.Timestamp(tweet.created_at).tz_convert(timezone)
-            day_of_week[tweet_timestamp] += 1
-
-            if tweet_timestamp >= start_hour_of_day:
-                # Only count tweets in the last 24 hours
-                hour_of_day[tweet_timestamp] += 1
+            day_of_week[tweet_timestamp.strftime("%a")] += 1
+            hour_of_day[tweet_timestamp.strftime("%H:00")] += 1
 
         dow_resp = TimeSeries(
-            time=day_of_week.index.strftime("%a").tolist(),
+            time=day_of_week.index.tolist(),
             value=day_of_week.tolist(),
         )
         hod_resp = TimeSeries(
-            time=hour_of_day.index.strftime("%H:%M").tolist(),
+            time=hour_of_day.index.tolist(),
             value=hour_of_day.tolist(),
         )
         return dow_resp, hod_resp
