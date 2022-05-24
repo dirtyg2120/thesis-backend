@@ -18,7 +18,7 @@ class BotChecker:
 
     def check_account(self, username):
         prediction_db: BotPrediction = BotPrediction.objects(
-            user__screen_name=username.lower()
+            user__screen_name=username
         ).first()
         if prediction_db is None:
             _logger.info("This account is not exist in DB")

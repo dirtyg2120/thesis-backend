@@ -19,6 +19,6 @@ def parse_twitter_url(url: str) -> str:
 
 def get_twitter_username(url_or_username: str) -> str:
     if "/" not in url_or_username:
-        return url_or_username
+        return url_or_username.lower()
     else:
-        return parse_twitter_url(url_or_username)
+        return parse_twitter_url(url_or_username).lower()
