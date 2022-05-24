@@ -117,12 +117,14 @@ class ReportService:
     def export(self) -> List[ProcessedReportResponse]:
         processed_report_list = []
         for report in ProcessedReport.objects:
-            report_dict = report.to_mongo()
+            twitter_info = report.twitter_info
+            debug(twitter_info.tweets)
             resp = ProcessedReportResponse(
-                user_id=report_dict["_id"],
-                user=report_dict["user"],
-                tweet_graph=report_dict["tweet_graph"],
-                label=report_dict["label"],
+                user_id=report.user_id,
+                user=twitter_info.user,
+                tweets=twitter_info.tweets,
+                tweet_relation=twitter_info.tweet_relation,
+                label=report.label,
             )
             processed_report_list.append(resp)
         return processed_report_list
