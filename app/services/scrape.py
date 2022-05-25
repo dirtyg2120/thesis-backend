@@ -12,6 +12,7 @@ from fastapi import HTTPException
 
 from app.core.config import settings
 from app.schemas.twitter import TimeSeries
+from app.utils import Singleton
 
 _logger = logging.getLogger(__name__)
 TwitterID = Union[int, str]
@@ -25,7 +26,7 @@ def _make_key(method_name: str):
     return method_key
 
 
-class TwitterScraper:
+class TwitterScraper(metaclass=Singleton):
     _cache_func = attrgetter("_cache")
 
     def __init__(self) -> None:

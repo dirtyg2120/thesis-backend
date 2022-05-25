@@ -1,15 +1,19 @@
+import logging
 from datetime import datetime, timedelta
 
 import networkx as nx
 import tweepy
 
 import model
+from app.utils import Singleton
 
 from .scrape import TwitterID, TwitterScraper
 
 
-class ML:
+class ML(metaclass=Singleton):
     def __init__(self):
+        logger = logging.getLogger("app")
+        logger.warning("Create ML")
         self._scraper = TwitterScraper()
         self._inference = model.Inference()
 

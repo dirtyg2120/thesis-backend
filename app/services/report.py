@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 
 from app.models import BotPrediction, ProcessedReport
 from app.models.report import Report, ReportKey
@@ -10,13 +10,14 @@ from app.schemas.report import (
     ReportResponse,
     WaitingReport,
 )
+from app.utils import Singleton
 
 from .scrape import TwitterScraper
 
 
-class ReportService:
-    def __init__(self, twitter_scraper: TwitterScraper = Depends()):
-        self._scraper = twitter_scraper
+class ReportService(metaclass=Singleton):
+    def __init__(self):
+        self._scraper = TwitterScraper()
 
     def _make_waiting_report(self, report: Report) -> WaitingReport:
         user = report.twitter_info.user

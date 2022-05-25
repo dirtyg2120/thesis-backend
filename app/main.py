@@ -12,6 +12,7 @@ from slowapi.util import get_remote_address
 from .api import api_router
 from .core.config import settings
 from .services.clean_database import clean_database
+from .utils import Singleton
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION)
 
@@ -56,6 +57,11 @@ def clear_db():
 @app.on_event("shutdown")
 def disconnect_db():
     disconnect()
+
+
+@app.on_event("shutdown")
+def clear_singleton():
+    Singleton._instances.clear()
 
 
 if __name__ == "__main__":

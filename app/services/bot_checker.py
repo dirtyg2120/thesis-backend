@@ -4,6 +4,7 @@ from networkx.readwrite import json_graph
 
 from app.models import BotPrediction
 from app.models.twitter import TwitterInfo, User
+from app.utils import Singleton
 
 from .ml import ML
 from .scrape import TwitterScraper
@@ -11,7 +12,7 @@ from .scrape import TwitterScraper
 _logger = logging.getLogger(__name__)
 
 
-class BotChecker:
+class BotChecker(metaclass=Singleton):
     def __init__(self):
         self._ml_service = ML()
         self._scraper = TwitterScraper()
