@@ -1,8 +1,10 @@
+import calendar
 import logging
+from datetime import datetime, timedelta
 from operator import attrgetter
 from typing import List, Literal, Tuple, Union
 
-import pandas as pd
+import pytz  # type: ignore
 import tweepy
 from cachetools import TTLCache, cachedmethod
 from cachetools.keys import hashkey
@@ -112,37 +114,32 @@ class TwitterScraper:
             + value: number of tweets posted in the same time
         """
         tweet_fields = ["created_at"]
-        timezone = "Asia/Ho_Chi_Minh"
-        now = pd.Timestamp.now(tz=timezone)
-        day_of_week = pd.Series(
-            index=pd.period_range(end=now, periods=7, freq="D").strftime("%a"),
-            dtype=int,
-        )
-        hour_of_day = pd.Series(
-            index=pd.period_range(end=now, periods=24, freq="H").strftime("%H:%M"),
-            dtype=int,
-        )
-
-        start_time = now - pd.Timedelta(weeks=4)
+        timezone = pytz.timezone("Asia/Ho_Chi_Minh")
+        day_of_week = [0] * 7
+        hour_of_day = [0] * 24
+        now = datetime.utcnow()
+        start_time = now - timedelta(weeks=4)
         for tweet in tweepy.Paginator(
             self.api_v2.get_users_tweets,
             id=user_id,
             tweet_fields=tweet_fields,
             exclude=["replies", "retweets"],
-            start_time=start_time.astimezone("UTC").strftime("%Y-%m-%dT%H:%M:%SZ"),
+            start_time=start_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
             max_results=100,
         ).flatten():
-            tweet_timestamp = pd.Timestamp(tweet.created_at).tz_convert(timezone)
-            day_of_week[tweet_timestamp.strftime("%a")] += 1
-            hour_of_day[tweet_timestamp.strftime("%H:00")] += 1
+            tweet_timestamp = tweet.created_at.astimezone(timezone)
+            day_of_week[tweet_timestamp.weekday()] += 1
+            hour_of_day[tweet_timestamp.hour] += 1
 
+        logging.warn(sum(day_of_week))
+        logging.warn(sum(hour_of_day))
         dow_resp = TimeSeries(
-            time=day_of_week.index.tolist(),
-            value=day_of_week.tolist(),
+            time=list(calendar.day_abbr),
+            value=day_of_week,
         )
         hod_resp = TimeSeries(
-            time=hour_of_day.index.tolist(),
-            value=hour_of_day.tolist(),
+            time=[f"{h:02}:00" for h in range(24)],
+            value=hour_of_day,
         )
         return dow_resp, hod_resp
 
