@@ -4,17 +4,17 @@ from typing import List
 from mongoengine import (
     BooleanField,
     DateTimeField,
-    DictField,
     Document,
     EmbeddedDocument,
     EmbeddedDocumentField,
     FloatField,
     IntField,
     ListField,
+    ReferenceField,
     StringField,
 )
 
-from .twitter import User
+from .twitter import TwitterInfo
 
 
 class ReportKey(EmbeddedDocument):
@@ -23,9 +23,8 @@ class ReportKey(EmbeddedDocument):
 
 
 class Report(Document):
-    user = EmbeddedDocumentField(User, required=True)
-    tweets = DictField(required=True)
     report_key = EmbeddedDocumentField(ReportKey, primary_key=True)
+    twitter_info = ReferenceField(TwitterInfo, required=True)
     reporters: List[str] = ListField(StringField(), required=True)
     score: float = FloatField(required=True)
     expired: bool = BooleanField(required=True)
@@ -35,8 +34,7 @@ class Report(Document):
 
 class ProcessedReport(Document):
     user_id: str = StringField(primary_key=True)
-    user = EmbeddedDocumentField(User, required=True)
-    tweet_graph = DictField(required=True)
+    twitter_info = ReferenceField(TwitterInfo, required=True)
     label: int = IntField(required=True)
 
     meta = {"collection": "processed_report_collection"}

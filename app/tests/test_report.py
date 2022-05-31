@@ -21,7 +21,7 @@ def checked_twitter_account(client, mock_user_found):
         "/api/check", params={"url": f"https://twitter.com/{username}"}
     )
     assert response.status_code == 200
-    assert response.json()["user_info"]["username"] == username
+    assert response.json()["user_info"]["username"] == username.lower()
     assert Report.objects().count() == 0
 
 

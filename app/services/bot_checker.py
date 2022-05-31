@@ -1,9 +1,10 @@
 import logging
 
-from fastapi import Depends
 from networkx.readwrite import json_graph
 
-from app.models import BotPrediction, User
+from app.models import BotPrediction
+from app.models.twitter import TwitterInfo, User
+from app.utils import Singleton
 
 from .ml import ML
 from .scrape import TwitterScraper
@@ -11,24 +12,27 @@ from .scrape import TwitterScraper
 _logger = logging.getLogger(__name__)
 
 
-class BotChecker:
-    def __init__(self, ml: ML = Depends(), scraper: TwitterScraper = Depends()):
-        self._ml_service = ml
-        self._scraper = scraper
+class BotChecker(metaclass=Singleton):
+    def __init__(self):
+        self._ml_service = ML()
+        self._scraper = TwitterScraper()
 
     def check_account(self, username):
+        user = self._scraper.get_user_by_username(username)
         prediction_db: BotPrediction = BotPrediction.objects(
-            user__screen_name=username
+            user_id=user.id_str,
         ).first()
         if prediction_db is None:
             _logger.info("This account is not exist in DB")
+            # self._ml_service = ML()
             score, user, tweet_graph = self._ml_service.get_analysis_result(username)
             tweet_graph = json_graph.node_link_data(tweet_graph)
-            prediction_db = BotPrediction(
+            twitter_info = TwitterInfo(
+                user_id=user.id_str,
                 user=User(
                     twitter_id=user.id_str,
                     name=user.name,
-                    screen_name=user.screen_name,
+                    screen_name=user.screen_name.lower(),
                     created_at=user.created_at,
                     statuses_count=user.statuses_count,
                     followers_count=user.followers_count,
@@ -43,9 +47,13 @@ class BotChecker:
                     banner=getattr(user, "profile_banner_url", None),
                     description=user.description,
                 ),
-                tweets={"graph": tweet_graph["graph"], "nodes": tweet_graph["nodes"]},
+                tweets=tweet_graph["nodes"],
+                tweet_relation=tweet_graph["links"],
+            ).save()
+            prediction_db = BotPrediction(
                 score=score,
                 user_id=user.id_str,
+                twitter_info=twitter_info,
             ).save()
 
         return prediction_db

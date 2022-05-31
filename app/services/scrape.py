@@ -1,8 +1,10 @@
+import calendar
 import logging
+from datetime import datetime, timedelta
 from operator import attrgetter
 from typing import List, Literal, Tuple, Union
 
-import pandas as pd
+import pytz  # type: ignore
 import tweepy
 from cachetools import TTLCache, cachedmethod
 from cachetools.keys import hashkey
@@ -10,6 +12,7 @@ from fastapi import HTTPException
 
 from app.core.config import settings
 from app.schemas.twitter import TimeSeries
+from app.utils import Singleton
 
 _logger = logging.getLogger(__name__)
 TwitterID = Union[int, str]
@@ -23,7 +26,7 @@ def _make_key(method_name: str):
     return method_key
 
 
-class TwitterScraper:
+class TwitterScraper(metaclass=Singleton):
     _cache_func = attrgetter("_cache")
 
     def __init__(self) -> None:
@@ -112,41 +115,32 @@ class TwitterScraper:
             + value: number of tweets posted in the same time
         """
         tweet_fields = ["created_at"]
-        timezone = "Asia/Ho_Chi_Minh"
-        now = pd.Timestamp.now(tz=timezone)
-        day_of_week = pd.Series(
-            index=pd.period_range(end=now, periods=7, freq="D"), dtype=int
-        )
-        start_day_of_week = day_of_week.index[0].start_time.tz_localize(timezone)
-        hour_of_day = pd.Series(
-            index=pd.period_range(end=now, periods=24, freq="H"), dtype=int
-        )
-        start_hour_of_day = hour_of_day.index[0].start_time.tz_localize(timezone)
-
+        timezone = pytz.timezone("Asia/Ho_Chi_Minh")
+        day_of_week = [0] * 7
+        hour_of_day = [0] * 24
+        now = datetime.utcnow()
+        start_time = now - timedelta(weeks=4)
         for tweet in tweepy.Paginator(
             self.api_v2.get_users_tweets,
             id=user_id,
             tweet_fields=tweet_fields,
             exclude=["replies", "retweets"],
-            start_time=start_day_of_week.astimezone("UTC").strftime(
-                "%Y-%m-%dT%H:%M:%SZ"
-            ),
+            start_time=start_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
             max_results=100,
         ).flatten():
-            tweet_timestamp = pd.Timestamp(tweet.created_at).tz_convert(timezone)
-            day_of_week[tweet_timestamp] += 1
+            tweet_timestamp = tweet.created_at.astimezone(timezone)
+            day_of_week[tweet_timestamp.weekday()] += 1
+            hour_of_day[tweet_timestamp.hour] += 1
 
-            if tweet_timestamp >= start_hour_of_day:
-                # Only count tweets in the last 24 hours
-                hour_of_day[tweet_timestamp] += 1
-
+        logging.warn(sum(day_of_week))
+        logging.warn(sum(hour_of_day))
         dow_resp = TimeSeries(
-            time=day_of_week.index.strftime("%a").tolist(),
-            value=day_of_week.tolist(),
+            time=list(calendar.day_abbr),
+            value=day_of_week,
         )
         hod_resp = TimeSeries(
-            time=hour_of_day.index.strftime("%H:%M").tolist(),
-            value=hour_of_day.tolist(),
+            time=[f"{h:02}:00" for h in range(24)],
+            value=hour_of_day,
         )
         return dow_resp, hod_resp
 

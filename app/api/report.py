@@ -24,8 +24,8 @@ operator_auth_handler = OperatorAuthHandler()
 )
 def view_reports(
     user_identifier=Depends(operator_auth_handler.auth_wrapper),
-    report_service: ReportService = Depends(),
 ):
+    report_service = ReportService()
     report_list = report_service.get_report_list()
     return report_list
 
@@ -35,8 +35,8 @@ def view_reports(
 def send_report(
     twitter_user_id: str,
     session_id: Optional[str] = Cookie(None),
-    report_service: ReportService = Depends(),
 ):
+    report_service = ReportService()
     init_session = False
     if session_id is None:
         session_id = secrets.token_hex()
@@ -58,8 +58,8 @@ def send_report(
 def approve_report(
     twitter_user_id: str,
     user_identifier=Depends(operator_auth_handler.auth_wrapper),
-    report_service: ReportService = Depends(),
 ):
+    report_service = ReportService()
     report_service.approve_report(twitter_user_id)
     return "success"
 
@@ -68,8 +68,8 @@ def approve_report(
 def reject_report(
     twitter_user_id: str,
     user_identifier=Depends(operator_auth_handler.auth_wrapper),
-    report_service: ReportService = Depends(),
 ):
+    report_service = ReportService()
     report_service.reject_report(twitter_user_id)
     return "success"
 
@@ -81,6 +81,6 @@ def reject_report(
 )
 def export_profile(
     user_identifier=Depends(operator_auth_handler.auth_wrapper),
-    report_service: ReportService = Depends(),
 ):
+    report_service = ReportService()
     return report_service.export()

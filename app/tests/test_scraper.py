@@ -67,7 +67,7 @@ class TestScrapper:
 
         def assert_check_success(self, client, username, response):
             assert response.status_code == 200
-            assert response.json()["user_info"]["username"] == username
+            assert response.json()["user_info"]["username"] == username.lower()
             assert BotPrediction.objects().count() == 1
 
         def test_input_https_url(self, client, path):

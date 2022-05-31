@@ -5,7 +5,9 @@ import tweepy
 from mongoengine import (
     BooleanField,
     DateTimeField,
+    Document,
     EmbeddedDocument,
+    EmbeddedDocumentField,
     IntField,
     ListField,
     StringField,
@@ -15,7 +17,7 @@ from app.schemas import TweetResponse
 
 
 class User(EmbeddedDocument):
-    twitter_id = StringField(primary_key=True)
+    twitter_id = StringField(required=True)
     name: str = StringField(required=True)
     screen_name: str = StringField(required=True)
     created_at: datetime = DateTimeField(required=True)
@@ -45,3 +47,12 @@ class Tweet(EmbeddedDocument):
             id=self.tweet_id, text=self.text, created_at=self.created_at
         )
         return response
+
+
+class TwitterInfo(Document):
+    user_id = StringField(primary_key=True)
+    user: User = EmbeddedDocumentField(User, required=True)
+    tweets = ListField()
+    tweet_relation = ListField()
+
+    meta = {"collection": "twitter_info"}

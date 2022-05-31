@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 
 from app.models import BotPrediction, ProcessedReport
 from app.models.report import Report, ReportKey
@@ -10,18 +10,17 @@ from app.schemas.report import (
     ReportResponse,
     WaitingReport,
 )
+from app.utils import Singleton
 
-from .ml import ML
 from .scrape import TwitterScraper
 
 
-class ReportService:
-    def __init__(self, twitter_scraper: TwitterScraper = Depends(), ml: ML = Depends()):
-        self._scraper = twitter_scraper
-        self._ml = ml
+class ReportService(metaclass=Singleton):
+    def __init__(self):
+        self._scraper = TwitterScraper()
 
     def _make_waiting_report(self, report: Report) -> WaitingReport:
-        user = report.user
+        user = report.twitter_info.user
         return WaitingReport(
             id=report.report_key.twitter_id,
             avatar=user.avatar,
@@ -33,14 +32,14 @@ class ReportService:
         )
 
     def _make_approved_report(self, report) -> ApprovedReport:
-        user = report.user
+        user = report.twitter_info.user
         return ApprovedReport(
             id=report.user_id,
             avatar=user.avatar,
             username=user.screen_name,
             created_at=user.created_at,
             label=report.label,
-            scrape_date=report.user["updated"],
+            scrape_date=user["updated"],
         )
 
     def get_report_list(self) -> ReportResponse:
@@ -82,8 +81,7 @@ class ReportService:
                 reporters=[reporter_id],
                 score=prediction_db.score,
                 expired=False,
-                user=prediction_db.user,
-                tweets=prediction_db.tweets,
+                twitter_info=prediction_db.twitter_info,
             )
         else:
             if reporter_id in report_db.reporters:
@@ -105,8 +103,7 @@ class ReportService:
 
             label = 0 if report_db.score >= 0.5 else 1
             ProcessedReport.objects(user_id=twitter_id).update_one(
-                user=report_db.user,
-                tweet_graph=report_db.tweets,
+                twitter_info=report_db.twitter_info,
                 label=label,
                 upsert=True,
             )
@@ -119,12 +116,13 @@ class ReportService:
     def export(self) -> List[ProcessedReportResponse]:
         processed_report_list = []
         for report in ProcessedReport.objects:
-            report_dict = report.to_mongo()
+            twitter_info = report.twitter_info
             resp = ProcessedReportResponse(
-                user_id=report_dict["_id"],
-                user=report_dict["user"],
-                tweet_graph=report_dict["tweet_graph"],
-                label=report_dict["label"],
+                user_id=report.user_id,
+                user=twitter_info.user,
+                tweets=twitter_info.tweets,
+                tweet_relation=twitter_info.tweet_relation,
+                label=report.label,
             )
             processed_report_list.append(resp)
         return processed_report_list

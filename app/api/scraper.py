@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 
 from app import schemas
 from app.core.config import settings
@@ -10,23 +10,24 @@ router = APIRouter()
 
 
 @router.get("/check", response_model=schemas.CheckResponse, name="user:get-data")
-def user_info_check(
-    url: str, bot_checker: BotChecker = Depends(), scraper: TwitterScraper = Depends()
-):
+def user_info_check(url: str):
     if url == "":
         raise HTTPException(400, "'url' argument is invalid!")
 
+    bot_checker = BotChecker()
     username = get_twitter_username(url)
     prediction = bot_checker.check_account(username)
 
-    response = schemas.CheckResponse(user_info=prediction.user, score=prediction.score)
+    response = schemas.CheckResponse(
+        user_info=prediction.twitter_info.user, score=prediction.score
+    )
     return response
 
 
 @router.get("/detail", response_model=schemas.DetailResponse, name="user:get-detail")
-def user_detail_check(
-    url: str, bot_checker: BotChecker = Depends(), scraper: TwitterScraper = Depends()
-):
+def user_detail_check(url: str):
+    bot_checker = BotChecker()
+    scraper = TwitterScraper()
     if url == "":
         raise HTTPException(400, "'url' argument is invalid!")
 
@@ -43,7 +44,7 @@ def user_detail_check(
     )
 
     response = schemas.DetailResponse(
-        user_info=prediction.user,
+        user_info=prediction.twitter_info.user,
         tweet_info=tweet_info,
         score=prediction.score,
     )
