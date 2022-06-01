@@ -7,7 +7,7 @@ pytest==6.2.5
 pydantic[dotenv]
 cachetools==5.0.0
 types-cachetools==4.2.9
-pyjwt==2.3.0
+pyjwt==2.4.0
 passlib==1.7.4
 bcrypt==3.2.0
 mongoengine==0.23.1
